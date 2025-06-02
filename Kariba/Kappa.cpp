@@ -1,6 +1,9 @@
 #include "Kappa.hpp"
 #include "Particles.hpp"
 
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_integration.h>
+
 #include <iostream>
 
 // Class constructor to initialize object

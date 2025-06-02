@@ -1,7 +1,11 @@
+#include <iostream>
+
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_integration.h>
+
 #include "Bknpower.hpp"
 #include "Particles.hpp"
 
-#include <iostream>
 
 Bknpower::Bknpower(int s) {
     size = s;

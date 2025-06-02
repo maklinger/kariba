@@ -1,4 +1,8 @@
+#include <iostream>
+
 #include "BBody.hpp"
+
+
 
 BBody::~BBody() {
     delete[] en_phot_obs;

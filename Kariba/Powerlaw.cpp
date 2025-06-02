@@ -1,7 +1,11 @@
+#include <iostream>
+
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_integration.h>
+
 #include "Powerlaw.hpp"
 #include "Particles.hpp"
 
-#include <iostream>
 
 // Class constructor to initialize object
 Powerlaw::Powerlaw(int s) {

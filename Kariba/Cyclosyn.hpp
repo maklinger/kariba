@@ -1,6 +1,8 @@
 #ifndef CYCLOSYN_HPP
 #define CYCLOSYN_HPP
 
+#include "Radiation.hpp"
+
 // Class synchrotron photons, inherited from Radiation.hpp
 
 class Cyclosyn : public Radiation {

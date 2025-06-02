@@ -1,13 +1,10 @@
 #ifndef PARTICLES_HPP
 #define PARTICLES_HPP
 
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_const_cgsm.h>
 #include <gsl/gsl_const_num.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_sf_bessel.h>
-#include <gsl/gsl_spline.h>
+
 
 #define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
 #define emgm GSL_CONST_CGSM_MASS_ELECTRON

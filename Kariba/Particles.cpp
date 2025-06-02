@@ -1,6 +1,11 @@
+#include <iostream>
+
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_spline.h>
+
 #include "Particles.hpp"
 
-#include <iostream>
 
 // Class destructor to de-allocate arrays
 Particles::~Particles() {

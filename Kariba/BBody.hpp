@@ -2,7 +2,6 @@
 #define BBODY_HPP
 
 #include "Radiation.hpp"
-#include <iostream>
 
 // Class black body photons, inherited from Radiation.hh
 

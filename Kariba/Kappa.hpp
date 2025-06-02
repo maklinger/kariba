@@ -1,6 +1,8 @@
 #ifndef KAPPA_HPP
 #define KAPPA_HPP
 
+#include "Particles.hpp"
+
 // Class for kappa distribution of particles, inherited from the generic
 // Particles class in Particles.hh
 

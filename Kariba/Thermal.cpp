@@ -1,4 +1,10 @@
+#include <iostream>
+
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sf_bessel.h>
+
 #include "Thermal.hpp"
+
 
 // Class constructor to initialize object
 Thermal::Thermal(int s) {
