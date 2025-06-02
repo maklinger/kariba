@@ -1,5 +1,5 @@
-#ifndef Powerlaw_HPP
-#define Powerlaw_HPP
+#ifndef POWERLAW_HPP
+#define POWERLAW_HPP
 
 #include "Particles.hpp"
 

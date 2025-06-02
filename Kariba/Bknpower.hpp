@@ -1,5 +1,5 @@
-#ifndef Bknpower_HPP
-#define Bknpower_HPP
+#ifndef BKNPOWER_HPP
+#define BKNPOWER_HPP
 
 #include "Particles.hpp"
 
