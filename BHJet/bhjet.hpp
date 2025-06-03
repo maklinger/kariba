@@ -21,26 +21,6 @@
 #include <string>
 
 
-/*
-#define kpc             (1e3*GSL_CONST_CGSM_PARSEC)
-#define cee             GSL_CONST_CGSM_SPEED_OF_LIGHT
-#define emgm            GSL_CONST_CGSM_MASS_ELECTRON
-#define pmgm            GSL_CONST_CGSM_MASS_PROTON
-#define kboltz          GSL_CONST_CGSM_BOLTZMANN
-#define kboltz_kev2erg  1.6022e-9 		//Boltzman constant in keV/erg
-#define emerg
-(GSL_CONST_CGSM_MASS_ELECTRON*pow(GSL_CONST_CGSM_SPEED_OF_LIGHT,2.)) #define pi
-M_PI #define charg           4.8e-10 #define sigtom
-GSL_CONST_CGSM_THOMSON_CROSS_SECTION #define herg
-GSL_CONST_CGSM_PLANCKS_CONSTANT_H #define hkev
-(GSL_CONST_CGSM_PLANCKS_CONSTANT_H*6.2415e8) #define mjy             1.e-26
-#define re0             2.81794e-13
-#define gconst          GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT
-#define sbconst         GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT
-#define aconst          7.56e-15
-#define msun            GSL_CONST_CGSM_SOLAR_MASS
-*/
-
 // Most functions in the code use input parameters arranged in a structure
 // rather than passed as a long list of multiple int/double variables. The
 // reason for this is imply to make the code easier to read and understand.
