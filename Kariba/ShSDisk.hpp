@@ -20,10 +20,10 @@ class ShSDisk : public Radiation {
     ~ShSDisk();
     ShSDisk();
 
-    const double hdisk() { return Hratio; };
-    const double tin() { return Tin; };
-    const double rin() { return r; };
-    const double lum() { return Ldisk; };
+    double hdisk() const { return Hratio; };
+    double tin() const { return Tin; };
+    double rin() const { return r; };
+    double lum() const { return Ldisk; };
 
     void disk_spectrum();
     void cover_disk(double f);

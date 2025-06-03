@@ -61,8 +61,8 @@ class Compton : public Radiation {
     void set_niter(int n);
     void seed_freq_array(const double *seed_energ);
 
-    const double get_tau() { return tau; };
-    const double get_ypar() { return ypar; };
+    double get_tau() const { return tau; };
+    double get_ypar() const { return ypar; };
 
     void reset();
     void urad_test();

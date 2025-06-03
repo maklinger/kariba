@@ -12,14 +12,14 @@
 #include <gsl/gsl_spline2d.h>
 #include <string>
 
+
 #define kpc (1e3 * GSL_CONST_CGSM_PARSEC)
 #define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
 #define emgm GSL_CONST_CGSM_MASS_ELECTRON
 #define pmgm GSL_CONST_CGSM_MASS_PROTON
 #define kboltz GSL_CONST_CGSM_BOLTZMANN
 #define kboltz_kev2erg 1.6022e-9 // Boltzman constant in keV/erg
-#define emerg                                                                  \
-    (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
+#define emerg (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
 #define pi M_PI
 #define charg 4.8e-10
 #define sigtom GSL_CONST_CGSM_THOMSON_CROSS_SECTION
@@ -105,11 +105,11 @@ class Radiation {
     std::string geometry; // string to track geometry of emitting region
 
   public:
-    const double *get_energy() const { return en_phot; }
-    const double *get_nphot() const { return num_phot; }
-    const double *get_energy_obs() const { return en_phot_obs; }
-    const double *get_nphot_obs() const { return num_phot_obs; }
-    const int get_size() const { return size; }
+    double *get_energy() const { return en_phot; }
+    double *get_nphot() const { return num_phot; }
+    double *get_energy_obs() const { return en_phot_obs; }
+    double *get_nphot_obs() const { return num_phot_obs; }
+    int get_size() const { return size; }
 
     double integrated_luminosity(double numin, double numax);
 
