@@ -1,7 +1,8 @@
-#include "Cyclosyn.hpp"
-#include "Radiation.hpp"
-
 #include <iostream>
+
+#include "kariba/Cyclosyn.hpp"
+#include "kariba/Radiation.hpp"
+
 
 // Synchrotron tables for F(nu/nuc) for calculation of single particle spectrum
 static double arg[47] = {

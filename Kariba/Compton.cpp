@@ -1,7 +1,8 @@
-#include "Compton.hpp"
-#include "Radiation.hpp"
-
 #include <iostream>
+
+#include "kariba/Compton.hpp"
+#include "kariba/Radiation.hpp"
+
 
 // radiative transfer tables vs tau and temperature. The limits are set an
 // epsilon off the physical limits tested (20-2500 kev, tau 0.05 to 3) to avoid

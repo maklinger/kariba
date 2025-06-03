@@ -1,4 +1,4 @@
-#include "ShSDisk.hpp"
+#include "kariba/ShSDisk.hpp"
 
 ShSDisk::~ShSDisk() {
     delete[] en_phot;

@@ -1,4 +1,9 @@
-#include "kariba_examples.hh"
+#include <kariba/Bknpower.hpp>
+#include <kariba/Kappa.hpp>
+#include <kariba/Mixed.hpp>
+#include <kariba/Thermal.hpp>
+
+#include "kariba_examples.hpp"
 
 // This example compares all the non-thermal particle distrubtions in Kariba,
 // for a common set of input parameters.

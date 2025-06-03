@@ -3,8 +3,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
 
-#include "Powerlaw.hpp"
-#include "Particles.hpp"
+#include "kariba/Powerlaw.hpp"
+#include "kariba/Particles.hpp"
 
 
 // Class constructor to initialize object

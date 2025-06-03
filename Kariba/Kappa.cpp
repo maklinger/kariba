@@ -1,10 +1,11 @@
-#include "Kappa.hpp"
-#include "Particles.hpp"
-
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
 
 #include <iostream>
+
+#include "kariba/Kappa.hpp"
+#include "kariba/Particles.hpp"
+
 
 // Class constructor to initialize object
 Kappa::Kappa(int s) {

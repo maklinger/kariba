@@ -3,8 +3,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
 
-#include "Bknpower.hpp"
-#include "Particles.hpp"
+#include "kariba/Bknpower.hpp"
+#include "kariba/Particles.hpp"
 
 
 Bknpower::Bknpower(int s) {

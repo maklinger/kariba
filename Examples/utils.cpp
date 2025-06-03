@@ -1,4 +1,6 @@
-#include "kariba_examples.hh"
+#include <kariba/Radiation.hpp>
+
+#include "kariba_examples.hpp"
 
 // Read input parameters from file, store them in an array
 void read_params(string file, double *pars) {

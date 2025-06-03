@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "BBody.hpp"
+#include "kariba/BBody.hpp"
 
 
 

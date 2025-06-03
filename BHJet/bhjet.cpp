@@ -1,16 +1,15 @@
 #include <fstream>
 #include <stdarg.h>
 
-#include "Kariba/Bknpower.hpp"
-#include "Kariba/Mixed.hpp"
-#include "Kariba/Powerlaw.hpp"
-#include "Kariba/Radiation.hpp"
-#include "Kariba/Thermal.hpp"
-
-#include "Kariba/BBody.hpp"
-#include "Kariba/Compton.hpp"
-#include "Kariba/Cyclosyn.hpp"
-#include "Kariba/ShSDisk.hpp"
+#include <kariba/Bknpower.hpp>
+#include <kariba/Mixed.hpp>
+#include <kariba/Powerlaw.hpp>
+#include <kariba/Radiation.hpp>
+#include <kariba/Thermal.hpp>
+#include <kariba/BBody.hpp>
+#include <kariba/Compton.hpp>
+#include <kariba/Cyclosyn.hpp>
+#include <kariba/ShSDisk.hpp>
 
 #include "bhjet.hpp"
 

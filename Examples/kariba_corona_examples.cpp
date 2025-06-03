@@ -1,4 +1,8 @@
-#include "kariba_examples.hh"
+#include <kariba/Compton.hpp>
+#include <kariba/ShSDisk.hpp>
+#include <kariba/Thermal.hpp>
+
+#include "kariba_examples.hpp"
 
 // This example shows how to set up thermal Comptonisation of accretion disk
 // photons in Kariba by a spherical coronae, using the ShSDisk, Thermal and
