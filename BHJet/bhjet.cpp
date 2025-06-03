@@ -328,7 +328,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
             isojetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed,
                        acc_speed);
         } else {
-            bljetpars(z, f_beta, jet_dyn, nozzle_ener, tshift, zone,
+            bljetpars(z, jet_dyn, nozzle_ener, tshift, zone,
                       spline_speed, acc_speed);
         }
         zone.delta =

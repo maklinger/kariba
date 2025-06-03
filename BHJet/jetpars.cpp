@@ -247,7 +247,7 @@ void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
     }
 }
 
-void bljetpars(double z, double brk, jet_dynpars &dyn, jet_enpars &en,
+void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en,
                double &t, zone_pars &zone, gsl_spline *spline,
                gsl_interp_accel *acc) {
 

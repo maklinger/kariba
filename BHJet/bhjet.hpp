@@ -145,8 +145,6 @@ void isojetpars(double z,jet_dynpars &dyn,jet_enpars &en,double &t,zone_pars &zo
                 gsl_interp_accel *acc);
 void adjetpars(double z,jet_dynpars &dyn,jet_enpars &en,double &t,zone_pars &zone,gsl_spline *spline,
                gsl_interp_accel *acc);
-void bljetpars(double z,double brk,jet_dynpars &dyn,jet_enpars &en,double &t,zone_pars &zone,gsl_spline 
-               *spline,gsl_interp_accel *acc);
 void b_profile(double g,double n,jet_dynpars &dyn,jet_enpars &en,double &field);
 
 void agn_photons_init(double lum,double f1,double f2,com_pars &agn_com);
@@ -156,3 +154,5 @@ void clean_file(std::string path,int check);
 void jetinterp(double *ear,double *energ,double *phot,double *photar,int ne,int newne);
 
 void ebl_atten_gil(int size,double* en,double* lum,double redsh);
+void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
+               zone_pars &zone, gsl_spline *spline, gsl_interp_accel *acc);
