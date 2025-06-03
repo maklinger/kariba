@@ -1,7 +1,7 @@
 import ctypes
 import pathlib
 
-libname = "/home/sheridan/GIT_PROJECTS/BHJet/BHJet/BHJet/pyjetmain"
+libname = "pyjetmain.so"
 c_lib = ctypes.CDLL(libname)
 
  

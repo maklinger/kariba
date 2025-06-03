@@ -1,3 +1,4 @@
-*.o
-*.x
-*.pdf
+# Executables
+kariba_corona_examples
+kariba_particles_examples
+kariba_singlezone_examples
