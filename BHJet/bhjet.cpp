@@ -33,7 +33,6 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     double jetrat; // injected power in Eddington units
     double zmin;   // jet launching point
     double r_0;    // initial jet radius in rg
-    double h;      // jet nozzle aspect ratio
     double z_acc;  // end of bulk magnetic acceleration region in rg
     double z_diss; // dissipation/nonthermal particle injection region in rg
     double z_max;  // distance from bh up to which calculation continues
