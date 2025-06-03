@@ -69,8 +69,10 @@ void read_params(string file, double *pars) {
         exit(1);
     }
     while (getline(inFile, line)) {
-        line.erase(line.begin(), find_if(line.begin(), line.end(),
-                                         not1(ptr_fun<int, int>(isspace))));
+        line.erase(line.begin(),
+                   std::find_if(line.begin(), line.end(), [](unsigned char c) {
+                       return !std::isspace(c);
+                   }));
         if (line[0] == '#') {
             continue;
         } else {
