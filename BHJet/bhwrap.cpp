@@ -69,7 +69,8 @@ void read_params(string file, double *pars) {
         exit(1);
     }
     while (getline(inFile, line)) {
-        line.erase(line.begin(),
+        // Remove whitespace from the beginning of the line
+	line.erase(line.begin(),
                    std::find_if(line.begin(), line.end(), [](unsigned char c) {
                        return !std::isspace(c);
                    }));
