@@ -1,4 +1,4 @@
-#include "bhjet.hh"
+#include "bhjet.hpp"
 
 // Velocity profile function: depending on mode either interpolate 1-d hydro jet
 // velocity tables or calculate 1-d magnetically accelerated jet velocity

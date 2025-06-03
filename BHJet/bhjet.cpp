@@ -1,7 +1,7 @@
 #include <fstream>
 #include <stdarg.h>
 
-#include "bhjet.hh"
+#include "bhjet.hpp"
 
 using namespace std;
 

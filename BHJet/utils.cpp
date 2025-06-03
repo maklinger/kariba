@@ -1,4 +1,4 @@
-#include "bhjet.hh"
+#include "bhjet.hpp"
 
 // This function determines very, very roughly whether the Compton emission from
 // a zone is worth computing or not. The criteria are a) are we in the first
