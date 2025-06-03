@@ -94,8 +94,8 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
 // initial plasma beta, accounting for 1 or 2 jets. One of two functions is
 // called depending on the base assumptions (magnetic/thermal driven jet)
 void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en) {
-    double eq_fac, dyn_fac; // the two numbers that change equipartition are the
-                            // jet dynamics and equipartition assumptions
+    double eq_fac, dyn_fac;    // the two numbers that change equipartition are
+                               // the jet dynamics and equipartition assumptions
     if (npsw == 0) {
         eq_fac = en.av_gamma * emerg * (1. + 1. / en.pbeta);
         dyn_fac = 2. * pi * pow(dyn.r0, 2.) * dyn.beta0 * dyn.gam0 * cee;
@@ -135,10 +135,10 @@ void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
     en.sig0 = (1. + en.sig_acc) * dyn.gamf / dyn.gam0 - 1.;
     if (en.pbeta == 0) {
         en.eta = 1.;
-        equip =
-            (en.sig0 / 2.) *
-            (4. / 3. + (pmgm) / (en.av_gamma *
-                                 emgm)); // NOTE: check energy vs lorentz factor
+        equip = (en.sig0 / 2.) *
+                (4. / 3. +
+                 (pmgm) / (en.av_gamma *
+                           emgm));    // NOTE: check energy vs lorentz factor
     } else {
         equip = 1. / en.pbeta;
         en.eta = (en.sig0 * pmgm) /
@@ -247,9 +247,8 @@ void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
     }
 }
 
-void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en,
-               double &t, zone_pars &zone, gsl_spline *spline,
-               gsl_interp_accel *acc) {
+void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
+               zone_pars &zone, gsl_spline *spline, gsl_interp_accel *acc) {
 
     double mj, theta, theta_acc, n_acc, b_acc, gb, r_acc;
     double gb0 = dyn.gam0 * dyn.beta0;
@@ -307,13 +306,13 @@ void agn_photons_init(double lum, double f1, double f2, com_pars &agn_com) {
     agn_com.rblr = 1.e17 * pow(lum / 1.e45, 1. / 2.);
     agn_com.ublr =
         (17. / 12.) * f1 * lum / (4. * pi * pow(agn_com.rblr, 2.) * cee);
-    agn_com.tblr = 10.2e-3; // temperature of the BLR photons in kev
+    agn_com.tblr = 10.2e-3;    // temperature of the BLR photons in kev
     agn_com.lblr =
         (12. / 17.) * 4. * pi * pow(agn_com.rblr, 2.) * cee * agn_com.ublr;
 
     agn_com.rdt = 2.5e18 * pow(lum / 1.e45, 1. / 2.);
     agn_com.udt = f2 * lum / (4. * pi * pow(agn_com.rdt, 2.) * cee);
-    agn_com.tdt = 370.; // temperature of the torus photons in Kelvin
+    agn_com.tdt = 370.;    // temperature of the torus photons in Kelvin
     agn_com.ldt = 4. * pi * pow(agn_com.rdt, 2.) * cee * agn_com.udt;
 }
 
@@ -332,14 +331,15 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
     // these are to calculate the conversion factor to account for z>zblr/zdt,
     // when photons are deboosted. See Ghisellini&Tavecchio 2009
     double blr_conv, dt_conv, mu_blr1, mu_blr2, mu_dt1, mu_dt2, fr;
-    fr = 12. / 17.; // the only reason this variable is here is to save space in
-                    // the code
+    fr = 12. / 17.;    // the only reason this variable is here is to save space
+                       // in the code
 
-    if (z < agn_com.rblr) { // for low z both photon fields are boosted
+    if (z < agn_com.rblr) {    // for low z both photon fields are boosted
         ublr_zone = pow(zone.delta, 2.) * agn_com.ublr;
         udt_zone = pow(zone.delta, 2.) * agn_com.udt;
         agn_com.urad_total = pow(zone.gamma, 2.) * (agn_com.udt + agn_com.ublr);
-    } else if (z < 3. * agn_com.rblr) { // BLR starts being slightly deboosted
+    } else if (z <
+               3. * agn_com.rblr) {    // BLR starts being slightly deboosted
         double blr_boost, blr_interp;
         mu_blr1 = pow(10. / 9., -1. / 2.);
         mu_blr2 = pow(8. / 9., 1. / 2.);
@@ -355,9 +355,9 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
         agn_com.urad_total =
             pow(zone.gamma, 2.) *
             (agn_com.udt + ublr_zone * pow(zone.gamma / zone.delta, 2.));
-    } else if (z < agn_com.rdt) { // for intermediate z BLR is deboosted, torus
-                                  // is boosted
-        mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.); //
+    } else if (z < agn_com.rdt) {    // for intermediate z BLR is deboosted,
+                                     // torus is boosted
+        mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);    //
         mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
         blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
                    pow(1. - zone.beta * mu_blr2, 3.) - pow(1. - zone.beta, 3.);
@@ -369,7 +369,8 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
             pow(zone.gamma, 2.) *
             (agn_com.udt + fr * agn_com.ublr * blr_conv / (3. * zone.beta));
     } else if (z <
-               3. * agn_com.rdt) { // BLR fully deboosted, DT slightly deboosted
+               3. * agn_com
+                        .rdt) {    // BLR fully deboosted, DT slightly deboosted
         mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);
         mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
         blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
@@ -393,7 +394,7 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
                              (udt_zone * pow(zone.gamma / zone.delta, 2.) +
                               fr * agn_com.ublr * blr_conv / (3. * zone.beta));
 
-    } else { // for high z both photon fields are deboosted
+    } else {    // for high z both photon fields are deboosted
         mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);
         mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
         blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -

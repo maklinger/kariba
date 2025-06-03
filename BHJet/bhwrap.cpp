@@ -23,7 +23,6 @@ extern void jetmain(double *ear, int ne, double *param, double *photeng,
 int main() {
 
     double start = omp_get_wtime();
-    double end;
 
     int npar = 28;
     int ne = 201;
@@ -46,13 +45,13 @@ int main() {
 
     delete[] ebins, delete[] param, delete[] spec, delete[] dumarr;
 
-    end = omp_get_wtime();
+    double end = omp_get_wtime();
     cout << "Total running time: " << end - start << " seconds" << endl;
 
     // system("python3 Plot_separate.py");
 
     return EXIT_SUCCESS;
-} // ----------  end of function main  ----------
+}    // ----------  end of function main  ----------
 
 // Read input file
 //

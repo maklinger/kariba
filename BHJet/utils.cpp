@@ -147,11 +147,11 @@ void sum_counterjet(int size, const double *input_en, const double *input_lum,
             lum[i] = gsl_spline_eval(spline_j, en[i], acc_j) +
                      gsl_spline_eval(spline_cj, en[i], acc_cj);
         } else {
-            lum[i] =
-                gsl_spline_eval(spline_j, en[i] * 0.999999,
-                                acc_j); // note: the factor 0.999 is to avoid
-                                        // occasional gsl interpolation errors
-                                        // due to numerical inaccuracies
+            lum[i] = gsl_spline_eval(
+                spline_j, en[i] * 0.999999,
+                acc_j);    // note: the factor 0.999 is to avoid
+                           // occasional gsl interpolation errors
+                           // due to numerical inaccuracies
         }
     }
 

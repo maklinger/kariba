@@ -19,4 +19,4 @@ extern void jetmain(double *ear, int ne, double *param, double *photeng,
 extern "C" void pyjetmain(double *ear, int ne, double *param, double *photeng,
                           double *photspec) {
     jetmain(ear, ne, param, photeng, photspec);
-} // ----------  end of function main  ----------
+}    // ----------  end of function main  ----------
