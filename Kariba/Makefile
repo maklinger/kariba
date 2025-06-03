@@ -17,7 +17,7 @@ RM = rm -f
 
 SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp Kappa.cpp Mixed.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
-LIBSHARED = kariba.so
+LIBSHARED = libkariba.so
 LIBSTATIC = libkariba.a
 
 
