@@ -226,7 +226,7 @@ void sum_ext(int size_in, int size_out, const double *input_en,
 // rough method and wide bins, so thread carefully
 double integrate_lum(int size, double numin, double numax,
                      const double *input_en, const double *input_lum) {
-    double temp = 0.;
+    double temp = 0.0;
     for (int i = 0; i < size - 1; i++) {
         if (input_en[i] / herg > numin && input_en[i + 1] / herg < numax) {
             temp = temp + (1. / 2.) *
@@ -242,8 +242,8 @@ double integrate_lum(int size, double numin, double numax,
 // input_lum is a power-law in shape
 double photon_index(int size, double numin, double numax,
                     const double *input_en, const double *input_lum) {
-    int counter_1, counter_2 = 0;
-    double delta_y, delta_x, gamma;
+    int counter_1 = 0, counter_2 = 0;
+    double delta_y = 0.0, delta_x = 0.0, gamma = 0.0;
     for (int i = 0; i < size; i++) {
         if (input_en[i] / herg < numin) {
             counter_1 = i;

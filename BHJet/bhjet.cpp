@@ -17,62 +17,62 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     int nel = 70;
     int syn_res = 10; // number of bins per decade in synch frequency;
     int com_res = 6;  // number of bins per decade in compton frequency;
-    int nsyn, ncom;   // number of bins in synch/compton frequency;
+    int nsyn = 0, ncom = 0;   // number of bins in synch/compton frequency;
     int npsw = 1; // switch to define number of protons calculations in agnjet
                   // 0: no protons
                   // 1: Up = Ue+Ub
                   // 2: ne = np
                   // NOTE pair only jet not implemented self-consistently yet!
 
-    double Mbh;    // black hole mass in solar masses
-    double Eddlum; // black hole Eddington luminosity
-    double Rg;     // black hole  gravitational radius in cm
-    double theta;  // viewing angle
-    double dist;   // distance in kpc
-    double redsh;  // source redshift
-    double jetrat; // injected power in Eddington units
-    double zmin;   // jet launching point
-    double r_0;    // initial jet radius in rg
-    double z_acc;  // end of bulk magnetic acceleration region in rg
-    double z_diss; // dissipation/nonthermal particle injection region in rg
-    double z_max;  // distance from bh up to which calculation continues
-    double t_e;    // temperature in kev, converted to erg
+    double Mbh = 0.0;    // black hole mass in solar masses
+    double Eddlum = 0.0; // black hole Eddington luminosity
+    double Rg = 0.0;     // black hole  gravitational radius in cm
+    double theta = 0.0;  // viewing angle
+    double dist = 0.0;   // distance in kpc
+    double redsh = 0.0;  // source redshift
+    double jetrat = 0.0; // injected power in Eddington units
+    double zmin = 0.0;   // jet launching point
+    double r_0 = 0.0;    // initial jet radius in rg
+    double z_acc = 0.0;  // end of bulk magnetic acceleration region in rg
+    double z_diss = 0.0; // dissipation/nonthermal particle injection region in rg
+    double z_max = 0.0;  // distance from bh up to which calculation continues
+    double t_e = 0.0;    // temperature in kev, converted to erg
     double
-        f_nth;   // percentage of nonthermal particles at the dissipation region
-    double f_pl; // parameter to change plfrac over distance
-    double pspec;  // slope of nonthermal distribution
-    double f_heat; // shock heating paramter
-    double f_beta; // effective expansion velocity used to set adiabatic cooling
-    double f_sc;   // particle acceleration timescale parameter
-    double p_beta; // plasma beta in the jet base
-    double sig_acc; // final sigma when using magnetic acceleration
-    double l_disk;  // disk luminosity in Eddington units
-    double r_in;    // disk inner radius in rg
-    double r_out;   // disk outer radius in rg
-    double compar1; // external inverse Compton parameters; different meanings
-    double compar2; // depending on the value of compsw
-    double compar3;
-    double compsw; // switch to activate different external Compton fields
-    double velsw;  // velocity profile parameter
-    int infosw;    // switch to print info
-    int EBLsw;     // switch to activate EBL attenuation
+        f_nth = 0.0;   // percentage of nonthermal particles at the dissipation region
+    double f_pl = 0.0; // parameter to change plfrac over distance
+    double pspec = 0.0;  // slope of nonthermal distribution
+    double f_heat = 0.0; // shock heating paramter
+    double f_beta = 0.0; // effective expansion velocity used to set adiabatic cooling
+    double f_sc = 0.0;   // particle acceleration timescale parameter
+    double p_beta = 0.0; // plasma beta in the jet base
+    double sig_acc = 0.0; // final sigma when using magnetic acceleration
+    double l_disk = 0.0;  // disk luminosity in Eddington units
+    double r_in = 0.0;    // disk inner radius in rg
+    double r_out = 0.0;   // disk outer radius in rg
+    double compar1 = 0.0; // external inverse Compton parameters; different meanings
+    double compar2 = 0.0; // depending on the value of compsw
+    double compar3 = 0.0;
+    double compsw = 0.0; // switch to activate different external Compton fields
+    double velsw = 0.0;  // velocity profile parameter
+    int infosw = 0.0;    // switch to print info
+    int EBLsw = 0.0;     // switch to activate EBL attenuation
 
-    double z;      // distance along the jet axis
-    double tshift; // temperature shift from initial value due to ad. cooling
-    double Urad;   // estimate of total radiation energy density in each zone
-    double Ubb1,
-        Ubb2; // estimate of comoving energy density of external photons
-    double gmin,
-        gmax; // minimum/maximum Lorentz factors over which to integrate
-    double syn_min,
-        syn_max; // interval for synchrotron calculation in each zone
-    double com_min,
-        com_max; // interval for inverse Compton calculation in each zone
+    double z = 0.0;      // distance along the jet axis
+    double tshift = 0.0; // temperature shift from initial value due to ad. cooling
+    double Urad = 0.0;   // estimate of total radiation energy density in each zone
+    double Ubb1 = 0.0,
+        Ubb2 = 0.0; // estimate of comoving energy density of external photons
+    double gmin = 0.0,
+        gmax = 0.0; // minimum/maximum Lorentz factors over which to integrate
+    double syn_min = 0.0,
+        syn_max = 0.0; // interval for synchrotron calculation in each zone
+    double com_min = 0.0,
+        com_max = 0.0; // interval for inverse Compton calculation in each zone
 
-    double *syn_en;  // sychrotron energy array for jet+counterjet summed
-    double *syn_lum; // synchrotron luminosity array for jet+counterjet summed
-    double *com_en;  // compton energy array for jet+counterjet summed
-    double *com_lum; // compton luminosity array for jet+counterjet summed
+    double *syn_en = nullptr;  // sychrotron energy array for jet+counterjet summed
+    double *syn_lum = nullptr; // synchrotron luminosity array for jet+counterjet summed
+    double *com_en = nullptr;  // compton energy array for jet+counterjet summed
+    double *com_lum = nullptr; // compton luminosity array for jet+counterjet summed
     double *tot_en =
         new double[ne]; // energy arrray for sum of all zones and/or components
     double *tot_syn_pre =
