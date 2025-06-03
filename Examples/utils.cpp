@@ -127,7 +127,7 @@ double integrate_lum(int size, double numin, double numax,
 // input_lum is a power-law in shape
 double photon_index(int size, double numin, double numax,
                     const double *input_en, const double *input_lum) {
-    int counter_1, counter_2 = 0;
+    int counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
     for (int i = 0; i < size; i++) {
         if (input_en[i] / herg < numin) {
