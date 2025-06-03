@@ -1,3 +1,5 @@
+#include <gsl/gsl_spline2d.h>
+
 #include "bhjet.hpp"
 
 // This files includes the implementation of the EBL attenuation factor for the

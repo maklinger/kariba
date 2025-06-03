@@ -1,3 +1,5 @@
+#include "Kariba/Radiation.hpp"
+
 #include "bhjet.hpp"
 
 // This function determines very, very roughly whether the Compton emission from

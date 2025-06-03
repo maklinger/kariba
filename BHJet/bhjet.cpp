@@ -1,6 +1,17 @@
 #include <fstream>
 #include <stdarg.h>
 
+#include "Kariba/Bknpower.hpp"
+#include "Kariba/Mixed.hpp"
+#include "Kariba/Powerlaw.hpp"
+#include "Kariba/Radiation.hpp"
+#include "Kariba/Thermal.hpp"
+
+#include "Kariba/BBody.hpp"
+#include "Kariba/Compton.hpp"
+#include "Kariba/Cyclosyn.hpp"
+#include "Kariba/ShSDisk.hpp"
+
 #include "bhjet.hpp"
 
 using namespace std;

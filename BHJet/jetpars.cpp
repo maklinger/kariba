@@ -1,3 +1,5 @@
+#include "Kariba/Radiation.hpp"
+
 #include "bhjet.hpp"
 
 // Velocity profile function: depending on mode either interpolate 1-d hydro jet

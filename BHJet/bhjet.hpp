@@ -17,18 +17,6 @@
 #include <sstream>
 #include <string>
 
-#include "Kariba/Bknpower.hpp"
-#include "Kariba/Kappa.hpp"
-#include "Kariba/Mixed.hpp"
-#include "Kariba/Particles.hpp"
-#include "Kariba/Powerlaw.hpp"
-#include "Kariba/Radiation.hpp"
-#include "Kariba/Thermal.hpp"
-
-#include "Kariba/BBody.hpp"
-#include "Kariba/Compton.hpp"
-#include "Kariba/Cyclosyn.hpp"
-#include "Kariba/ShSDisk.hpp"
 
 /*
 #define kpc             (1e3*GSL_CONST_CGSM_PARSEC)
