@@ -5,7 +5,7 @@
 GSL = /opt/homebrew/Cellar/gsl/2.8
 
 CXX = g++-15
-CXXFLAGS = -std=c++17 -fopenmp -fPIC -Ofast
+CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
 CPPFLAGS = -I${GSL}/include
 LD = $(CXX)
 LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
@@ -13,22 +13,28 @@ LDLIBS = -lgsl -lm
 RM = rm -f
 
 
-SOURCES = bhjet.cpp bhwrap.cpp EBL.cpp jetpars.cpp utils.cpp
+SOURCES = bhjet.cpp EBL.cpp jetpars.cpp utils.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
-TARGET = bhjet
+TARGET_OBJ = bhwrap.o
+TARGET = bhwrap
+PYOBJ = pyjetmain.o
+PYLIB = pyjetmain.so
 LIBKARIBA = ../Kariba/libkariba.a
 
 
 .PHONY: all clean distclean
 
 
-all: $(TARGET)
+all: $(TARGET) $(PYLIB)
 
-$(TARGET): $(OBJECTS) $(LIBKARIBA)
-	$(LD) $(LDFLAGS) -o $(TARGET) $(OBJECTS) $(LIBKARIBA) $(LDLIBS)
+$(TARGET): $(OBJECTS) $(LIBKARIBA) $(TARGET_OBJ)
+	$(LD) $(LDFLAGS) -o $(TARGET) $(OBJECTS) $(TARGET_OBJ) $(LIBKARIBA) $(LDLIBS)
+
+$(PYLIB): $(OBJECTS) $(LIKARIBA) $(PYOBJ)
+	$(LD) $(LDFLAGS) -shared -o $(PYLIB) $(OBJECTS) $(PYOBJ) $(LIBKARIBA) $(LDLIBS)
 
 clean:
-	$(RM) $(OBJECTS) $(KARIBA_OBJECTS)
+	$(RM) $(OBJECTS) $(KARIBA_OBJECTS) $(TARGET_OJB) $(PYOBJ)
 
 distclean: clean
-	$(RM) $(TARGET)
+	$(RM) $(TARGET) $(PYLIB)
