@@ -29,7 +29,7 @@ ShSDisk::ShSDisk() {
 // return SD spectrum over a given radius, frequency to be integrated over
 // radius
 double disk_int(double lr, void *p) {
-    struct disk_obs_params *params = (struct disk_obs_params *)p;
+    struct disk_obs_params *params = (struct disk_obs_params *) p;
     double tin = (params->tin);
     double rin = (params->rin);
     double nu = (params->nu);

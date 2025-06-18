@@ -12,14 +12,14 @@
 #include <gsl/gsl_spline2d.h>
 #include <string>
 
-
 #define kpc (1e3 * GSL_CONST_CGSM_PARSEC)
 #define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
 #define emgm GSL_CONST_CGSM_MASS_ELECTRON
 #define pmgm GSL_CONST_CGSM_MASS_PROTON
 #define kboltz GSL_CONST_CGSM_BOLTZMANN
-#define kboltz_kev2erg 1.6022e-9 // Boltzman constant in keV/erg
-#define emerg (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
+#define kboltz_kev2erg 1.6022e-9    // Boltzman constant in keV/erg
+#define emerg                                                                  \
+    (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
 #define pi M_PI
 #define charg 4.8e-10
 #define sigtom GSL_CONST_CGSM_THOMSON_CROSS_SECTION
@@ -89,20 +89,20 @@ typedef struct disk_ic_params {
 
 class Radiation {
   protected:
-    int size;             // size of arrays
-    double *en_phot;      // array of photon energies
-    double *num_phot;     // array of number of photons in units of erg/s/Hz
-    double *en_phot_obs;  // same as above but in observer frame
-    double *num_phot_obs; // same as above but in observer frame
+    int size;                // size of arrays
+    double *en_phot;         // array of photon energies
+    double *num_phot;        // array of number of photons in units of erg/s/Hz
+    double *en_phot_obs;     // same as above but in observer frame
+    double *num_phot_obs;    // same as above but in observer frame
 
-    double r, z;          // Dimensions of emitting region
-    double vol;           // Volume of emitting region
-    double beta;          // speed of the emitting region
-    double dopfac, angle; // Viewing angle/Doppler factor of emitting region
-    double dopnum;        // Doppler boosting exponent, depends on geometry
-    bool counterjet;      // boolean switch if user wants to include counterjet
-                          // emission
-    std::string geometry; // string to track geometry of emitting region
+    double r, z;             // Dimensions of emitting region
+    double vol;              // Volume of emitting region
+    double beta;             // speed of the emitting region
+    double dopfac, angle;    // Viewing angle/Doppler factor of emitting region
+    double dopnum;           // Doppler boosting exponent, depends on geometry
+    bool counterjet;    // boolean switch if user wants to include counterjet
+                        // emission
+    std::string geometry;    // string to track geometry of emitting region
 
   public:
     double *get_energy() const { return en_phot; }

@@ -3,7 +3,6 @@
 #include "kariba/Cyclosyn.hpp"
 #include "kariba/Radiation.hpp"
 
-
 // Synchrotron tables for F(nu/nuc) for calculation of single particle spectrum
 static double arg[47] = {
     0.0001, 0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.03, 0.05, 0.07,
@@ -55,7 +54,7 @@ Cyclosyn::Cyclosyn(int s) {
 
 // Single particle emissivity/absorption coefficient calculations
 double cyclosyn_emis(double gamma, void *p) {
-    struct cyclosyn_emis_params *params = (struct cyclosyn_emis_params *)p;
+    struct cyclosyn_emis_params *params = (struct cyclosyn_emis_params *) p;
     double nu = (params->nu);
     double b = (params->b);
     gsl_spline *syn = (params->syn);
@@ -76,7 +75,7 @@ double cyclosyn_emis(double gamma, void *p) {
         } else {
             emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
-    } else { // cyclotron regime
+    } else {    // cyclotron regime
         nu_larmor = (charg * b) / (2. * pi * emgm * cee);
         x = nu / nu_larmor;
         psquared = pow(gamma, 2.) - 1.;
@@ -90,7 +89,7 @@ double cyclosyn_emis(double gamma, void *p) {
 }
 
 double cyclosyn_abs(double gamma, void *p) {
-    struct cyclosyn_abs_params *params = (struct cyclosyn_abs_params *)p;
+    struct cyclosyn_abs_params *params = (struct cyclosyn_abs_params *) p;
     double nu = (params->nu);
     double b = (params->b);
     gsl_spline *syn = (params->syn);
@@ -111,7 +110,7 @@ double cyclosyn_abs(double gamma, void *p) {
         } else {
             emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
-    } else { // cyclotron regime
+    } else {    // cyclotron regime
         nu_larmor = (charg * b) / (2. * pi * emgm * cee);
         x = nu / nu_larmor;
         psquared = pow(gamma, 2.) - 1.;

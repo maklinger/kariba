@@ -7,32 +7,33 @@
 
 class Compton : public Radiation {
   private:
-    int seed_size;      // size of seed photon field
-    int Niter;          // number of IC iterations
-    double tau, ypar;   // optical depth/comtpon Y of emitting region
-    double rphot;       // photospheric radius when tau > 1, used to renormalize
-                        // volume
-    double escape_corr; // escape term, used to renormalize our spectra to
-                        // CompPS
+    int seed_size;       // size of seed photon field
+    int Niter;           // number of IC iterations
+    double tau, ypar;    // optical depth/comtpon Y of emitting region
+    double rphot;    // photospheric radius when tau > 1, used to renormalize
+                     // volume
+    double escape_corr;    // escape term, used to renormalize our spectra to
+                           // CompPS
 
-    double *seed_energ; // array of seed frequencies in Hz
-    double
-        *seed_urad; // array of seed photon number density in log10(#/erg/cm^3)
-    double *iter_urad; // array of iterated photon number density in
-                       // log10(#/erg/cm^3)
+    double *seed_energ;    // array of seed frequencies in Hz
+    double *seed_urad;     // array of seed photon number density in
+                           // log10(#/erg/cm^3)
+    double *iter_urad;     // array of iterated photon number density in
+                           // log10(#/erg/cm^3)
 
-    gsl_spline *seed_ph;        // interpolation of photon field array seed_urad
-    gsl_interp_accel *acc_seed; // accelerator for above spline
+    gsl_spline *seed_ph;    // interpolation of photon field array seed_urad
+    gsl_interp_accel *acc_seed;    // accelerator for above spline
 
-    gsl_spline *iter_ph; // interpolation of photon field for multiple scatters
-    gsl_interp_accel *acc_iter; // accelerator of above spline
+    gsl_spline
+        *iter_ph;    // interpolation of photon field for multiple scatters
+    gsl_interp_accel *acc_iter;    // accelerator of above spline
 
-    gsl_spline2d *esc_p_sph;   // interpolation for escape calculation to mimic
-                               // radiative transfer
-    gsl_spline2d *esc_p_cyl;   // interpolation for escape calculation to mimic
-                               // radiative transfer
-    gsl_interp_accel *acc_tau; // accelerator of above spline over tau
-    gsl_interp_accel *acc_Te;  // accelerator of above spline over Te
+    gsl_spline2d *esc_p_sph;    // interpolation for escape calculation to mimic
+                                // radiative transfer
+    gsl_spline2d *esc_p_cyl;    // interpolation for escape calculation to mimic
+                                // radiative transfer
+    gsl_interp_accel *acc_tau;    // accelerator of above spline over tau
+    gsl_interp_accel *acc_Te;     // accelerator of above spline over Te
 
   public:
     ~Compton();

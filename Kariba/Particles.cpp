@@ -6,7 +6,6 @@
 
 #include "kariba/Particles.hpp"
 
-
 // Class destructor to de-allocate arrays
 Particles::~Particles() {
     delete[] p;

@@ -2,8 +2,6 @@
 
 #include "kariba/BBody.hpp"
 
-
-
 BBody::~BBody() {
     delete[] en_phot_obs;
     delete[] num_phot_obs;

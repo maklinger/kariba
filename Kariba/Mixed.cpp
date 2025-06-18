@@ -1,12 +1,11 @@
 #include <iostream>
 
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_sf_bessel.h>
 
 #include "kariba/Mixed.hpp"
 #include "kariba/Particles.hpp"
-
 
 // Class constructors to initialize object
 Mixed::Mixed(int s) {
@@ -103,7 +102,7 @@ void Mixed::set_norm(double n) {
 
 // Injection function to be integrated in cooling
 double injection_mixed_int(double x, void *p) {
-    struct injection_mixed_params *params = (struct injection_mixed_params *)p;
+    struct injection_mixed_params *params = (struct injection_mixed_params *) p;
 
     double s = (params->s);
     double t = (params->t);
@@ -214,7 +213,7 @@ double Mixed::K2(double x) {
 
 // Methods to calculate number density and average energy in thermal part
 double th_num_dens_int(double x, void *p) {
-    struct th_params *params = (struct th_params *)p;
+    struct th_params *params = (struct th_params *) p;
     double t = (params->t);
     double n = (params->n);
     double m = (params->m);
@@ -225,7 +224,7 @@ double th_num_dens_int(double x, void *p) {
 }
 
 double av_th_p_int(double x, void *p) {
-    struct th_params *params = (struct th_params *)p;
+    struct th_params *params = (struct th_params *) p;
     double t = (params->t);
     double n = (params->n);
     double m = (params->m);
@@ -275,7 +274,7 @@ double Mixed::av_th_gamma() {
 
 // Methods to calculate number density and average energy in non-thermal part
 double pl_num_dens_int(double x, void *p) {
-    struct pl_params *params = (struct pl_params *)p;
+    struct pl_params *params = (struct pl_params *) p;
     double s = (params->s);
     double n = (params->n);
 
@@ -283,7 +282,7 @@ double pl_num_dens_int(double x, void *p) {
 }
 
 double av_pl_p_int(double x, void *p) {
-    struct pl_params *params = (struct pl_params *)p;
+    struct pl_params *params = (struct pl_params *) p;
     double s = (params->s);
     double n = (params->n);
 

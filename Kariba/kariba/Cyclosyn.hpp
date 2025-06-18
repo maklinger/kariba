@@ -7,7 +7,7 @@
 
 class Cyclosyn : public Radiation {
   private:
-    double bfield; // Magnetic field in emitting region
+    double bfield;    // Magnetic field in emitting region
     gsl_spline *syn_f;
     gsl_interp_accel *syn_acc;
 

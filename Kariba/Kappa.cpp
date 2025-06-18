@@ -1,11 +1,10 @@
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_math.h>
 
 #include <iostream>
 
 #include "kariba/Kappa.hpp"
 #include "kariba/Particles.hpp"
-
 
 // Class constructor to initialize object
 Kappa::Kappa(int s) {
@@ -36,8 +35,8 @@ void Kappa::set_temp_kev(double T) {
     theta = T * kboltz_kev2erg / (mass_gr * cee * cee);
 
     double emin =
-        (1. / 100.) * T;   // minimum energy in kev, 1/100 lower than peak
-    double emax = 20. * T; // maximum energy in kev, 20 higher than peak
+        (1. / 100.) * T;      // minimum energy in kev, 1/100 lower than peak
+    double emax = 20. * T;    // maximum energy in kev, 20 higher than peak
     double gmin, gmax;
 
     gmin = emin / mass_kev + 1.;
@@ -84,7 +83,7 @@ void Kappa::set_ndens() {
 
 // Methods to calculate the normalization of the function
 double norm_kappa_int(double x, void *p) {
-    struct k_params *params = (struct k_params *)p;
+    struct k_params *params = (struct k_params *) p;
 
     double t = (params->t);
     double k = (params->k);
@@ -115,7 +114,7 @@ void Kappa::set_norm(double n) {
 // Method to solve steady state continuity equation. NOTE: KN cross section not
 // included in IC cooling
 double injection_kappa_int(double x, void *p) {
-    struct injection_kappa_params *params = (struct injection_kappa_params *)p;
+    struct injection_kappa_params *params = (struct injection_kappa_params *) p;
 
     double t = (params->t);
     double k = (params->k);
