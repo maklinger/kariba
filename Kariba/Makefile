@@ -15,7 +15,7 @@ AR_OPTS = rcs
 RM = rm -f
 
 
-SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp EBL.cpp Electrons.cpp GammaRays.cpp Kappa.cpp Mixed.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
+SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp EBL.cpp Electrons.cpp GammaRays.cpp Kappa.cpp Mixed.cpp Neutrinos_pg.cpp Neutrinos_pp.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
 LIBSHARED = libkariba.so
 LIBSTATIC = libkariba.a
