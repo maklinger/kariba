@@ -39,6 +39,7 @@ class Mixed : public Particles {
     void set_temp_kev(double T);
     void set_norm(double n);
     void set_plfrac(double f);
+    void set_plfrac(double Le, double r, double eldens);
     void set_pspec(double s1);
 
     void cooling_steadystate(double ucom, double n0, double bfield, double r,
