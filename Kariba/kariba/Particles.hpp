@@ -1,10 +1,9 @@
 #ifndef PARTICLES_HPP
 #define PARTICLES_HPP
 
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_const_cgsm.h>
 #include <gsl/gsl_const_num.h>
-
+#include <gsl/gsl_math.h>
 
 #define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
 #define emgm GSL_CONST_CGSM_MASS_ELECTRON
@@ -93,15 +92,17 @@ class Particles {
   protected:
     int size;
 
-    double mass_gr;  // particle mass in grams
-    double mass_kev; // same as above but in keV, using electrons as "reference"
+    double mass_gr;    // particle mass in grams
+    double
+        mass_kev;    // same as above but in keV, using electrons as "reference"
 
-    double *p;     // array of particle momenta
-    double *ndens; // array of number density per unit volume, per unit momentum
-    double *gamma; // array of particle kinetic energies for each momentum
-    double *gdens; // array of number density per unit volume, per unit gamma
-    double *gdens_diff; // array with differential of number density for
-                        // radiation calculation
+    double *p;    // array of particle momenta
+    double
+        *ndens;    // array of number density per unit volume, per unit momentum
+    double *gamma;    // array of particle kinetic energies for each momentum
+    double *gdens;    // array of number density per unit volume, per unit gamma
+    double *gdens_diff;    // array with differential of number density for
+                           // radiation calculation
 
   public:
     ~Particles();

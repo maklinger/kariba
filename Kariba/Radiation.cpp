@@ -1,6 +1,6 @@
-#include "Radiation.hpp"
-
 #include <iostream>
+
+#include "kariba/Radiation.hpp"
 
 // Methods to set viewing angle, beaming and geometry of emission region
 void Radiation::set_beaming(double theta, double speed, double doppler) {

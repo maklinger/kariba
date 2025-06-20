@@ -1,7 +1,7 @@
-#include "Compton.hpp"
-#include "Radiation.hpp"
-
 #include <iostream>
+
+#include "kariba/Compton.hpp"
+#include "kariba/Radiation.hpp"
 
 // radiative transfer tables vs tau and temperature. The limits are set an
 // epsilon off the physical limits tested (20-2500 kev, tau 0.05 to 3) to avoid
@@ -135,7 +135,7 @@ Compton::Compton(int s1, int s2) {
 // represents the scattered photon spectrum for a given electron and includes
 // the Klein-Nishina cross section.
 double comfnc(double ein, void *p) {
-    struct comfnc_params *params = (struct comfnc_params *)p;
+    struct comfnc_params *params = (struct comfnc_params *) p;
     double game = (params->game);
     double e1 = (params->e1);
     gsl_spline *phodis = (params->phodis);
@@ -168,7 +168,7 @@ double comfnc(double ein, void *p) {
 // This function is the integral of comfnc above over the total seed photon
 // distribution
 double comint(double gam, void *p) {
-    struct comint_params *params = (struct comint_params *)p;
+    struct comint_params *params = (struct comint_params *) p;
     double eph = (params->eph);
     double ephmin = (params->ephmin);
     double ephmax = (params->ephmax);
@@ -363,7 +363,7 @@ void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
 // H, inner temperature Tin, inner radius Rin, at a distance z from the disk,
 // taking beaming into account
 double disk_integral(double alfa, void *p) {
-    struct disk_ic_params *params = (struct disk_ic_params *)p;
+    struct disk_ic_params *params = (struct disk_ic_params *) p;
     double gamma = (params->gamma);
     double beta = (params->beta);
     double tin = (params->tin);

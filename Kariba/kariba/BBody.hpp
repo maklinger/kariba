@@ -21,12 +21,12 @@ class BBody : public Radiation {
     void set_lum(double L);
     void bb_spectrum();
 
-    const double temp_kev();
-    const double temp_k();
-    const double temp_hz();
-    const double lum();
-    const double norm();
-    const double Urad(double d);
+    double temp_kev() const;
+    double temp_k() const;
+    double temp_hz() const;
+    double lum() const;
+    double norm() const;
+    double Urad(double d) const;
 
     void test();
 };

@@ -1,4 +1,6 @@
-#include "bhjet.hh"
+#include <gsl/gsl_spline2d.h>
+
+#include "bhjet.hpp"
 
 // This files includes the implementation of the EBL attenuation factor for the
 // luminosity of photon energies above the photon TeV scale. This is similar to

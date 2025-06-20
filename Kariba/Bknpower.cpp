@@ -1,11 +1,10 @@
 #include <iostream>
 
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_math.h>
 
-#include "Bknpower.hpp"
-#include "Particles.hpp"
-
+#include "kariba/Bknpower.hpp"
+#include "kariba/Particles.hpp"
 
 Bknpower::Bknpower(int s) {
     size = s;
@@ -79,7 +78,7 @@ void Bknpower::set_brk(double brk) { pbrk = brk; }
 
 // Methods to calculate the normalization of the function
 double norm_bkn_int(double x, void *p) {
-    struct bkn_params *params = (struct bkn_params *)p;
+    struct bkn_params *params = (struct bkn_params *) p;
 
     double s1 = (params->s1);
     double s2 = (params->s2);
@@ -114,7 +113,7 @@ void Bknpower::set_norm(double n) {
 
 // Injection function to be integrated in cooling
 double injection_bkn_int(double x, void *p) {
-    struct injection_bkn_params *params = (struct injection_bkn_params *)p;
+    struct injection_bkn_params *params = (struct injection_bkn_params *) p;
 
     double s1 = (params->s1);
     double s2 = (params->s2);

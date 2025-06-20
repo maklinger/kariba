@@ -4,9 +4,12 @@
 # through Homebrew on macOS
 GSL = /opt/homebrew/Cellar/gsl/2.8
 
+# Path to Kariba root
+KARIBA = ../Kariba
+
 CXX = g++-15
 CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
-CPPFLAGS = -I${GSL}/include
+CPPFLAGS = -I${GSL}/include -I${KARIBA}
 LD = $(CXX)
 LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
 LDLIBS = -lgsl -lm
@@ -19,7 +22,7 @@ TARGET_OBJ = bhwrap.o
 TARGET = bhwrap
 PYOBJ = pyjetmain.o
 PYLIB = pyjetmain.so
-LIBKARIBA = ../Kariba/libkariba.a
+LIBKARIBA = ${KARIBA}/libkariba.a
 
 
 .PHONY: all clean distclean
@@ -34,7 +37,7 @@ $(PYLIB): $(OBJECTS) $(LIKARIBA) $(PYOBJ)
 	$(LD) $(LDFLAGS) -shared -o $(PYLIB) $(OBJECTS) $(PYOBJ) $(LIBKARIBA) $(LDLIBS)
 
 clean:
-	$(RM) $(OBJECTS) $(KARIBA_OBJECTS) $(TARGET_OJB) $(PYOBJ)
+	$(RM) $(OBJECTS) $(KARIBA_OBJECTS) $(TARGET_OBJ) $(PYOBJ)
 
 distclean: clean
 	$(RM) $(TARGET) $(PYLIB)

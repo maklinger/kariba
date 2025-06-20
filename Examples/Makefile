@@ -4,9 +4,12 @@
 # through Homebrew on macOS
 GSL = /opt/homebrew/Cellar/gsl/2.8
 
+# Path to Kariba root
+KARIBA = ../Kariba
+
 CXX = g++-15
 CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
-CPPFLAGS = -I${GSL}/include
+CPPFLAGS = -I${GSL}/include -I${KARIBA}
 LD = $(CXX)
 LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
 LDLIBS = -lgsl -lm
@@ -23,7 +26,7 @@ OBJECT_CORONA = kariba_corona_examples.o
 OBJECT_PARTICLES = kariba_particles_examples.o
 OBJECT_SINGLEZONE = kariba_singlezone_examples.o
 
-LIBKARIBA = ../Kariba/libkariba.a
+LIBKARIBA = ${KARIBA}/libkariba.a
 
 
 .PHONY: all clean distclean

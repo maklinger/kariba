@@ -1,8 +1,6 @@
 #include <iostream>
 
-#include "BBody.hpp"
-
-
+#include "kariba/BBody.hpp"
 
 BBody::~BBody() {
     delete[] en_phot_obs;
@@ -94,17 +92,17 @@ void BBody::bb_spectrum() {
 
 // Methods to return BB temperature, luminosity, energy density at a given
 // distance d (or for a given radius d of the source)
-const double BBody::temp_kev() { return Tbb * kboltz / kboltz_kev2erg; }
+double BBody::temp_kev() const { return Tbb * kboltz / kboltz_kev2erg; }
 
-const double BBody::temp_k() { return Tbb; }
+double BBody::temp_k() const { return Tbb; }
 
-const double BBody::temp_hz() { return 2.82 * kboltz * Tbb / herg; }
+double BBody::temp_hz() const { return 2.82 * kboltz * Tbb / herg; }
 
-const double BBody::lum() { return Lbb; }
+double BBody::lum() const { return Lbb; }
 
-const double BBody::norm() { return normbb; }
+double BBody::norm() const { return normbb; }
 
-const double BBody::Urad(double d) {
+double BBody::Urad(double d) const {
     return Lbb / (4. * pi * pow(d, 2.) * cee);
 }
 

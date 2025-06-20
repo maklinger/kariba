@@ -3,8 +3,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf_bessel.h>
 
-#include "Thermal.hpp"
-
+#include "kariba/Thermal.hpp"
 
 // Class constructor to initialize object
 Thermal::Thermal(int s) {
@@ -28,10 +27,10 @@ Thermal::Thermal(int s) {
 }
 
 // Method to initialize momentum array a with default interval
-void Thermal::set_p() { //
+void Thermal::set_p() {    //
     double emin =
-        (1. / 100.) * Temp;   // minimum energy in kev, 1/100 lower than peak
-    double emax = 20. * Temp; // maximum energy in kev, 20 higher than peak
+        (1. / 100.) * Temp;      // minimum energy in kev, 1/100 lower than peak
+    double emax = 20. * Temp;    // maximum energy in kev, 20 higher than peak
     double gmin, gmax, pmin, pmax, pinc;
 
     gmin = emin / mass_kev + 1.;

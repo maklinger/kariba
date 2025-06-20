@@ -1,4 +1,8 @@
-#include "kariba_examples.hh"
+#include <kariba/Compton.hpp>
+#include <kariba/Cyclosyn.hpp>
+#include <kariba/Powerlaw.hpp>
+
+#include "kariba_examples.hpp"
 
 // This example shows the simplest possible blazar-type homogoeneous one zone
 // jet model. The parameters are set to replicate Model 2 from the EHT MWL paper

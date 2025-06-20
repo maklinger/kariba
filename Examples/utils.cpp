@@ -1,4 +1,6 @@
-#include "kariba_examples.hh"
+#include <kariba/Radiation.hpp>
+
+#include "kariba_examples.hpp"
 
 // Read input parameters from file, store them in an array
 void read_params(string file, double *pars) {
@@ -11,8 +13,11 @@ void read_params(string file, double *pars) {
         exit(1);
     }
     while (getline(inFile, line)) {
-        line.erase(line.begin(), find_if(line.begin(), line.end(),
-                                         not1(ptr_fun<int, int>(isspace))));
+        // Remove whitespace from the beginning of the line
+        line.erase(line.begin(),
+                   std::find_if(line.begin(), line.end(), [](unsigned char c) {
+                       return !std::isspace(c);
+                   }));
         if (line[0] == '#') {
             continue;
         } else {
@@ -122,7 +127,7 @@ double integrate_lum(int size, double numin, double numax,
 // input_lum is a power-law in shape
 double photon_index(int size, double numin, double numax,
                     const double *input_en, const double *input_lum) {
-    int counter_1, counter_2 = 0;
+    int counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
     for (int i = 0; i < size; i++) {
         if (input_en[i] / herg < numin) {

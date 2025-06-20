@@ -4,8 +4,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_spline.h>
 
-#include "Particles.hpp"
-
+#include "kariba/Particles.hpp"
 
 // Class destructor to de-allocate arrays
 Particles::~Particles() {

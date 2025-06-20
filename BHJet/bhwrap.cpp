@@ -23,7 +23,6 @@ extern void jetmain(double *ear, int ne, double *param, double *photeng,
 int main() {
 
     double start = omp_get_wtime();
-    double end;
 
     int npar = 28;
     int ne = 201;
@@ -46,13 +45,13 @@ int main() {
 
     delete[] ebins, delete[] param, delete[] spec, delete[] dumarr;
 
-    end = omp_get_wtime();
+    double end = omp_get_wtime();
     cout << "Total running time: " << end - start << " seconds" << endl;
 
     // system("python3 Plot_separate.py");
 
     return EXIT_SUCCESS;
-} // ----------  end of function main  ----------
+}    // ----------  end of function main  ----------
 
 // Read input file
 //
@@ -70,8 +69,11 @@ void read_params(string file, double *pars) {
         exit(1);
     }
     while (getline(inFile, line)) {
-        line.erase(line.begin(), find_if(line.begin(), line.end(),
-                                         not1(ptr_fun<int, int>(isspace))));
+        // Remove whitespace from the beginning of the line
+	line.erase(line.begin(),
+                   std::find_if(line.begin(), line.end(), [](unsigned char c) {
+                       return !std::isspace(c);
+                   }));
         if (line[0] == '#') {
             continue;
         } else {

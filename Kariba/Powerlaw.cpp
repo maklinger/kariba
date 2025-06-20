@@ -1,11 +1,10 @@
 #include <iostream>
 
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_math.h>
 
-#include "Powerlaw.hpp"
-#include "Particles.hpp"
-
+#include "kariba/Particles.hpp"
+#include "kariba/Powerlaw.hpp"
 
 // Class constructor to initialize object
 Powerlaw::Powerlaw(int s) {
@@ -77,7 +76,7 @@ void Powerlaw::set_norm(double n) {
 
 // Injection function to be integrated in cooling
 double injection_pl_int(double x, void *p) {
-    struct injection_pl_params *params = (struct injection_pl_params *)p;
+    struct injection_pl_params *params = (struct injection_pl_params *) p;
     double s = (params->s);
     double n = (params->n);
     double m = (params->m);
