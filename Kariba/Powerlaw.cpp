@@ -5,6 +5,7 @@
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_math.h>
 
+#include "kariba/Electrons.hpp"
 #include "kariba/Particles.hpp"
 #include "kariba/Powerlaw.hpp"
 
@@ -408,6 +409,254 @@ void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
         for (int i = 0; i < size; i++)
             gdens[i] = 1.e-100;
     }
+}
+
+// Function that produces the secondary electrons from pp
+void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
+                            double ntot_prot, double nwind, double plfrac,
+                            double gammap_min, double Ep_max, double bfield,
+                            double r) {
+
+    double ntilde = multiplicity(pspec);    // The number of produced pions for
+                                            // a given proton distribution
+    double pp_targets = target_protons(ntot_prot, nwind, plfrac);
+    double Epcode_max = Ep_max * erg * 1.e-12;    // The proton energy in TeV
+
+    int N = 60;    // The number of steps of the secondary particle (e.g., pion)
+                   // energy.
+    double gmin = 1.002;             // the min Lorentz factor of the secondary
+    double gmax = Ep_max / emerg;    // the max Lorentz factor of the secondary
+    double Ep;                       // the energy of the proton
+    double Bprob;    // Energy distribution of sec electrons for arbitrary pion
+                     // distribution
+    double xmin = 1.e-3,
+           xmax = 1.;    // Min/Max sec particle energy in proton energy
+    double ymin, ymax, dy,
+        y;        // The exponent of min and max from above, and the step.
+    double Ee;    // energy of secondary electrons in TeV
+    double Epimin, Epimax;    // Min/Max pion energy in TeV for the integral
+                              // over all pion energies.
+    double lEpi;              // log10 of pion energy in TeV
+    double dw;     // The logarithmic step with which the pion energy increases
+    double sum;    // For the integral over all pion energies.
+    double sinel;     // The inelastic part of the total cross-section of pp
+                      // collisions.
+    double qpi;       // The production rate of pions.
+    double Jp;        // The number of non-thermal protons/cm3/TeV
+    double Fespec;    // Spectrum of sec electrons from pion decay eq62 from
+                      // Kelner et al. 2006
+    double
+        Fpi;    // eq. 78 from Kelner et al. 2006, the emissivity of electrons
+    double Phie;    // Φ_e the energy spectral distribution in #/cm3/TeV/sec for
+                    // secondary e
+    double fe;      // The energy distribution/probability f_e of electrons
+    double tchar;         // characteristic timescale of electron distribution
+    double beta_elec;     // beta veloscity of electron
+    double tesc;          // escape timescale
+    double tsyne;         // electron synchrotron timescale
+    double transition;    // The transition between delta approximation and
+                          // distributions in TeV
+
+    ymin = log10(
+        xmin);    // The exponent of the min energy of the secondary particles.
+    ymax = log10(
+        xmax);    // The exponent of the max energy of the secondary particles.
+    dy = (ymax - ymin) / (N - 1);    // The step of the above
+
+    Bprob = prob();    // The probability for electron production after charged
+                       // pion decay.
+
+    transition = 0.16;    // The transition between delta approximation and
+                          // distributions.
+
+    // Loop for every electron energy
+    for (int j = 0; j < size; j++) {
+        gamma[j] = pow(10., log10(gmin) + j * log10(gmax / gmin) / (size - 1));
+        Ee = gamma[j] * emerg * erg * 1.e-12;    // in TeV
+        if (Ee < transition) {
+            Epimin = Ee + mpionTeV * mpionTeV / (4. * Ee);
+            Epimax = 1.e6;
+            dw = (log10(Epimax / Epimin)) / (N - 1);
+            sum = 0.;
+            for (int i = 0; i < N; i++) {
+                lEpi = log10(Epimin) +
+                       i * dw;    // The exponent of the pion energy.
+                Ep = mprotTeV +
+                     pow(10., lEpi) / Kpi;    // The mass of the proton in TeV.
+                sinel = sigma_pp(Ep);
+                Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp, acc_Jp);
+                qpi = 2. * ntilde / Kpi * sinel * Jp;
+                fe = elec_dist_pp(log10(Ee), lEpi);    // eq36 KAB16
+                //				Fpi = qpi*pow(10.,w)/ sqrt(
+                // pow(10.,(2.*w))- mpionTeV*mpionTeV)*fe*Bprob; Use the
+                // expression below because the above makes a spike at around
+                // 1e8eV (disc. wiht Maria)
+                Fpi = qpi * pow(10., lEpi) / sqrt(pow(10., (2. * lEpi))) * fe *
+                      Bprob /**1.5*/;
+                sum += dw * (Fpi);
+            }
+            Phie = cee * pp_targets * sum * 1.e-27 *
+                   log(10.);    // eq 78 in #/cm3/TeV/sec
+        } else if ((Ee >= transition) && (Ee <= Epcode_max)) {
+            sum = 0.;
+            for (int i = 0; i < N; i++) {    // The loop over all pion energies.
+                y = ymin + i * dy;
+                Ep = pow(10., (log10(Ee) - y));    // Proton enrergy in TeV.
+                if (Ep <= Epcode_max) {
+                    sinel = sigma_pp(Ep);
+                    Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp,
+                                     acc_Jp);
+                    Fespec = elec_spec_pp(Ep, y);
+                    sum += dy * (sinel * Jp * Fespec);
+                }
+                Phie = cee * pp_targets * sum * 1.e-27 * log(10.);
+            }
+        } else {
+            Phie = 1.e-50;
+        }
+
+        beta_elec = sqrt(gamma[j] * gamma[j] - 1.) / gamma[j];
+        tesc = r / (beta_elec * cee);
+        tsyne =
+            6. * pi * emerg /
+            (sigtom * cee * bfield * bfield * gamma[j] * beta_elec * beta_elec);
+        tchar = pow(1. / tsyne + 1. / tesc, -1.);
+
+        gdens[j] = Phie * tchar * Ee / gamma[j];
+    }
+}
+
+// The method to set the secondary electrons from pg (I have called the Neutrino
+// object first because I have all the tables from KA09 in this class/file
+void Powerlaw::set_pg_electrons(const double *energy, const double *density,
+                                double f_beta, double r, double vol, double B) {
+    /* the density is in erg/s/Hz (because it's a Radiation object)*/
+    double tcool;    // cooling time to account for synchrotron losses
+    for (int i = 0; i < size; i++) {
+        gamma[i] = energy[i] / emerg;
+        tcool = pow(sigtom * B * B * gamma[i] * cee / (6. * pi * emerg) +
+                        f_beta * cee / r,
+                    -1);
+        gdens[i] =
+            density[i] / (energy[i] * herg * vol) * tcool;    // in #/erg/cm3
+    }
+}
+
+// Function that produces the secondary electrons from photon-photon
+// annihilation
+void Powerlaw::Qggeefunction(double r, double vol, double bfield,
+                             int phot_number, double *en_perseg,
+                             double *lum_perseg, double gmax) {
+
+    double gmin = 1.002;    // the min Lorentz factor of the secondary
+    double ng;    // number density of photons with energy 2gammae (#/cm3/erg)
+    double Eg;    // log of energy(emerg) of photon that collides in order to
+                  // produce pairs
+    double x, dx;    // the dimensionless energy of target photon and log step
+                     // of the integration
+    double sum;
+    double R_gg;    // production rate of pairs from gg (in cm3/sec)
+    // double *logx		= new double[phot_number]();	//array of
+    // x=log10(hv/mec2) double *logNgamma	= new double[phot_number]();
+    // //array of log10(Ngamma[#/cm3/erg]) double *Ngamma		= new
+    // double[phot_number]();	//array of Ngamma[#/cm3/erg]
+    double logx[phot_number];         // array of x=log10(hv/mec2)
+    double logNgamma[phot_number];    // array of log10(Ngamma[#/cm3/erg])
+    double Ngamma[phot_number];       // array of Ngamma[#/cm3/erg]
+
+    double tchar;        // characteristic timescale
+    double beta_elec;    // beta veloscity of electron
+    double tsyn;         // synchrotron timescale
+    double Rann;         // pair annihilation rate between cold and non-thermal
+                         // electrons
+    double Ne;        // number density (not per erg) of cold/target electrons
+    double Lee_gg;    // losses due to pair annihilation in #/cm3/erg/sec
+    // double *tgg_ee 		= new double[phot_number]();	//photon-photon
+    // annihilation timescale
+    double tgg_ee[phot_number];    // photon-photon annihilation timescale
+    double tcharg;                 // characteristic timescale for photons
+
+    double Qgg_ee;    // in #/cm3/erg
+
+    sum = 1.e-100;
+    dx = log10(en_perseg[2] / en_perseg[1]);
+    for (int i = 0; i < phot_number; i++) {
+        logx[i] = log10(en_perseg[i] / emerg);
+        Ngamma[i] = lum_perseg[i] * r / (herg * cee * en_perseg[i] * vol);
+        if (Ngamma[i] <= 1.e-100)
+            Ngamma[i] = 1.e-100;
+        logNgamma[i] = log10(Ngamma[i]);
+        sum += en_perseg[i] * log(10.) * dx * Ngamma[i];
+    }
+
+    for (int i = 0; i < phot_number; i++) {
+        x = pow(10., logx[i]);
+        if (x <= 1.) {    // for values higher than one the photons are
+                          // considered merely targets
+            tgg_ee[i] = 1.e100;
+        } else {
+            R_gg = sigtom * cee * .652 * (x * x - 1.) / pow(x, 3) * log(x);
+            tgg_ee[i] = r / (cee * .652 * (x * x - 1.) / pow(x, 3) * log(x));
+        }
+
+        tcharg = pow(cee / r + /*1./tgICS +*/ 1. / tgg_ee[i], -1);
+        Ngamma[i] *=
+            tcharg / tgg_ee[i];    // photons taken into account for γγ->ee
+        logNgamma[i] = log10(Ngamma[i]);
+    }
+
+    // We interpolate all over the photons added above
+    gsl_interp_accel *acc_lNg = gsl_interp_accel_alloc();
+    gsl_spline *spline_lNg = gsl_spline_alloc(gsl_interp_steffen, phot_number);
+    gsl_spline_init(spline_lNg, logx, logNgamma, phot_number);
+
+    for (int i = 0; i < size; i++) {
+        gamma[i] = pow(10., log10(gmin) + i * log10(gmax / gmin) / (size - 1));
+        Eg = log10(2. * gamma[i]);    // 2γ from MK95
+
+        if (Eg >= logx[1] && Eg <= logx[phot_number - 1]) {
+            ng = pow(10., gsl_spline_eval(spline_lNg, Eg,
+                                          acc_lNg));    // n_γ(2γ) from MK95
+        } else {
+            ng = 1.e-200;
+        }
+
+        sum = 0.;
+        for (int j = 0; j < phot_number;
+             j++) {    // eq.57 from MK95 in units of [n]=#/cm3/erg
+            x = pow(10., logx[j]);
+            R_gg = production_rate(gamma[i], x);
+            sum += dx * pow(10., logNgamma[j] + logx[j]) * log(10.) * R_gg;
+            // ln10 and the extra x term because of log integration
+        }
+        Qgg_ee = 4. * ng * sum * emerg;    // #/cm3/erg/sec
+
+        beta_elec = sqrt(gamma[i] * gamma[i] - 1.) / gamma[i];
+        tsyn =
+            6. * pi * emerg /
+            (cee * sigtom * bfield * bfield * gamma[i] * beta_elec * beta_elec);
+        tchar = pow(cee / r + 1. / tsyn, -1);
+
+        Qgg_ee *= tchar;    // #/cm3/erg of pairs after photon-photon
+
+        Rann = 3. * sigtom * cee / (8. * gamma[i]) *
+               (pow(gamma[i], -0.5) + log(gamma[i]));
+        Ne = Qgg_ee * gamma[i] * emerg;
+        Lee_gg = Ne * Rann * Qgg_ee *
+                 tchar;    //(non-)cooled pairs collide with cold pairs
+        gdens[i] = (Qgg_ee - Lee_gg) * emerg;    // #/cm3/γ
+    }
+
+    // we free the space occupied for interpolation
+    gsl_spline_free(spline_lNg), gsl_interp_accel_free(acc_lNg);
+
+    // we delete the arrays created in this function
+    //  delete[] logx;
+    //  delete[] logNgamma,	delete[] Ngamma;
+    //  delete[] tgg_ee;	//delete[] tgg_ee2;
+
+    //	ggannihilationFile.close();
+    //	attenuatedFile.close();
 }
 
 // simple method to check quantities.

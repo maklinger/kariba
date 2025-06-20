@@ -31,6 +31,14 @@
 #define sbconst GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT
 #define aconst 7.56e-15
 #define msun GSL_CONST_CGSM_SOLAR_MASS
+#define erg 6.24e11               // 1 erg = 6.24e11 eV
+#define mprotTeV 938.272046e-6    // mass of proton in TeV/c^2
+#define mpionTeV 139.57e-6        // mass of pion in TeV/c^2
+#define Kpp 0.5     // Inelasticity Kpp. Here is considered constant.
+#define Kpi 0.17    // fraction of E_kinetic of proton transferred to neutrinos
+#define hbar (herg / (2. * Pi))    // h bar
+#define barn 1.e-24
+#define mbarn (1.e-3 * barn)
 
 // Template class for photon/neutrino distributions
 

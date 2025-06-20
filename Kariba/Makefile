@@ -6,7 +6,7 @@ GSL = /opt/homebrew/Cellar/gsl/2.8
 
 CXX = g++-15
 CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -Ofast
-CPPFLAGS = -I${GSL}/include
+CPPFLAGS = -I${GSL}/include -I.
 LD = $(CXX)
 LDFLAGS = -fPIC -L${GSL}/lib
 LDLIBS = -lgsl
@@ -15,7 +15,7 @@ AR_OPTS = rcs
 RM = rm -f
 
 
-SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp Kappa.cpp Mixed.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
+SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp Electrons.cpp GammaRays.cpp Kappa.cpp Mixed.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
 LIBSHARED = libkariba.so
 LIBSTATIC = libkariba.a
