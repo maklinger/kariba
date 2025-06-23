@@ -12,9 +12,9 @@ class ShSDisk : public Radiation {
     double Mbh, Rg;    // Black hole mass in solar masses
     double Ldisk;      // Disk luminosity in Eddington units
     double Hratio;     // Disk aspect ratio; TODO test with constant hbb or with
-                      // hbb varying with disk size. Also test with just one
-                      // Comptonization zone, and with one up to  hbb(Rin) and
-                      // another up to the end of the nozzle
+                       // hbb varying with disk size. Also test with just one
+                       // Comptonization zone, and with one up to hbb(Rin) and
+                       // another up to the end of the nozzle
 
   public:
     ~ShSDisk();

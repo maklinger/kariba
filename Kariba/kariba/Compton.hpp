@@ -57,6 +57,7 @@ class Compton : public Radiation {
 
     void set_frequency(double numin, double numax);
     void set_tau(double n, double gam);
+    void set_tau(double _tau);
     void set_escape(double escape);
     void set_niter(double nu0, double Te);
     void set_niter(int n);

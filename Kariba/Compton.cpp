@@ -512,6 +512,8 @@ void Compton::set_tau(double n, double Te) {
     }
 }
 
+void Compton::set_tau(double _tau) { tau = _tau; }
+
 // Method to set up the frequency array over desired range
 void Compton::set_frequency(double numin, double numax) {
     double nuinc = (log10(numax) - log10(numin)) / (size - 1);

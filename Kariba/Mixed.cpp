@@ -93,6 +93,27 @@ void Mixed::set_pspec(double s1) { pspec = s1; }
 
 void Mixed::set_plfrac(double f) { plfrac = f; }
 
+void Mixed::set_plfrac(double Le, double r, double eldens) {
+    double gpmax =
+        sqrt(pmax_pl * pmax_pl / (mass_gr * cee * mass_gr * cee) + 1.);
+    double sum = 0;
+    double dx = log10(gamma[2] / gamma[1]);
+    for (int i = 0; i < size; i++) {
+        sum +=
+            log(10.) * pow(gamma[i], -pspec + 2.) * exp(-gamma[i] / gpmax) * dx;
+    }
+    double Ue = Le / (pi * r * r * cee);
+    double K = std::max(Ue / (sum * mass_gr * cee * cee), 0.);
+
+    sum = 0.;
+    for (int i = 0; i < size; i++) {
+        sum +=
+            log(10.) * pow(gamma[i], -pspec + 1.) * exp(-gamma[i] / gpmax) * dx;
+    }
+    double n_nth = K * sum;
+    plfrac = n_nth / eldens;
+}
+
 void Mixed::set_norm(double n) {
     thnorm =
         (1. - plfrac) * n / (pow(mass_gr * cee, 3.) * theta * K2(1. / theta));

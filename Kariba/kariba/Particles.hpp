@@ -24,6 +24,11 @@
 #define gconst GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT
 #define sbconst GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT
 #define aconst 7.56e-15
+#define erg 6.24e11    // 1 erg = 6.24e11 eV
+#define Kpp 0.5        // Inelasticity Kpp. Here is considered constant
+#define barn 1.e-24
+#define mbarn (1.e-3 * barn)
+#define sigmapp 3.43e-26    // pp cross section in cm2
 
 // Template class for particle distributions
 // This class contains members and methods that are used for thermal,
