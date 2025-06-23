@@ -5,6 +5,7 @@
 
 #include "kariba/Bknpower.hpp"
 #include "kariba/Particles.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

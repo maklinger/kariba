@@ -8,6 +8,7 @@
 #include "kariba/Electrons.hpp"
 #include "kariba/Particles.hpp"
 #include "kariba/Powerlaw.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

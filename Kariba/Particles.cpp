@@ -5,6 +5,7 @@
 #include <gsl/gsl_spline.h>
 
 #include "kariba/Particles.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

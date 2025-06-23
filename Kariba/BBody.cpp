@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "kariba/BBody.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

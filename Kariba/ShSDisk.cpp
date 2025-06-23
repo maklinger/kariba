@@ -1,4 +1,5 @@
 #include "kariba/ShSDisk.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

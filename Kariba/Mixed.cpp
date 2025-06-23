@@ -6,6 +6,7 @@
 
 #include "kariba/Mixed.hpp"
 #include "kariba/Particles.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

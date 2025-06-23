@@ -2,6 +2,7 @@
 
 #include "kariba/Cyclosyn.hpp"
 #include "kariba/Radiation.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 

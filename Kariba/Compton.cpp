@@ -2,6 +2,7 @@
 
 #include "kariba/Compton.hpp"
 #include "kariba/Radiation.hpp"
+#include "kariba/constants.hpp"
 
 namespace kariba {
 
