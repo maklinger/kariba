@@ -1,7 +1,7 @@
 #ifndef COMPTON_HPP
 #define COMPTON_HPP
 
-#include "Radiation.hpp"
+#include "kariba/Radiation.hpp"
 
 // Class inverse Compton, inherited from Radiation.hpp
 

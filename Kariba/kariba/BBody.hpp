@@ -1,7 +1,7 @@
 #ifndef BBODY_HPP
 #define BBODY_HPP
 
-#include "Radiation.hpp"
+#include "kariba/Radiation.hpp"
 
 // Class black body photons, inherited from Radiation.hh
 

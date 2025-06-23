@@ -1,7 +1,7 @@
 #ifndef CYCLOSYN_HPP
 #define CYCLOSYN_HPP
 
-#include "Radiation.hpp"
+#include "kariba/Radiation.hpp"
 
 // Class synchrotron photons, inherited from Radiation.hpp
 

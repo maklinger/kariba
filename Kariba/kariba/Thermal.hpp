@@ -1,7 +1,7 @@
 #ifndef THERMAL_HPP
 #define THERMAL_HPP
 
-#include "Particles.hpp"
+#include "kariba/Particles.hpp"
 
 // Class for thermal particles, inherited from the generic Particles class in
 // Particles.hpp note: ndens is number density per unit momentum
