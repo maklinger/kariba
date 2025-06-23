@@ -24,6 +24,8 @@ class Powerlaw : public Particles {
     void set_pspec(double s1);
     void set_norm(double n);
 
+    bool get_Efficiency() const { return isEfficient; }
+
     void cooling_steadystate(double ucom, double n0, double bfield, double r,
                              double tshift);
     double max_p(double ucom, double bfield, double betaeff, double r,

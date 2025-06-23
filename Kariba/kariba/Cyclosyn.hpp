@@ -8,6 +8,7 @@
 class Cyclosyn : public Radiation {
   private:
     double bfield;    // Magnetic field in emitting region
+    double mass_gr;    //Mass of the emitting particle
     gsl_spline *syn_f;
     gsl_interp_accel *syn_acc;
 
@@ -36,6 +37,7 @@ class Cyclosyn : public Radiation {
 
     void set_frequency(double numin, double numax);
     void set_bfield(double b);
+    void set_mass(double mass);
 
     void test();
 };

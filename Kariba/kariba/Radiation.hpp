@@ -118,6 +118,7 @@ class Radiation {
     double *get_energy_obs() const { return en_phot_obs; }
     double *get_nphot_obs() const { return num_phot_obs; }
     int get_size() const { return size; }
+    double get_volume() const         { return vol; }
 
     double integrated_luminosity(double numin, double numax);
 

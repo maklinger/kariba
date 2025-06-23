@@ -273,6 +273,11 @@ void Cyclosyn::set_frequency(double numin, double numax) {
 // Method to set magnetic field
 void Cyclosyn::set_bfield(double b) { bfield = b; }
 
+// Method to set the particle mass
+void Cyclosyn::set_mass(double mass) {
+        mass_gr = mass;
+}
+
 void Cyclosyn::test() {
     std::cout << "Bfield: " << bfield << " r: " << r << " z: " << z
               << " v.angle: " << angle << " speed: " << beta
