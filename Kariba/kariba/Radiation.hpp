@@ -12,13 +12,16 @@
 #include <gsl/gsl_spline2d.h>
 #include <string>
 
+namespace kariba {
+namespace constants {
 const double kpc = 1e3 * GSL_CONST_CGSM_PARSEC;
 const double cee = GSL_CONST_CGSM_SPEED_OF_LIGHT;
 const double emgm = GSL_CONST_CGSM_MASS_ELECTRON;
 const double pmgm = GSL_CONST_CGSM_MASS_PROTON;
 const double kboltz = GSL_CONST_CGSM_BOLTZMANN;
 const double kboltz_kev2erg = 1.6022e-9;    // Boltzman constant in keV/erg
-const double emerg = GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.0);
+const double emerg =
+    GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.0);
 const double pi = M_PI;
 const double charg = 4.8e-10;
 const double sigtom = GSL_CONST_CGSM_THOMSON_CROSS_SECTION;
@@ -33,11 +36,13 @@ const double msun = GSL_CONST_CGSM_SOLAR_MASS;
 const double erg = 6.24e11;               // 1 erg = 6.24e11 eV
 const double mprotTeV = 938.272046e-6;    // mass of proton in TeV/c^2
 const double mpionTeV = 139.57e-6;        // mass of pion in TeV/c^2
-const double Kpp = 0.5;     // Inelasticity Kpp. Here is considered constant.
-const double Kpi = 0.17;    // fraction of E_kinetic of proton transferred to neutrinos
+const double Kpp = 0.5;    // Inelasticity Kpp. Here is considered constant.
+const double Kpi =
+    0.17;    // fraction of E_kinetic of proton transferred to neutrinos
 const double hbar = herg / (2.0 * pi);    // h bar
 const double barn = 1.0e-24;
 const double mbarn = 1.e-3 * barn;
+}    // namespace constants
 
 // Template class for photon/neutrino distributions
 
@@ -108,7 +113,7 @@ class Radiation {
     double dopfac, angle;    // Viewing angle/Doppler factor of emitting region
     double dopnum;           // Doppler boosting exponent, depends on geometry
     bool counterjet;    // boolean switch if user wants to include counterjet
-                        // emission
+    // emission
     std::string geometry;    // string to track geometry of emitting region
 
   public:
@@ -117,7 +122,7 @@ class Radiation {
     double *get_energy_obs() const { return en_phot_obs; }
     double *get_nphot_obs() const { return num_phot_obs; }
     int get_size() const { return size; }
-    double get_volume() const         { return vol; }
+    double get_volume() const { return vol; }
 
     double integrated_luminosity(double numin, double numax);
 
@@ -129,5 +134,6 @@ class Radiation {
     void set_counterjet(bool flag);
     void test_arrays();
 };
+}    // namespace kariba
 
 #endif

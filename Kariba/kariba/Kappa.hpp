@@ -3,6 +3,8 @@
 
 #include "kariba/Particles.hpp"
 
+namespace kariba {
+
 // Class for kappa distribution of particles, inherited from the generic
 // Particles class in Particles.hh
 
@@ -33,5 +35,7 @@ class Kappa : public Particles {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

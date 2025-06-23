@@ -10,6 +10,8 @@
 
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 class Neutrinos_pp : public Radiation {
     //	private:
   public:
@@ -36,4 +38,7 @@ double distr_pp(double lEv, double lEpi, std::string flavor);
 double secondary_spectrum(double Ep, double y, std::string flavor);
 
 double prob_fve();
+
+}    // namespace kariba
+
 #endif

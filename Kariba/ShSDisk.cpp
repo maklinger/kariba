@@ -1,5 +1,7 @@
 #include "kariba/ShSDisk.hpp"
 
+namespace kariba {
+
 ShSDisk::~ShSDisk() {
     delete[] en_phot;
     delete[] num_phot;
@@ -37,15 +39,17 @@ double disk_int(double lr, void *p) {
     double r, temp, fac, bb;
     r = exp(lr);
     temp = tin * pow(rin / r, 0.75);
-    fac = herg * nu / (kboltz * temp);
+    fac = constants::herg * nu / (constants::kboltz * temp);
 
     if (fac < 1.e-3) {
-        bb = 2. * herg * pow(nu, 3.) / (pow(cee, 2.) * fac);
+        bb = 2. * constants::herg * pow(nu, 3.) /
+             (pow(constants::cee, 2.) * fac);
     } else {
-        bb = 2. * herg * pow(nu, 3.) / (pow(cee, 2.) * (exp(fac) - 1.));
+        bb = 2. * constants::herg * pow(nu, 3.) /
+             (pow(constants::cee, 2.) * (exp(fac) - 1.));
     }
 
-    return 2. * pi * pow(r, 2.) * bb;
+    return 2. * constants::pi * pow(r, 2.) * bb;
 }
 
 void ShSDisk::disk_spectrum() {
@@ -55,7 +59,8 @@ void ShSDisk::disk_spectrum() {
         gsl_integration_workspace *w1;
         w1 = gsl_integration_workspace_alloc(100);
         gsl_function F1;
-        struct disk_obs_params F1params = {Tin, r, en_phot_obs[k] / herg};
+        struct disk_obs_params F1params = {Tin, r,
+                                           en_phot_obs[k] / constants::herg};
         F1.function = &disk_int;
         F1.params = &F1params;
         gsl_integration_qag(&F1, log(r), log(z), 0, 1e-2, 100, 2, w1, &result,
@@ -82,7 +87,8 @@ double ShSDisk::total_luminosity() {
     double temp = 0.;
     for (int i = 0; i < size - 1; i++) {
         temp = temp + (1. / 2.) *
-                          (en_phot_obs[i + 1] / herg - en_phot_obs[i] / herg) *
+                          (en_phot_obs[i + 1] / constants::herg -
+                           en_phot_obs[i] / constants::herg) *
                           (num_phot_obs[i + 1] / cos(angle) +
                            num_phot_obs[i] / cos(angle));
     }
@@ -91,7 +97,8 @@ double ShSDisk::total_luminosity() {
 
 void ShSDisk::set_mbh(double M) {
     Mbh = M;
-    Rg = gconst * Mbh * msun / (cee * cee);
+    Rg = constants::gconst * Mbh * constants::msun /
+         (constants::cee * constants::cee);
 }
 
 // note: for disk r is inner radius, z is the outer radius, both are input in cm
@@ -107,10 +114,11 @@ void ShSDisk::set_luminosity(double L) {
     double emin, emax, einc;
 
     Ldisk = L;
-    Tin = pow(Ldisk * 1.25e38 * Mbh / (2. * sbconst * pow(r, 2.)), 0.25);
+    Tin = pow(Ldisk * 1.25e38 * Mbh / (2. * constants::sbconst * pow(r, 2.)),
+              0.25);
     Hratio = std::max(0.1, Ldisk);
-    emin = 0.0001 * kboltz * Tin;
-    emax = 30. * kboltz * Tin;
+    emin = 0.0001 * constants::kboltz * Tin;
+    emax = 30. * constants::kboltz * Tin;
     einc = (log10(emax) - log10(emin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
@@ -124,12 +132,13 @@ void ShSDisk::set_luminosity(double L) {
 void ShSDisk::set_tin_kev(double T) {
     double emin, emax, einc;
 
-    // note: 1 keV = kboltz_kev2erg/kboltz keV
-    Tin = T * kboltz_kev2erg / kboltz;
-    Ldisk = 2. * sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
+    // note: 1 keV = constants::kboltz_kev2erg/constants::kboltz keV
+    Tin = T * constants::kboltz_kev2erg / constants::kboltz;
+    Ldisk =
+        2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
     Hratio = std::max(0.1, Ldisk);
-    emin = 0.0001 * kboltz * Tin;
-    emax = 30. * kboltz * Tin;
+    emin = 0.0001 * constants::kboltz * Tin;
+    emax = 30. * constants::kboltz * Tin;
     einc = (log10(emax) - log10(emin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
@@ -144,10 +153,11 @@ void ShSDisk::set_tin_k(double T) {
     double emin, emax, einc;
 
     Tin = T;
-    Ldisk = 2. * sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
+    Ldisk =
+        2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
     Hratio = std::max(0.1, Ldisk);
-    emin = 0.0001 * kboltz * Tin;
-    emax = 30. * kboltz * Tin;
+    emin = 0.0001 * constants::kboltz * Tin;
+    emax = 30. * constants::kboltz * Tin;
     einc = (log10(emax) - log10(emin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
@@ -162,7 +172,10 @@ void ShSDisk::test() {
     std::cout << "Inner disk radius: " << r << " cm, " << r / Rg
               << " rg; outer disk radius: " << z << " cm, " << z / Rg
               << " rg; disk scale height: " << Hratio << std::endl;
-    std::cout << "Inner disk temperature: " << Tin * kboltz / kboltz_kev2erg
+    std::cout << "Inner disk temperature: "
+              << Tin * constants::kboltz / constants::kboltz_kev2erg
               << " kev; emitted  disk luminosity in Eddington units: " << Ldisk
               << " and erg s^-1: " << total_luminosity() << std::endl;
 }
+
+}    // namespace kariba

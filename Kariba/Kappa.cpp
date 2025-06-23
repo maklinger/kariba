@@ -6,6 +6,8 @@
 #include "kariba/Kappa.hpp"
 #include "kariba/Particles.hpp"
 
+namespace kariba {
+
 // Class constructor to initialize object
 Kappa::Kappa(int s) {
     size = s;
@@ -18,8 +20,8 @@ Kappa::Kappa(int s) {
 
     knorm = 1.;
 
-    mass_gr = emgm;
-    mass_kev = emgm * gr_to_kev;
+    mass_gr = constants::emgm;
+    mass_kev = constants::emgm * constants::gr_to_kev;
 
     for (int i = 0; i < size; i++) {
         p[i] = 0;
@@ -32,7 +34,8 @@ Kappa::Kappa(int s) {
 
 // Method to set the temperature, using ergs as input
 void Kappa::set_temp_kev(double T) {
-    theta = T * kboltz_kev2erg / (mass_gr * cee * cee);
+    theta = T * constants::kboltz_kev2erg /
+            (mass_gr * constants::cee * constants::cee);
 
     double emin =
         (1. / 100.) * T;      // minimum energy in kev, 1/100 lower than peak
@@ -41,8 +44,8 @@ void Kappa::set_temp_kev(double T) {
 
     gmin = emin / mass_kev + 1.;
     gmax = emax / mass_kev + 1.;
-    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * cee;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 void Kappa::set_kappa(double k) { kappa = k; }
@@ -56,19 +59,21 @@ void Kappa::set_p(double ucom, double bfield, double betaeff, double r,
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 // Same as above, but assuming a fixed maximum Lorentz factor
 void Kappa::set_p(double gmax) {
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
     double pinc = (log10(pmax) - log10(pmin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -95,8 +100,8 @@ double norm_kappa_int(double x, void *p) {
 void Kappa::set_norm(double n) {
     double norm_integral, error, min, max;
 
-    min = pow(pow(pmin / (mass_gr * cee), 2.) + 1., 1. / 2.);
-    max = pow(pow(pmax / (mass_gr * cee), 2.) + 1., 1. / 2.);
+    min = pow(pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    max = pow(pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     gsl_function F1;
     struct k_params params = {theta, kappa};
@@ -121,9 +126,10 @@ double injection_kappa_int(double x, void *p) {
     double n = (params->n);
     double m = (params->m);
 
-    double mom = pow(pow(x, 2.) - 1., 1. / 2.) * m * cee;
+    double mom = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
     double diff =
-        mom / (pow(m * cee, 2.) * pow(pow(mom / (m * cee), 2.) + 1., 1. / 2.));
+        mom / (pow(m * constants::cee, 2.) *
+               pow(pow(mom / (m * constants::cee), 2.) + 1., 1. / 2.));
 
     return diff * n * x * pow(pow(x, 2.) - 1., 1. / 2.) *
            pow(1. + (x - 1.) / (k * t), -k - 1.);
@@ -131,11 +137,11 @@ double injection_kappa_int(double x, void *p) {
 
 void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
                                 double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    double pdot_ad = betaeff * cee / r;
-    double pdot_rad =
-        (4. * sigtom * cee * Urad) / (3. * mass_gr * pow(cee, 2.));
-    double tinj = r / (cee);
+    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double pdot_ad = betaeff * constants::cee / r;
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * pow(constants::cee, 2.));
+    double tinj = r / (constants::cee);
 
     double integral, error;
     gsl_function F1;
@@ -151,9 +157,10 @@ void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
                                 w1, &integral, &error);
             gsl_integration_workspace_free(w1);
 
-            ndens[i] = (integral / tinj) /
-                       (pdot_ad * p[i] / (mass_gr * cee) +
-                        pdot_rad * (gamma[i] * p[i] / (mass_gr * cee)));
+            ndens[i] =
+                (integral / tinj) /
+                (pdot_ad * p[i] / (mass_gr * constants::cee) +
+                 pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[size - 1] =
                 ndens[size - 2] * pow(p[size - 1] / p[size - 2], -kappa);
@@ -183,17 +190,18 @@ void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
 double Kappa::max_p(double ucom, double bfield, double betaeff, double r,
                     double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    escom = betaeff * cee / r;
-    syncon = (4. * sigtom * Urad) / (3. * mass_gr * cee);
-    accon = (3. * fsc * charg * bfield) / (4. * mass_gr * cee);
+    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    escom = betaeff * constants::cee / r;
+    syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
+    accon = (3. * fsc * constants::charg * bfield) /
+            (4. * mass_gr * constants::cee);
 
     b = escom / syncon;
     c = accon / syncon;
 
     gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 void Kappa::test() {
@@ -204,3 +212,5 @@ void Kappa::test() {
     std::cout << "Default normalization: " << knorm << std::endl;
     std::cout << "Particle mass in grams: " << mass_gr << std::endl;
 }
+
+}    // namespace kariba

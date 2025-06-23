@@ -3,6 +3,8 @@
 
 #include "kariba/Particles.hpp"
 
+namespace kariba {
+
 // Class for mixed particles, inherited from the generic Particles class in
 // Particles.hh the minimum momentum of the PL is always be assumed to be the
 // averge momentum of the thermal note: ndens is number density per unit
@@ -63,5 +65,7 @@ class Mixed : public Particles {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

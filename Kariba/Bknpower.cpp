@@ -6,6 +6,8 @@
 #include "kariba/Bknpower.hpp"
 #include "kariba/Particles.hpp"
 
+namespace kariba {
+
 Bknpower::Bknpower(int s) {
     size = s;
 
@@ -17,8 +19,8 @@ Bknpower::Bknpower(int s) {
 
     norm = 1.;
 
-    mass_gr = emgm;
-    mass_kev = emgm * gr_to_kev;
+    mass_gr = constants::emgm;
+    mass_kev = constants::emgm * constants::gr_to_kev;
 
     for (int i = 0; i < size; i++) {
         p[i] = 0;
@@ -40,20 +42,22 @@ void Bknpower::set_p(double min, double brk, double ucom, double bfield,
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 void Bknpower::set_p(double min, double brk, double gmax) {
     pmin = min;
     pbrk = brk;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
     double pinc = (log10(pmax) - log10(pmin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -86,7 +90,7 @@ double norm_bkn_int(double x, void *p) {
     double max = (params->max);
     double m = (params->m);
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * cee;
+    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
     return pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) *
            exp(-mom_int / max);
@@ -95,8 +99,8 @@ double norm_bkn_int(double x, void *p) {
 void Bknpower::set_norm(double n) {
     double norm_integral, error, min, max;
 
-    min = pow(pow(pmin / (mass_gr * cee), 2.) + 1., 1. / 2.);
-    max = pow(pow(pmax / (mass_gr * cee), 2.) + 1., 1. / 2.);
+    min = pow(pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    max = pow(pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
@@ -108,7 +112,7 @@ void Bknpower::set_norm(double n) {
                         &error);
     gsl_integration_workspace_free(w1);
 
-    norm = n / (norm_integral * mass_gr * cee);
+    norm = n / (norm_integral * mass_gr * constants::cee);
 }
 
 // Injection function to be integrated in cooling
@@ -122,7 +126,7 @@ double injection_bkn_int(double x, void *p) {
     double m = (params->m);
     double n = (params->n);
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * cee;
+    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
     return n * pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) *
            exp(-mom_int / max);
@@ -132,11 +136,11 @@ double injection_bkn_int(double x, void *p) {
 // included in IC cooling
 void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
                                    double r, double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    double pdot_ad = betaeff * cee / r;
-    double pdot_rad =
-        (4. * sigtom * cee * Urad) / (3. * mass_gr * pow(cee, 2.));
-    double tinj = r / (cee);
+    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double pdot_ad = betaeff * constants::cee / r;
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * pow(constants::cee, 2.));
+    double tinj = r / (constants::cee);
 
     double integral, error;
     gsl_function F1;
@@ -153,9 +157,10 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
                                 w1, &integral, &error);
             gsl_integration_workspace_free(w1);
 
-            ndens[i] = (integral / tinj) /
-                       (pdot_ad * p[i] / (mass_gr * cee) +
-                        pdot_rad * (gamma[i] * p[i] / (mass_gr * cee)));
+            ndens[i] =
+                (integral / tinj) /
+                (pdot_ad * p[i] / (mass_gr * constants::cee) +
+                 pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[size - 1] =
                 ndens[size - 2] * pow(p[size - 1] / p[size - 2], -pspec2 - 1);
@@ -187,17 +192,18 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
 double Bknpower::max_p(double ucom, double bfield, double betaeff, double r,
                        double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    escom = betaeff * cee / r;
-    syncon = (4. * sigtom * Urad) / (3. * mass_gr * cee);
-    accon = (3. * fsc * charg * bfield) / (4. * mass_gr * cee);
+    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    escom = betaeff * constants::cee / r;
+    syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
+    accon = (3. * fsc * constants::charg * bfield) /
+            (4. * mass_gr * constants::cee);
 
     b = escom / syncon;
     c = accon / syncon;
 
     gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 // simple method to check quantities.
@@ -210,3 +216,5 @@ void Bknpower::test() {
     std::cout << "Default normalization: " << norm << std::endl;
     std::cout << "Particle mass: " << mass_gr << std::endl;
 }
+
+}    // namespace kariba

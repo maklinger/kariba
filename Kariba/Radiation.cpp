@@ -2,26 +2,30 @@
 
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 // Methods to set viewing angle, beaming and geometry of emission region
 void Radiation::set_beaming(double theta, double speed, double doppler) {
-    angle = theta * pi / 180.;
+    angle = theta * constants::pi / 180.;
     beta = speed;
     dopfac = doppler;
 }
 
-void Radiation::set_inclination(double theta) { angle = theta * pi / 180.; }
+void Radiation::set_inclination(double theta) {
+    angle = theta * constants::pi / 180.;
+}
 
 void Radiation::set_geometry(std::string geom, double l1, double l2) {
     if (geom == "cylinder") {
         r = l1;
         z = l2;
-        vol = pi * pow(r, 2.) * z;
+        vol = constants::pi * pow(r, 2.) * z;
         dopnum = 2.;
         geometry = geom;
     } else if (geom == "sphere") {
         r = l1;
         z = r;
-        vol = (4. / 3.) * pi * pow(r, 3.);
+        vol = (4. / 3.) * constants::pi * pow(r, 3.);
         dopnum = 3.;
         geometry = geom;
     } else {
@@ -29,7 +33,7 @@ void Radiation::set_geometry(std::string geom, double l1, double l2) {
         std::cout << "Choose either sphere or cylinder!" << std::endl;
         r = 1.;
         z = 1.;
-        vol = 4. * pi / 3.;
+        vol = 4. * constants::pi / 3.;
         dopnum = 3.;
         geometry = "wrong!";
     }
@@ -42,13 +46,13 @@ void Radiation::set_geometry(std::string geom, double l1) {
                   << std::endl;
         r = l1;
         z = l1;
-        vol = pi * pow(r, 2.) * z;
+        vol = constants::pi * pow(r, 2.) * z;
         dopnum = 2.;
         geometry = geom;
     } else if (geom == "sphere") {
         r = l1;
         z = r;
-        vol = (4. / 3.) * pi * pow(r, 3.);
+        vol = (4. / 3.) * constants::pi * pow(r, 3.);
         dopnum = 3.;
         geometry = geom;
     } else {
@@ -56,7 +60,7 @@ void Radiation::set_geometry(std::string geom, double l1) {
         std::cout << "Choose either sphere or cylinder!" << std::endl;
         r = 1.;
         z = 1.;
-        vol = 4. * pi / 3.;
+        vol = 4. * constants::pi / 3.;
         dopnum = 3.;
         geometry = "wrong!";
     }
@@ -67,12 +71,12 @@ void Radiation::set_geometry(std::string geom, double l1) {
 double Radiation::integrated_luminosity(double numin, double numax) {
     double temp = 0.;
     for (int i = 0; i < size - 1; i++) {
-        if (en_phot_obs[i] / herg > numin &&
-            en_phot_obs[i + 1] / herg < numax) {
-            temp =
-                temp + (1. / 2.) *
-                           (en_phot_obs[i + 1] / herg - en_phot_obs[i] / herg) *
-                           (num_phot_obs[i + 1] + num_phot_obs[i]);
+        if (en_phot_obs[i] / constants::herg > numin &&
+            en_phot_obs[i + 1] / constants::herg < numax) {
+            temp = temp + (1. / 2.) *
+                              (en_phot_obs[i + 1] / constants::herg -
+                               en_phot_obs[i] / constants::herg) *
+                              (num_phot_obs[i + 1] + num_phot_obs[i]);
         }
     }
     return temp;
@@ -85,6 +89,8 @@ void Radiation::set_counterjet(bool flag) { counterjet = flag; }
 void Radiation::test_arrays() {
     for (int i = 0; i < size; i++) {
         std::cout << en_phot[i] << " " << num_phot[i] << " "
-                  << num_phot[i] * en_phot[i] * herg << std::endl;
+                  << num_phot[i] * en_phot[i] * constants::herg << std::endl;
     }
 }
+
+}    // namespace kariba

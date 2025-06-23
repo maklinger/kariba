@@ -3,6 +3,8 @@
 #include "kariba/Neutrinos_pp.hpp"
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 Neutrinos_pp::~Neutrinos_pp() {
     delete[] en_phot;
     delete[] num_phot;
@@ -52,7 +54,8 @@ void Neutrinos_pp::set_neutrinos_pp(
     double ntilde = multiplicity(pspec);    // The number of produced pions for
                                             // a given proton distribution
     double pp_targets = target_protons(ntot_prot, nwind, plfrac);
-    double Epcode_max = gammap_max * pmgm * cee * cee * erg *
+    double Epcode_max = gammap_max * constants::pmgm * constants::cee *
+                        constants::cee * constants::erg *
                         1.e-12;    // The proton energy in TeV
     // std::cout<<"*****************************"<<std::endl;
     // // std::cout<<"Epmax : "<<gammap_max*pmgm*cee*cee*erg<<" eV"<<std::endl;
@@ -93,18 +96,18 @@ void Neutrinos_pp::set_neutrinos_pp(
     }
     dy = log10(xmax / xmin) / (N - 1);
 
-    for (int j = 0; j < size; j++) {       // for every single Ev
-        Ev = en_phot[j] * erg * 1.e-12;    // in TeV
+    for (int j = 0; j < size; j++) {                  // for every single Ev
+        Ev = en_phot[j] * constants::erg * 1.e-12;    // in TeV
         if (Ev <= transition) {
-            Epimin = Ev + mpionTeV * mpionTeV / (4. * Ev);
+            Epimin = Ev + constants::mpionTeV * constants::mpionTeV / (4. * Ev);
             dw = (log10(Epimax / Epimin)) / (N - 1);
             sum = 1.e-100;
             for (int i = i_init; i < N; i++) {
                 lEpi = log10(Epimin) + i * dw;
-                Ep = mprotTeV + pow(10., lEpi) / Kpi;
+                Ep = constants::mprotTeV + pow(10., lEpi) / constants::Kpi;
                 sinel = sigma_pp(Ep);
                 Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp, acc_Jp);
-                qpi = 2. * ntilde / Kpi * sinel *
+                qpi = 2. * ntilde / constants::Kpi * sinel *
                       Jp;    // The production rate of neutral pions
                 fv = distr_pp(log10(Ev), lEpi, flavor);
                 // Fv =
@@ -113,7 +116,7 @@ void Neutrinos_pp::set_neutrinos_pp(
                      Bprob;
                 sum += dw * Fv;
             }    // end of if statement for energies greater than Ep_min
-            Phiv = cee * pp_targets * sum * 1.e-27 * log(10.);
+            Phiv = constants::cee * pp_targets * sum * 1.e-27 * log(10.);
         }    // end of for loop for all the pions
         else if ((Ev > transition) && (Ev <= Epcode_max)) {
             sum = 1.e-100;
@@ -128,22 +131,24 @@ void Neutrinos_pp::set_neutrinos_pp(
                     sum += dy * (sinel * Jp * Fnuspec);
                 }
             }    // end of for loop for all the pions
-            Phiv = cee * pp_targets * sum * 1.e-27 * log(10.);
+            Phiv = constants::cee * pp_targets * sum * 1.e-27 * log(10.);
         } else {
             Phiv = 1.e-100;
         }
-        num_phot[j] = Phiv * herg * vol * Ev;    // erg/s/Hz per segment
-        en_phot_obs[j] = en_phot[j] * dopfac;    //*dopfac;
+        num_phot[j] =
+            Phiv * constants::herg * vol * Ev;    // erg/s/Hz per segment
+        en_phot_obs[j] = en_phot[j] * dopfac;     //*dopfac;
         num_phot_obs[j] =
             num_phot[j] *
             pow(dopfac,
                 dopnum);    // dopfac*dopfac;			//L'_v' -> L_v
 
         if (infosw >= 2) {
-            NeutrinosppFile << std::left << std::setw(15) << Ev * 1.e12 / erg
-                            << std::setw(25) << Phiv / (1.e12 / erg)
-                            << std::setw(25)
-                            << num_phot[j] / (herg * en_phot[j]) << std::endl;
+            NeutrinosppFile << std::left << std::setw(15)
+                            << Ev * 1.e12 / constants::erg << std::setw(25)
+                            << Phiv / (1.e12 / constants::erg) << std::setw(25)
+                            << num_phot[j] / (constants::herg * en_phot[j])
+                            << std::endl;
         }
     }    // End of for loop for all the neutrino energies.
     if (infosw >= 2)
@@ -320,3 +325,5 @@ double secondary_spectrum(double Ep, double y, std::string flavor) {
     }
     return Fvespec;
 }
+
+}    // namespace kariba

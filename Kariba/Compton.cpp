@@ -3,6 +3,8 @@
 #include "kariba/Compton.hpp"
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 // radiative transfer tables vs tau and temperature. The limits are set an
 // epsilon off the physical limits tested (20-2500 kev, tau 0.05 to 3) to avoid
 // occasional weird GSL interoplation bugs.
@@ -147,15 +149,15 @@ double comfnc(double ein, void *p) {
     double btst, eg4;
 
     einit = exp(ein);
-    btst = einit / (game * emerg);
+    btst = einit / (game * constants::emerg);
     eg4 = 4. * einit * game;
-    utst = eg4 / (emerg + eg4);
+    utst = eg4 / (constants::emerg + eg4);
 
     if ((e1 < btst && (btst - e1) / btst >= 4.e-8) ||
         (e1 > utst && (e1 - utst) / utst >= 4.e-8)) {
         return 0.;
     } else {
-        biggam = eg4 / emerg;
+        biggam = eg4 / constants::emerg;
         q = e1 / (biggam * (1. - e1));
         phonum = gsl_spline_eval(phodis, einit, acc_phodis);
         tm1 = 2. * q * log(q);
@@ -181,9 +183,11 @@ double comint(double gam, void *p) {
     double result, error;
 
     game = exp(gam);
-    e1 = eph / (game * emerg);
-    econst = 2. * pi * re0 * re0 * cee;
-    blim = log(std::max(eph / (4. * game * (game - eph / emerg)), ephmin));
+    e1 = eph / (game * constants::emerg);
+    econst =
+        2. * constants::pi * constants::re0 * constants::re0 * constants::cee;
+    blim = log(
+        std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
     ulim = log(std::min(eph, ephmax));
 
     if (ulim <= blim) {
@@ -250,7 +254,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
 
     for (int it = 0; it < Niter; it++) {
         for (int i = 0; i < size; i++) {
-            blim = log(std::max(gmin, en_phot[i] / emerg));
+            blim = log(std::max(gmin, en_phot[i] / constants::emerg));
             ulim = log(gmax);
             if (blim >= ulim) {
                 com = 1e-100;
@@ -258,7 +262,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 com = comintegral(it, blim, ulim, en_phot[i], ephmin, ephmax,
                                   eldis, acc_eldis);
             }
-            num_phot[i] = num_phot[i] + com * vol * en_phot[i] * herg;
+            num_phot[i] =
+                num_phot[i] + com * vol * en_phot[i] * constants::herg;
             en_phot_obs[i] = en_phot[i] * dopfac;
             num_phot_obs[i] = num_phot[i] * pow(dopfac, dopnum);
             if (counterjet == true) {
@@ -272,7 +277,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 iter_urad[i] = -50;
             } else {
                 iter_urad[i] =
-                    log10(escape_corr * com * vol / (pi * pow(r, 2.) * cee));
+                    log10(escape_corr * com * vol /
+                          (constants::pi * pow(r, 2.) * constants::cee));
             }
         }
         ephmin = en_phot[0];
@@ -293,13 +299,16 @@ void Compton::cyclosyn_seed(const double *seed_arr, const double *seed_lum) {
         if (seed_urad[i] != 0) {
             seed_urad[i] =
                 log10(pow(10., seed_urad[i]) +
-                      seed_lum[i] / (cee * herg * seed_energ[i] * pi * r * r));
-        } else if (seed_lum[i] / (cee * herg * seed_energ[i] * pi * r * r) <=
+                      seed_lum[i] / (constants::cee * constants::herg *
+                                     seed_energ[i] * constants::pi * r * r));
+        } else if (seed_lum[i] / (constants::cee * constants::herg *
+                                  seed_energ[i] * constants::pi * r * r) <=
                    0) {
             seed_urad[i] = -100;
         } else {
             seed_urad[i] =
-                log10(seed_lum[i] / (cee * herg * seed_energ[i] * pi * r * r));
+                log10(seed_lum[i] / (constants::cee * constants::herg *
+                                     seed_energ[i] * constants::pi * r * r));
         }
     }
     gsl_spline_init(seed_ph, seed_energ, seed_urad, seed_size);
@@ -311,14 +320,15 @@ void Compton::cyclosyn_seed(const double *seed_arr, const double *seed_lum) {
 void Compton::bb_seed_k(const double *seed_arr, double Urad, double Tbb) {
     double ulim, bbfield;
 
-    ulim = 1e2 * Tbb * kboltz;
+    ulim = 1e2 * Tbb * constants::kboltz;
     seed_freq_array(seed_arr);
 
     for (int i = 0; i < seed_size; i++) {
         if (seed_energ[i] < ulim) {
-            bbfield = (2. * Urad * pow(seed_energ[i] / herg, 2.)) /
-                      (herg * pow(cee, 2.) * sbconst * pow(Tbb, 4) *
-                       (exp(seed_energ[i] / (kboltz * Tbb)) - 1.));
+            bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
+                      (constants::herg * pow(constants::cee, 2.) *
+                       constants::sbconst * pow(Tbb, 4) *
+                       (exp(seed_energ[i] / (constants::kboltz * Tbb)) - 1.));
         } else {
             bbfield = 1.e-100;
         }
@@ -336,15 +346,17 @@ void Compton::bb_seed_k(const double *seed_arr, double Urad, double Tbb) {
 void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
     double ulim, bbfield;
 
-    ulim = 1e2 * Tbb * kboltz_kev2erg;
+    ulim = 1e2 * Tbb * constants::kboltz_kev2erg;
     seed_freq_array(seed_arr);
 
     for (int i = 0; i < seed_size; i++) {
         if (seed_energ[i] < ulim) {
-            bbfield = (2. * Urad * pow(seed_energ[i] / herg, 2.)) /
-                      (herg * pow(cee, 2.) * sbconst *
-                       pow(Tbb * kboltz_kev2erg / kboltz, 4) *
-                       (exp(seed_energ[i] / (Tbb * kboltz_kev2erg)) - 1.));
+            bbfield =
+                (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
+                (constants::herg * pow(constants::cee, 2.) *
+                 constants::sbconst *
+                 pow(Tbb * constants::kboltz_kev2erg / constants::kboltz, 4) *
+                 (exp(seed_energ[i] / (Tbb * constants::kboltz_kev2erg)) - 1.));
         } else {
             bbfield = 1.e-100;
         }
@@ -385,9 +397,10 @@ double disk_integral(double alfa, void *p) {
     r = pow(pow(x, 2.) + pow(y, 2.), 1. / 2.);
     T_eff = delta * tin * pow(rin / r, 0.75);
     nu_eff = delta * nu;
-    fac = (herg * nu_eff) / (kboltz * T_eff);
+    fac = (constants::herg * nu_eff) / (constants::kboltz * T_eff);
 
-    Urad = 4. * pi * pow(nu_eff, 2.) / (herg * pow(cee, 3.) * (exp(fac) - 1.));
+    Urad = 4. * constants::pi * pow(nu_eff, 2.) /
+           (constants::herg * pow(constants::cee, 3.) * (exp(fac) - 1.));
 
     return Urad;
 }
@@ -400,11 +413,11 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
 
     blim = atan(rin / z);
     if (z < h * rout / 2.) {
-        ulim = pi / 2. + atan((h * rout / 2. - z) / rout);
+        ulim = constants::pi / 2. + atan((h * rout / 2. - z) / rout);
     } else {
         ulim = atan(rout / (z - h * rout / 2.));
     }
-    nulim = 1e1 * tin * kboltz;
+    nulim = 1e1 * tin * constants::kboltz;
     seed_freq_array(seed_arr);
 
     for (int i = 0; i < seed_size; i++) {
@@ -413,7 +426,8 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
             w1 = gsl_integration_workspace_alloc(100);
             gsl_function F;
             struct disk_ic_params Fparams = {
-                Gamma, beta, tin, rin, rout, h, z, seed_energ[i] / herg};
+                Gamma, beta, tin, rin,
+                rout,  h,    z,   seed_energ[i] / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result,
@@ -445,8 +459,8 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
 void Compton::set_niter(double nu0, double Te) {
     double x0, xf, k;
 
-    x0 = herg * nu0 / emerg;
-    xf = Te / emerg;
+    x0 = constants::herg * nu0 / constants::emerg;
+    xf = Te / constants::emerg;
     k = log(xf / x0);
     Niter = int(k + 0.5);
 }
@@ -460,11 +474,11 @@ void Compton::set_niter(int n) { Niter = n; }
 void Compton::set_tau(double n, double Te) {
     double theta;
 
-    theta = Te * kboltz_kev2erg / emerg;
-    tau = n * r * sigtom;
+    theta = Te * constants::kboltz_kev2erg / constants::emerg;
+    tau = n * r * constants::sigtom;
     ypar =
         std::max(tau * tau, tau) * (pow(4.0 * theta, 1) + pow(4.0 * theta, 2));
-    rphot = 1. / (n * sigtom);
+    rphot = 1. / (n * constants::sigtom);
 
     // set up the radiative transfer correction (first two ifs), and handle out
     // of range cases (all other ifs) if it's too low, avoid any problems by
@@ -506,9 +520,9 @@ void Compton::set_tau(double n, double Te) {
     }
     // set up the photopshere correction if optical depth greater than 1
     if (geometry == "sphere" && tau > 1.) {
-        vol = (4. / 3.) * pi * (pow(r, 3.) - pow(r - rphot, 3.));
+        vol = (4. / 3.) * constants::pi * (pow(r, 3.) - pow(r - rphot, 3.));
     } else if (geometry == "cylinder" && tau > 1.) {
-        vol = pi * z * (pow(r, 2.) - pow(r - rphot, 2.));
+        vol = constants::pi * z * (pow(r, 2.) - pow(r - rphot, 2.));
     }
 }
 
@@ -519,7 +533,7 @@ void Compton::set_frequency(double numin, double numax) {
     double nuinc = (log10(numax) - log10(numin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
-        en_phot[i] = pow(10., log10(numin) + i * nuinc) * herg;
+        en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
     }
 }
 
@@ -549,8 +563,8 @@ void Compton::reset() {
 
 void Compton::urad_test() {
     for (int i = 0; i < seed_size; i++) {
-        std::cout << seed_energ[i] / herg << " " << seed_urad[i] << " "
-                  << iter_urad[i] << std::endl;
+        std::cout << seed_energ[i] / constants::herg << " " << seed_urad[i]
+                  << " " << iter_urad[i] << std::endl;
     }
 }
 
@@ -560,3 +574,5 @@ void Compton::test() {
               << " speed: " << beta << " delta: " << dopfac << std::endl;
     std::cout << "Number of scatters: " << Niter << std::endl;
 }
+
+}    // namespace kariba

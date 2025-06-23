@@ -5,6 +5,8 @@
 
 #include "kariba/EBL.hpp"
 
+namespace kariba {
+
 static const size_t N_REDSHIFT = 57;
 static const size_t N_ENERGY = 101;
 static const size_t N_ATT = 5757;
@@ -1621,3 +1623,5 @@ void ebl_atten_gil(int size, double *en, double *lum, double redshift) {
         }
     }
 }
+
+}    // namespace kariba

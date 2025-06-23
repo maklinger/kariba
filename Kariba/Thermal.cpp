@@ -5,6 +5,8 @@
 
 #include "kariba/Thermal.hpp"
 
+namespace kariba {
+
 // Class constructor to initialize object
 Thermal::Thermal(int s) {
     size = s;
@@ -17,8 +19,8 @@ Thermal::Thermal(int s) {
 
     thnorm = 1.;
 
-    mass_gr = emgm;
-    mass_kev = emgm * gr_to_kev;
+    mass_gr = constants::emgm;
+    mass_kev = constants::emgm * constants::gr_to_kev;
 
     for (int i = 0; i < size; i++) {
         p[i] = 0;
@@ -36,13 +38,14 @@ void Thermal::set_p() {    //
     gmin = emin / mass_kev + 1.;
     gmax = emax / mass_kev + 1.;
 
-    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * cee;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
     pinc = (log10(pmax) - log10(pmin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -60,11 +63,12 @@ void Thermal::set_ndens() {
 // in ergs, no factor kb
 void Thermal::set_temp_kev(double T) {
     Temp = T;
-    theta = (Temp * kboltz_kev2erg) / (mass_gr * cee * cee);
+    theta = (Temp * constants::kboltz_kev2erg) /
+            (mass_gr * constants::cee * constants::cee);
 }
 
 void Thermal::set_norm(double n) {
-    thnorm = n / (pow(mass_gr * cee, 3.) * theta * K2(1. / theta));
+    thnorm = n / (pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
 }
 
 // Evaluate Bessel function as in old agnjet
@@ -83,11 +87,13 @@ double Thermal::K2(double x) {
 // simple method to check quantities.
 void Thermal::test() {
     std::cout << "Thermal distribution;" << std::endl;
-    std::cout << "Temperature: " << Temp << " erg, " << Temp / kboltz_kev2erg
-              << " kev" << std::endl;
+    std::cout << "Temperature: " << Temp << " erg, "
+              << Temp / constants::kboltz_kev2erg << " kev" << std::endl;
     std::cout << "Array size: " << size << std::endl;
     std::cout << "Normalization: " << thnorm << std::endl;
     std::cout << "Particle mass in grams: " << mass_gr << std::endl;
     std::cout << "Particle mass in keV: " << mass_kev << std::endl;
     std::cout << "kT/mc^2: " << theta << std::endl;
 }
+
+}    // namespace kariba

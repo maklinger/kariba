@@ -5,6 +5,9 @@
 #include <gsl/gsl_const_num.h>
 #include <gsl/gsl_math.h>
 
+namespace kariba {
+namespace constants {
+
 const double cee = GSL_CONST_CGSM_SPEED_OF_LIGHT;
 const double emgm = GSL_CONST_CGSM_MASS_ELECTRON;
 const double pmgm = GSL_CONST_CGSM_MASS_PROTON;
@@ -12,7 +15,8 @@ const double kboltz = GSL_CONST_CGSM_BOLTZMANN;
 const double kboltz_kev2erg = 1.6022e-9;
 const double gr_to_kev = 5.6095883571872e+29;
 const double me_kev = 511.0;
-const double emerg = GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.0);
+const double emerg =
+    GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.0);
 const double pi = M_PI;
 const double charg = 4.8e-10;
 const double sigtom = GSL_CONST_CGSM_THOMSON_CROSS_SECTION;
@@ -24,11 +28,11 @@ const double gconst = GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT;
 const double sbconst = GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT;
 const double aconst = 7.56e-15;
 const double erg = 6.24e11;    // 1 erg = 6.24e11 eV
-const double Kpp  = 0.5;        // Inelasticity Kpp. Here is considered constant
+const double Kpp = 0.5;        // Inelasticity Kpp. Here is considered constant
 const double barn = 1.e-24;
 const double mbarn = 1.e-3 * barn;
 const double sigmapp = 3.43e-26;    // pp cross section in cm2
-
+}    // namespace constants
 // Template class for particle distributions
 // This class contains members and methods that are used for thermal,
 // non-thermal and mixed distributions
@@ -133,4 +137,7 @@ class Particles {
 
     void test_arrays();
 };
+
+}    // namespace kariba
+
 #endif

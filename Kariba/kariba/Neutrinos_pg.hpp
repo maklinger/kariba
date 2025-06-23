@@ -10,6 +10,8 @@
 
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 typedef struct Heta_params {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
     double eta;
@@ -47,5 +49,7 @@ double photons_jet(double eta, double Ep, gsl_spline *spline_ng,
 void tables_photomeson(double &s, double &delta, double &Beta,
                        std::string product, double xeta);
 double PhiFunc(double eta, double eta0, double x, std::string product);
+
+}    // namespace kariba
 
 #endif

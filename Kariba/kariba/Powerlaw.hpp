@@ -5,6 +5,8 @@
 
 #include "kariba/Particles.hpp"
 
+namespace kariba {
+
 // Class for non-thermal particles, inherited from the generic Particles class
 // in Particles.hpp note: ndens is number density per unit momentum
 
@@ -66,5 +68,7 @@ class Powerlaw : public Particles {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

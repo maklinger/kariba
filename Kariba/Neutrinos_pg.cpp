@@ -3,6 +3,8 @@
 #include "kariba/Neutrinos_pg.hpp"
 #include "kariba/Radiation.hpp"
 
+namespace kariba {
+
 #ifndef PHOTOMESON_TABLES
 #define PHOTOMESON_TABLES
 //----------------------- electrons -----------------------//
@@ -143,16 +145,17 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         }
     }
     int N = 10;
-    double Epion = 139.6e6 / erg;    // rest mass of pion in erg
+    double Epion = 139.6e6 / constants::erg;    // rest mass of pion in erg
     double eta, deta;    // eta parameter: η = 4εE_p/(m_p^2*c^4) and its step
     double eta_zero = 0.313;    // eq 16 from Kelner & Aharonian 08
     double Hfunction;           // the quantity that we intergrate for every eta
     double dNdEv;               // spectrum of products in #/erg/cm3/sec
     double eta_max = 99.99;     // max η
     double eta_min = 1.10;      // min η
-    double nu_min = en_perseg[0] / herg;    // the min freq of photon targets
-    double nu_max =
-        en_perseg[nphot - 1] / herg;    // the max freq of photon targets
+    double nu_min =
+        en_perseg[0] / constants::herg;    // the min freq of photon targets
+    double nu_max = en_perseg[nphot - 1] /
+                    constants::herg;    // the max freq of photon targets
     double *freq =
         new double[nphot];    // frequency of photons per segment in Hz
     double *Uphot =
@@ -161,12 +164,13 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
     if (flavor.compare("electrons") == 0 || flavor.compare("antielectron") == 0)
         eta_min = 3.001;
     if (flavor.compare("gamma_rays") == 0)
-        Epion = 137.5e6 / erg;
+        Epion = 137.5e6 / constants::erg;
 
     for (int k = 0; k < nphot; k++) {
-        freq[k] = en_perseg[k] / herg;    // Hz from erg
-        Uphot[k] = lum_perseg[k] *
-                   (r / cee / (herg * herg * freq[k] * vol));    // #/cm3/erg
+        freq[k] = en_perseg[k] / constants::herg;    // Hz from erg
+        Uphot[k] = lum_perseg[k] * (r / constants::cee /
+                                    (constants::herg * constants::herg *
+                                     freq[k] * vol));    // #/cm3/erg
     }
 
     // Interpolation for jet photon distribution
@@ -181,7 +185,8 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
          i++) {    // for every neutrino of energy en_phot[i](erg)
         double sum;
         double Ev = en_phot[i];
-        if (Ev > Epion && Ev <= gp_max * pmgm * cee * cee) {    // in erg
+        if (Ev > Epion && Ev <= gp_max * constants::pmgm * constants::cee *
+                                    constants::cee) {    // in erg
             sum = 0.0;
             gsl_integration_workspace *w1 =
                 gsl_integration_workspace_alloc(100);
@@ -194,14 +199,17 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
                                         acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;
                 F1.params = &F1params;
-                double max = log10(Ev / (gp_min * pmgm * cee * cee));
-                double min = log10(Ev / (gp_max * pmgm * cee * cee));
+                double max = log10(Ev / (gp_min * constants::pmgm *
+                                         constants::cee * constants::cee));
+                double min = log10(Ev / (gp_max * constants::pmgm *
+                                         constants::cee * constants::cee));
                 gsl_integration_qag(&F1, min, max, 1e0, 1e0, 100, 1, w1,
                                     &result1, &error1);
                 // Have to increase to 3 to get a good shape without arificial
                 // features
-                Hfunction = pow(pmgm * cee * cee, 2) / 4. *
-                            result1;    // eq 70 from KA08
+                Hfunction =
+                    pow(constants::pmgm * constants::cee * constants::cee, 2) /
+                    4. * result1;    // eq 70 from KA08
                 sum += Hfunction * deta * eta * log(10.);
             }
             dNdEv = sum;    // in #/erg/cm3/sec
@@ -209,8 +217,9 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         } else {
             dNdEv = 1.e-100;    // in #/erg/cm3/sec
         }
-        num_phot[i] = dNdEv * herg * en_phot[i] * vol;    // erg/sec/Hz
-        en_phot_obs[i] = en_phot[i] * dopfac;             //*dopfac;
+        num_phot[i] =
+            dNdEv * constants::herg * en_phot[i] * vol;    // erg/sec/Hz
+        en_phot_obs[i] = en_phot[i] * dopfac;              //*dopfac;
         num_phot_obs[i] =
             num_phot[i] * pow(dopfac, dopnum);    //*dopfac*dopfac;
                                                   ////L'_v' -> L_v
@@ -221,8 +230,9 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         for (int i = 0; i < size; i++) {
             PhotopionFile << std::left << std::setw(15) << en_phot[i]
                           << std::setw(25)
-                          << num_phot[i] / (herg * en_phot[i] * vol)
-                          << std::setw(25) << num_phot[i] / (herg * en_phot[i])
+                          << num_phot[i] / (constants::herg * en_phot[i] * vol)
+                          << std::setw(25)
+                          << num_phot[i] / (constants::herg * en_phot[i])
                           << std::endl;
         }
     }
@@ -445,3 +455,5 @@ void tables_photomeson(double &s, double &delta, double &Beta,
     gsl_spline_free(spline_delta), gsl_interp_accel_free(acc_delta);
     gsl_spline_free(spline_Beta), gsl_interp_accel_free(acc_Beta);
 }
+
+}    // namespace kariba

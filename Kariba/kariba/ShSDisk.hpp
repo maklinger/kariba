@@ -4,6 +4,8 @@
 #include "kariba/Radiation.hpp"
 #include <iostream>
 
+namespace kariba {
+
 // Class Shakura-Sunyeav disk, inherited from Radiation.hpp
 
 class ShSDisk : public Radiation {
@@ -40,5 +42,7 @@ class ShSDisk : public Radiation {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif
