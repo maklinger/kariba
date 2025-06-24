@@ -199,7 +199,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
             gsl_function F1;
             for (int j = 0; j < N; j++) {    // eq 69 from KA08
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
-                Heta_params F1params = {eta,    eta_zero,  Ev,     gp_min,
+                auto F1params = HetaParams {eta,    eta_zero,  Ev,     gp_min,
                                         gp_max, spline_Jp, acc_Jp, flavor,
                                         acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;
@@ -249,22 +249,22 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
     delete[] freq;
     delete[] Uphot;
 }
-double Heta(double x, void *p) {
+double Heta(double x, void *pars) {
     // eq 70 from KA08 for pairs and writen as {0< x=Ee/Ep <1} Ee/Epmax <
     // x=Ee/Ep <Ee/Epmin
-    Heta_params *params = (Heta_params *) p;
-    double eta = (params->eta);
-    double eta_zero = (params->eta_zero);
-    double E = (params->E);
-    double gp_min = (params->gp_min);
-    double gp_max = (params->gp_max);
-    gsl_spline *spline_Jp = (params->spline_Jp);
-    gsl_interp_accel *acc_Jp = (params->acc_Jp);
-    std::string product = (params->product);
-    gsl_interp_accel *acc_ng = (params->acc_ng);
-    gsl_spline *spline_ng = (params->spline_ng);
-    double nu_min = (params->nu_min);
-    double nu_max = (params->nu_max);
+    HetaParams* params = static_cast<HetaParams*> (pars);
+    double eta = params->eta;
+    double eta_zero = params->eta_zero;
+    double E = params->E;
+    double gp_min = params->gp_min;
+    double gp_max = params->gp_max;
+    gsl_spline *spline_Jp = params->spline_Jp;
+    gsl_interp_accel *acc_Jp = params->acc_Jp;
+    std::string product = params->product;
+    gsl_interp_accel *acc_ng = params->acc_ng;
+    gsl_spline *spline_ng = params->spline_ng;
+    double nu_min = params->nu_min;
+    double nu_max = params->nu_max;
 
     double fp;         // number density of accelerated protons in #/cm3/erg
     double fph;        // number density of target photons in #/cm3/Hz
@@ -280,7 +280,7 @@ double Heta(double x, void *p) {
     //	double Tstar = 2.7;
     //	fph = photon_field(eta,Ep,Tstar);
     Phi = PhiFunc(eta, eta_zero, pow(10., x), product);
-    return fp * fph * Phi * log(10.) / Ep;
+    return fp * fph * Phi * log(10.) / Ep;  // tod: replace log(10) with m_ln10
 }
 
 //************************************************************************************************************

@@ -9,25 +9,25 @@ namespace kariba {
 // Template class for photon/neutrino distributions
 
 // Structures used for GSL integration
-typedef struct cyclosyn_emis_params {
+struct CyclosynEmisParams {
     double nu;
     double b;
     gsl_spline *syn;
     gsl_interp_accel *acc_syn;
     gsl_spline *eldis;
     gsl_interp_accel *acc_eldis;
-} cyclosyn_emis_params;
+};
 
-typedef struct cyclosyn_abs_params {
+struct CyclosynAbsParams {
     double nu;
     double b;
     gsl_spline *syn;
     gsl_interp_accel *acc_syn;
     gsl_spline *derivs;
     gsl_interp_accel *acc_derivs;
-} cyclosyn_abs_params;
+};
 
-typedef struct comint_params {
+struct ComintParams {
     double eph;
     double ephmin;
     double ephmax;
@@ -35,22 +35,22 @@ typedef struct comint_params {
     gsl_interp_accel *acc_eldis;
     gsl_spline *phodis;
     gsl_interp_accel *acc_phodis;
-} comint_params;
+};
 
-typedef struct comfnc_params {
+struct ComfncParams {
     double game;
     double e1;
     gsl_spline *phodis;
     gsl_interp_accel *acc_phodis;
-} comfnc_params;
+};
 
-typedef struct disk_obs_params {
+struct DiskObsParams {
     double tin;
     double rin;
     double nu;
-} disk_obs_params;
+};
 
-typedef struct disk_ic_params {
+struct DiskIcParams {
     double gamma;
     double beta;
     double tin;
@@ -59,7 +59,7 @@ typedef struct disk_ic_params {
     double h;
     double z;
     double nu;
-} disk_ic_params;
+};
 
 class Radiation {
   protected:

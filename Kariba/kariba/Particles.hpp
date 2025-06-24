@@ -6,31 +6,31 @@ namespace kariba {
 // non-thermal and mixed distributions
 
 // Structures used for GSL integration
-typedef struct pl_params {
+struct PlParams {
     double s;
     double n;
-} pl_params;
+};
 
-typedef struct bkn_params {
+struct BknParams {
     double s1;
     double s2;
     double brk;
     double max;
     double m;
-} bkn_params;
+};
 
-typedef struct th_params {
+struct ThParams {
     double t;
     double n;
     double m;
-} th_params;
+};
 
-typedef struct k_params {
+struct KParams {
     double t;
     double k;
-} k_params;
+};
 
-typedef struct injection_mixed_params {
+struct InjectionMixedParams {
     double s;
     double t;
     double nth;
@@ -39,30 +39,30 @@ typedef struct injection_mixed_params {
     double min;
     double max;
     double cutoff;
-} injection_mixed_params;
+};
 
-typedef struct injection_kappa_params {
+struct InjectionKappaParams {
     double t;
     double k;
     double n;
     double m;
-} injection_kappa_params;
+};
 
-typedef struct injection_pl_params {
+struct InjectionPlParams {
     double s;
     double n;
     double m;
     double max;
-} injection_pl_params;
+};
 
-typedef struct injection_bkn_params {
+struct InjectionBknParams {
     double s1;
     double s2;
     double brk;
     double max;
     double m;
     double n;
-} injection_bkn_params;
+};
 
 class Particles {
   protected:

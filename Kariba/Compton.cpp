@@ -140,12 +140,12 @@ Compton::Compton(int s1, int s2) {
 // This function is the kernel of eq 2.48 in Blumenthal & Gould(1970),
 // represents the scattered photon spectrum for a given electron and includes
 // the Klein-Nishina cross section.
-double comfnc(double ein, void *p) {
-    struct comfnc_params *params = (struct comfnc_params *) p;
-    double game = (params->game);
-    double e1 = (params->e1);
-    gsl_spline *phodis = (params->phodis);
-    gsl_interp_accel *acc_phodis = (params->acc_phodis);
+double comfnc(double ein, void *pars) {
+    ComfncParams *params = static_cast<ComfncParams*> (pars);
+    double game = params->game;
+    double e1 = params->e1;
+    gsl_spline *phodis = params->phodis;
+    gsl_interp_accel *acc_phodis = params->acc_phodis;
 
     double einit, utst, biggam, q;
     double phonum;
@@ -173,8 +173,8 @@ double comfnc(double ein, void *p) {
 
 // This function is the integral of comfnc above over the total seed photon
 // distribution
-double comint(double gam, void *p) {
-    struct comint_params *params = (struct comint_params *) p;
+double comint(double gam, void *pars) {
+    ComintParams *params = static_cast<ComintParams*> (pars);
     double eph = (params->eph);
     double ephmin = (params->ephmin);
     double ephmax = (params->ephmax);
@@ -200,7 +200,7 @@ double comint(double gam, void *p) {
         gsl_integration_workspace *w2;
         w2 = gsl_integration_workspace_alloc(100);
         gsl_function F2;
-        struct comfnc_params F2params = {game, e1, phodis, acc_phodis};
+        auto F2params = ComfncParams {game, e1, phodis, acc_phodis};
         F2.function = &comfnc;
         F2.params = &F2params;
         gsl_integration_qag(&F2, blim, ulim, 1e0, 1e0, 100, 2, w2, &result,
@@ -222,10 +222,8 @@ double Compton::comintegral(int it, double blim, double ulim, double enphot,
     w1 = gsl_integration_workspace_alloc(100);
 
     gsl_function F1;
-    struct comint_params F1params = {enphot,    enphmin, enphmax, eldis,
-                                     acc_eldis, seed_ph, acc_seed};
-    struct comint_params F1params_it = {enphot,    enphmin, enphmax, eldis,
-                                        acc_eldis, iter_ph, acc_iter};
+    auto F1params = ComintParams {enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed};
+    auto F1params_it = ComintParams {enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;
@@ -378,16 +376,16 @@ void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
 // Calculates incident photon field for a Shakura-Sunyaev disk with aspect ratio
 // H, inner temperature Tin, inner radius Rin, at a distance z from the disk,
 // taking beaming into account
-double disk_integral(double alfa, void *p) {
-    struct disk_ic_params *params = (struct disk_ic_params *) p;
-    double gamma = (params->gamma);
-    double beta = (params->beta);
-    double tin = (params->tin);
-    double rin = (params->rin);
-    double rout = (params->rout);
-    double h = (params->h);
-    double z = (params->z);
-    double nu = (params->nu);
+double disk_integral(double alfa, void *pars) {
+    DiskIcParams *params = static_cast<DiskIcParams*> (pars);
+    double gamma = params->gamma;
+    double beta = params->beta;
+    double tin = params->tin;
+    double rin = params->rin;
+    double rout = params->rout;
+    double h = params->h;
+    double z = params->z;
+    double nu = params->nu;
 
     double delta = 1. / (gamma - beta * cos(alfa));
     double a, b, x, y, r, T_eff, nu_eff, fac, Urad;
@@ -429,9 +427,7 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_function F;
-            struct disk_ic_params Fparams = {
-                Gamma, beta, tin, rin,
-                rout,  h,    z,   seed_energ[i] / constants::herg};
+            auto Fparams = DiskIcParams {Gamma, beta, tin, rin, rout, h, z, seed_energ[i] / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result,

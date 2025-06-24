@@ -10,7 +10,7 @@ Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 
 namespace kariba {
 
-typedef struct Hetag_params {
+struct HetagParams {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
     double eta;
     double eta_zero;
@@ -23,7 +23,7 @@ typedef struct Hetag_params {
     gsl_spline *spline_ng;
     double nu_min;
     double nu_max;
-} Hetag_params;
+};
 
 class Grays : public Radiation {
     //	private:

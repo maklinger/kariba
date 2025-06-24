@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gsl/gsl_spline2d.h>
+
 #include "kariba/Radiation.hpp"
 
 namespace kariba {

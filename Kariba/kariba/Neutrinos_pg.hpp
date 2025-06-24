@@ -9,7 +9,7 @@
 
 namespace kariba {
 
-typedef struct Heta_params {
+struct HetaParams {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
     double eta;
     double eta_zero;
@@ -23,7 +23,7 @@ typedef struct Heta_params {
     gsl_spline *spline_ng;
     double nu_min;
     double nu_max;
-} Heta_params;
+};
 
 class Neutrinos_pg : public Radiation {
     //	private:

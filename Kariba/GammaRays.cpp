@@ -377,21 +377,21 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
             gsl_function F1;
             for (int j = 0; j < N; j++) {
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
-                Hetag_params F1params = {
+                auto F1params = HetagParams {
                     eta,    eta_zero,  Eg,     gp_min,
                     gp_max, spline_Jp, acc_Jp,    // product,
                     acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Hetag;
                 F1.params = &F1params;
-                double max = log10(Eg / (gp_min * constants::pmgm *
+                double max = std::log10(Eg / (gp_min * constants::pmgm *
                                          constants::cee * constants::cee));
-                double min = log10(Eg / (gp_max * constants::pmgm *
+                double min = std::log10(Eg / (gp_max * constants::pmgm *
                                          constants::cee * constants::cee));
                 gsl_integration_qag(&F1, min, max, 1e0, 1e0, 100, 1, w1,
                                     &result1, &error1);
-                Hg = pow(constants::pmgm * constants::cee * constants::cee, 2) /
+                Hg = std::pow(constants::pmgm * constants::cee * constants::cee, 2) /
                      4. * result1;
-                sum += Hg * deta * eta * log(10.);
+                sum += Hg * deta * eta * std::log(10.); // todo: replace log(10) with std::M_LN10
             }
             dNdEg = sum;    // in #/erg/cm3/sec
             gsl_integration_workspace_free(w1);
@@ -414,20 +414,20 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     // delete[] freq;
     // delete[] Uphot;
 }
-double Hetag(double x, void *p) {
+double Hetag(double x, void *pars) {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
-    Hetag_params *params = (Hetag_params *) p;
-    double eta = (params->eta);
-    double eta_zero = (params->eta_zero);
-    double Eg = (params->Eg);
-    double gp_min = (params->gp_min);
-    double gp_max = (params->gp_max);
-    gsl_spline *spline_Jp = (params->spline_Jp);
-    gsl_interp_accel *acc_Jp = (params->acc_Jp);
-    gsl_interp_accel *acc_ng = (params->acc_ng);
-    gsl_spline *spline_ng = (params->spline_ng);
-    double nu_min = (params->nu_min);
-    double nu_max = (params->nu_max);
+    HetagParams* params = static_cast<HetagParams*> (pars);
+    double eta = params->eta;
+    double eta_zero = params->eta_zero;
+    double Eg = params->Eg;
+    double gp_min = params->gp_min;
+    double gp_max = params->gp_max;
+    gsl_spline *spline_Jp = params->spline_Jp;
+    gsl_interp_accel *acc_Jp = params->acc_Jp;
+    gsl_interp_accel *acc_ng = params->acc_ng;
+    gsl_spline *spline_ng = params->spline_ng;
+    double nu_min = params->nu_min;
+    double nu_max = params->nu_max;
 
     double fp;         // number density of accelerated protons in #/cm3/erg
     double fph;        // number density of target photons in #/cm3/Hz

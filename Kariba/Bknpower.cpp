@@ -82,14 +82,14 @@ void Bknpower::set_pspec2(double s2) { pspec2 = s2; }
 void Bknpower::set_brk(double brk) { pbrk = brk; }
 
 // Methods to calculate the normalization of the function
-double norm_bkn_int(double x, void *p) {
-    struct bkn_params *params = (struct bkn_params *) p;
+double norm_bkn_int(double x, void *pars) {
+    BknParams* params = static_cast<BknParams*>(pars);
 
-    double s1 = (params->s1);
-    double s2 = (params->s2);
-    double brk = (params->brk);
-    double max = (params->max);
-    double m = (params->m);
+    double s1 = params->s1;
+    double s2 = params->s2;
+    double brk = params->brk;
+    double max = params->max;
+    double m = params->m;
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
@@ -106,7 +106,7 @@ void Bknpower::set_norm(double n) {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct bkn_params params = {pspec1, pspec2, pbrk, pmax, mass_gr};
+    auto params = BknParams {pspec1, pspec2, pbrk, pmax, mass_gr};
     F1.function = &norm_bkn_int;
     F1.params = &params;
     gsl_integration_qag(&F1, min, max, 0, 1e-7, 100, 1, w1, &norm_integral,
@@ -117,15 +117,14 @@ void Bknpower::set_norm(double n) {
 }
 
 // Injection function to be integrated in cooling
-double injection_bkn_int(double x, void *p) {
-    struct injection_bkn_params *params = (struct injection_bkn_params *) p;
-
-    double s1 = (params->s1);
-    double s2 = (params->s2);
-    double brk = (params->brk);
-    double max = (params->max);
-    double m = (params->m);
-    double n = (params->n);
+double injection_bkn_int(double x, void *pars) {
+    InjectionBknParams* params = static_cast<InjectionBknParams*> (pars);
+    double s1 = params->s1;
+    double s2 = params->s2;
+    double brk = params->brk;
+    double max = params->max;
+    double m = params->m;
+    double n = params->n;
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
@@ -145,8 +144,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
 
     double integral, error;
     gsl_function F1;
-    struct injection_bkn_params params = {pspec1, pspec2,  pbrk,
-                                          pmax,   mass_gr, n0};
+    auto params = InjectionBknParams {pspec1, pspec2, pbrk, pmax, mass_gr, n0};
     F1.function = &injection_bkn_int;
     F1.params = &params;
 

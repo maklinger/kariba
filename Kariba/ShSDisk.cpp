@@ -35,26 +35,26 @@ ShSDisk::ShSDisk() {
 
 // return SD spectrum over a given radius, frequency to be integrated over
 // radius
-double disk_int(double lr, void *p) {
-    struct disk_obs_params *params = (struct disk_obs_params *) p;
-    double tin = (params->tin);
-    double rin = (params->rin);
-    double nu = (params->nu);
-
+double disk_int(double lr, void *pars) {
+    DiskObsParams* params = static_cast<DiskObsParams*> (pars);
+    double tin = params->tin;
+    double rin = params->rin;
+    double nu = params->nu;
     double r, temp, fac, bb;
-    r = exp(lr);
-    temp = tin * pow(rin / r, 0.75);
+    
+    r = std::exp(lr);
+    temp = tin * std::pow(rin / r, 0.75);
     fac = constants::herg * nu / (constants::kboltz * temp);
 
     if (fac < 1.e-3) {
-        bb = 2. * constants::herg * pow(nu, 3.) /
+        bb = 2. * constants::herg * std::pow(nu, 3.) /
              (pow(constants::cee, 2.) * fac);
     } else {
-        bb = 2. * constants::herg * pow(nu, 3.) /
+        bb = 2. * constants::herg * std::pow(nu, 3.) /
              (pow(constants::cee, 2.) * (exp(fac) - 1.));
     }
 
-    return 2. * constants::pi * pow(r, 2.) * bb;
+    return 2. * constants::pi * std::pow(r, 2.) * bb;
 }
 
 void ShSDisk::disk_spectrum() {
@@ -64,8 +64,7 @@ void ShSDisk::disk_spectrum() {
         gsl_integration_workspace *w1;
         w1 = gsl_integration_workspace_alloc(100);
         gsl_function F1;
-        struct disk_obs_params F1params = {Tin, r,
-                                           en_phot_obs[k] / constants::herg};
+        auto F1params = DiskObsParams{Tin, r, en_phot_obs[k] / constants::herg};
         F1.function = &disk_int;
         F1.params = &F1params;
         gsl_integration_qag(&F1, log(r), log(z), 0, 1e-2, 100, 2, w1, &result,

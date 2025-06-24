@@ -83,12 +83,12 @@ void Powerlaw::set_norm(double n) {
 }
 
 // Injection function to be integrated in cooling
-double injection_pl_int(double x, void *p) {
-    struct injection_pl_params *params = (struct injection_pl_params *) p;
-    double s = (params->s);
-    double n = (params->n);
-    double m = (params->m);
-    double max = (params->max);
+double injection_pl_int(double x, void *pars) {
+    InjectionPlParams *params = static_cast<InjectionPlParams*> (pars);
+    double s = params->s;
+    double n = params->n;
+    double m = params->m;
+    double max = params->max;
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
@@ -107,7 +107,7 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield,
 
     double integral, error;
     gsl_function F1;
-    struct injection_pl_params params = {pspec, plnorm, mass_gr, pmax};
+    auto params = InjectionPlParams {pspec, plnorm, mass_gr, pmax};
     F1.function = &injection_pl_int;
     F1.params = &params;
 

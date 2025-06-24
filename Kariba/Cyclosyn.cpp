@@ -58,14 +58,14 @@ Cyclosyn::Cyclosyn(int s) {
 }
 
 // Single particle emissivity/absorption coefficient calculations
-double cyclosyn_emis(double gamma, void *p) {
-    struct cyclosyn_emis_params *params = (struct cyclosyn_emis_params *) p;
-    double nu = (params->nu);
-    double b = (params->b);
-    gsl_spline *syn = (params->syn);
-    gsl_interp_accel *acc_syn = (params->acc_syn);
-    gsl_spline *eldis = (params->eldis);
-    gsl_interp_accel *acc_eldis = (params->acc_eldis);
+double cyclosyn_emis(double gamma, void *pars) {
+    CyclosynEmisParams *params = static_cast<CyclosynEmisParams*> (pars);
+    double nu = params->nu;
+    double b = params->b;
+    gsl_spline *syn = params->syn;
+    gsl_interp_accel *acc_syn = params->acc_syn;
+    gsl_spline *eldis = params->eldis;
+    gsl_interp_accel *acc_eldis = params->acc_eldis;
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma;
     gamma = exp(gamma);
@@ -96,8 +96,8 @@ double cyclosyn_emis(double gamma, void *p) {
     return ngamma * gamma * emisfunc;
 }
 
-double cyclosyn_abs(double gamma, void *p) {
-    struct cyclosyn_abs_params *params = (struct cyclosyn_abs_params *) p;
+double cyclosyn_abs(double gamma, void *pars) {
+    CyclosynAbsParams *params = static_cast<CyclosynAbsParams*> (pars);
     double nu = (params->nu);
     double b = (params->b);
     gsl_spline *syn = (params->syn);
@@ -141,8 +141,7 @@ double Cyclosyn::emis_integral(double nu, double gmin, double gmax,
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct cyclosyn_emis_params F1params = {nu,      bfield, syn_f,
-                                            syn_acc, eldis,  acc_eldis};
+    auto F1params = CyclosynEmisParams {nu, bfield, syn_f, syn_acc, eldis,  acc_eldis};
     F1.function = &cyclosyn_emis;
     F1.params = &F1params;
     gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1,
@@ -159,8 +158,7 @@ double Cyclosyn::abs_integral(double nu, double gmin, double gmax,
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct cyclosyn_abs_params F1params = {nu,      bfield, syn_f,
-                                           syn_acc, derivs, acc_derivs};
+    auto F1params = CyclosynAbsParams {nu, bfield, syn_f, syn_acc, derivs, acc_derivs};
     F1.function = &cyclosyn_abs;
     F1.params = &F1params;
     gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1,
