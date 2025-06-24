@@ -1,8 +1,11 @@
 #include <kariba/Compton.hpp>
 #include <kariba/Cyclosyn.hpp>
 #include <kariba/Powerlaw.hpp>
+#include <kariba/constants.hpp>
 
 #include "kariba_examples.hpp"
+
+namespace karcst = kariba::constants;
 
 // This example shows the simplest possible blazar-type homogoeneous one zone
 // jet model. The parameters are set to replicate Model 2 from the EHT MWL paper
@@ -11,25 +14,25 @@
 
 int main() {
 
-    int nel = 100;   // array size for particle distributions
-    int nfreq = 200; // array size for frequency arrays
+    int nel = 100;      // array size for particle distributions
+    int nfreq = 200;    // array size for frequency arrays
 
     double B, R,
-        n; // plasma quantities of emitting region: bfield, radius, number
-           // density
-    double gmin, gmax, p; // details of particle distribution: minimum/maximum
-                          // gamma factor, powerlaw slope
-    double pmin;          // minimum momentum corresponding to gmin
-    double delta, gamma, beta; // plasma speed/beaming factor
-    double theta;              // jet viewing angle
-    double Pj;                 // total power carried in the jet
-    double Pe, Ue;             // power/energy density in electrons
-    double Pb, Ub;             // power/energy density in bfields
-    double Pp, Up;             // power/energy density in cold protons
-    double equip;              // standard equipartition factor Ue/Ub
-    double Mbh, Eddlum, Rg;    // black hole scale quantities
-    double nus_min, nus_max;   // synchrotron frequency range
-    double nuc_min, nuc_max;   // SSC frequency range
+        n;    // plasma quantities of emitting region: bfield, radius, number
+              // density
+    double gmin, gmax, p;    // details of particle distribution:
+                             // minimum/maximum gamma factor, powerlaw slope
+    double pmin;             // minimum momentum corresponding to gmin
+    double delta, gamma, beta;    // plasma speed/beaming factor
+    double theta;                 // jet viewing angle
+    double Pj;                    // total power carried in the jet
+    double Pe, Ue;                // power/energy density in electrons
+    double Pb, Ub;                // power/energy density in bfields
+    double Pp, Up;                // power/energy density in cold protons
+    double equip;                 // standard equipartition factor Ue/Ub
+    double Mbh, Eddlum, Rg;       // black hole scale quantities
+    double nus_min, nus_max;      // synchrotron frequency range
+    double nuc_min, nuc_max;      // SSC frequency range
 
     // splines for electron distribution. These are needed by the radiation
     // codes
@@ -47,18 +50,20 @@ int main() {
     // Set the model parameters
     Mbh = 6.5e9;
     Eddlum = 1.25e38 * Mbh;
-    Rg = gconst * Mbh * msun / (cee * cee);
+    Rg = karcst::gconst * Mbh * karcst::msun / karcst::cee_cee;
     B = 1.5e-3;
     R = 626. * Rg;
     n = 9.5e-3;
     gmin = 4.1e3;
-    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * emgm * cee;
+    pmin =
+        std::pow(std::pow(gmin, 2.) - 1., 1. / 2.) * karcst::emgm * karcst::cee;
     gmax = 6.4e7;
     p = 3.03;
     delta = 3.3;
     gamma = 3.;
     beta = 0.942809;
-    theta = acos((delta * gamma - 1.) / (beta * delta * gamma)) * 180. / pi;
+    theta = std::acos((delta * gamma - 1.) / (beta * delta * gamma)) * 180. /
+            karcst::pi;
 
     nus_min = 1.e8;
     nus_max = 1.e21;
@@ -71,7 +76,7 @@ int main() {
     // factor of the distribution, in no particular order. Then, set the
     // normalisation from the number density and non-thermal slope, and set the
     // distribution array with set_ndens().
-    Powerlaw Electrons(nel);
+    kariba::Powerlaw Electrons(nel);
     Electrons.set_p(pmin, gmax);
     Electrons.set_pspec(p);
     Electrons.set_norm(n);
@@ -92,7 +97,7 @@ int main() {
     // These can be done in no particular order. Finally, compute the spectrum
     // by passing the particle distribution Lorenz factor and interoplation
     // objects.
-    Cyclosyn Syncro(nfreq);
+    kariba::Cyclosyn Syncro(nfreq);
     Syncro.set_frequency(nus_min, nus_max);
     Syncro.set_bfield(B);
     Syncro.set_beaming(theta, beta, delta);
@@ -113,7 +118,7 @@ int main() {
     // Finally, set up the SSC calculation by calling directly the co-moving
     // photon energy and specify luminosity arrays from Cyclosyn, and calculate
     // the spectrum.
-    Compton InvCompton(nfreq, nfreq);
+    kariba::Compton InvCompton(nfreq, nfreq);
     InvCompton.set_frequency(nuc_min, nuc_max);
     InvCompton.set_beaming(theta, beta, delta);
     InvCompton.set_geometry("sphere", R);
@@ -125,23 +130,24 @@ int main() {
 
     // Calculate physically relevant quantities like energy densities and
     // powers, and output to terminal.
-    Ue = Electrons.av_gamma() * n * emgm * pow(cee, 2.);
-    Ub = pow(B, 2.) / (8. * pi);
-    Up = n * pmgm * pow(cee, 2.);
+    Ue = Electrons.av_gamma() * n * karcst::emgm * karcst::cee_cee;
+    Ub = std::pow(B, 2.) / (8. * karcst::pi);
+    Up = n * karcst::pmgm * karcst::cee_cee;
     equip = Ue / Ub;
-    Pe = pi * beta * cee * pow(gamma * R, 2.) * Ue;
-    Pb = pi * beta * cee * pow(gamma * R, 2.) * Ub;
-    Pp = pi * beta * cee * pow(gamma * R, 2.) * Up;
+    Pe = karcst::pi * beta * karcst::cee * std::pow(gamma * R, 2.) * Ue;
+    Pb = karcst::pi * beta * karcst::cee * std::pow(gamma * R, 2.) * Ub;
+    Pp = karcst::pi * beta * karcst::cee * std::pow(gamma * R, 2.) * Up;
     Pj = Pe + Pb + Pp;
 
-    cout << "Physical quantities:" << endl;
-    cout << "Average electron Lorenz factor: " << Electrons.av_gamma() << endl;
-    cout << "Equipartition Ue/UB: " << equip << endl;
-    cout << "Electron power: " << Pe << endl;
-    cout << "Magnetic power: " << Pb << endl;
-    cout << "Proton power: " << Pp << endl;
-    cout << "Total power: " << Pj << " erg s^-1, " << Pj / Eddlum
-         << " Eddington" << endl;
+    std::cout << "Physical quantities:\n";
+    std::cout << "Average electron Lorenz factor: " << Electrons.av_gamma()
+              << "\n";
+    std::cout << "Equipartition Ue/UB: " << equip << "\n";
+    std::cout << "Electron power: " << Pe << "\n";
+    std::cout << "Magnetic power: " << Pb << "\n";
+    std::cout << "Proton power: " << Pp << "\n";
+    std::cout << "Total power: " << Pj << " erg s^-1, " << Pj / Eddlum
+              << " Eddington\n";
 
     // system("python3 Singlezone.py");
 

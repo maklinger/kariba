@@ -2,15 +2,18 @@
 #include <kariba/Kappa.hpp>
 #include <kariba/Mixed.hpp>
 #include <kariba/Thermal.hpp>
+#include <kariba/constants.hpp>
 
 #include "kariba_examples.hpp"
+
+namespace karcst = kariba::constants;
 
 // This example compares all the non-thermal particle distrubtions in Kariba,
 // for a common set of input parameters.
 
 int main() {
 
-    int nel = 200; // array size for particle distributions
+    int nel = 200;    // array size for particle distributions
 
     // Set the radius of the emitting regions in cm, the electron temperature,
     // the maximum Lorenz factor, magnetic field in the emitting region,
@@ -36,11 +39,11 @@ int main() {
 
     // Declare all the objects for the different particle distributions; the
     // only parameter needed is the size of the arrays to be insantiated
-    Mixed lowfrac(nel);
-    Mixed highfrac(nel);
-    Kappa kdist(nel);
-    Bknpower bkndist(nel);
-    Thermal placeholder(nel);
+    kariba::Mixed lowfrac(nel);
+    kariba::Mixed highfrac(nel);
+    kariba::Kappa kdist(nel);
+    kariba::Bknpower bkndist(nel);
+    kariba::Thermal placeholder(nel);
 
     // For the mixed particle distribution, you need to set the temperature of
     // the thermal poo before setting up the Lorenz factor and momentum arrays
