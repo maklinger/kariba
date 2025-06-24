@@ -1,6 +1,11 @@
+#include <cmath>
+
 #include <kariba/Radiation.hpp>
+#include <kariba/constants.hpp>
 
 #include "bhjet.hpp"
+
+namespace karcst = kariba::constants;
 
 // Velocity profile function: depending on mode either interpolate 1-d hydro jet
 // velocity tables or calculate 1-d magnetically accelerated jet velocity
@@ -69,20 +74,21 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
     double *gby_vel_mag = new double[size];
     double step;
 
-    step = (log10(dyn.max) + 1. - log10(dyn.min)) / (size - 3.);
+    step = (std::log10(dyn.max) + 1. - std::log10(dyn.min)) / (size - 3.);
     for (int i = 0; i < size; i++) {
-        gbx_vel_mag[i] = pow(10., log10(dyn.min) + i * step);
+        gbx_vel_mag[i] = std::pow(10., std::log10(dyn.min) + i * step);
         if (gbx_vel_mag[i] < dyn.h0) {
             gby_vel_mag[i] = dyn.gam0;
         } else if (gbx_vel_mag[i] < dyn.acc) {
             gby_vel_mag[i] =
-                dyn.gam0 + ((dyn.gamf - dyn.gam0) /
-                            ((pow(dyn.acc, 0.5) - pow(dyn.h0, 0.5)))) *
-                               (pow(gbx_vel_mag[i], 0.5) - pow(dyn.h0, 0.5));
+                dyn.gam0 +
+                ((dyn.gamf - dyn.gam0) /
+                 ((std::pow(dyn.acc, 0.5) - std::pow(dyn.h0, 0.5)))) *
+                    (std::pow(gbx_vel_mag[i], 0.5) - std::pow(dyn.h0, 0.5));
         } else {
             gby_vel_mag[i] = dyn.gamf;
         }
-        gby_vel_mag[i] = sqrt(pow(gby_vel_mag[i], 2.) - 1.);
+        gby_vel_mag[i] = std::sqrt(std::pow(gby_vel_mag[i], 2.) - 1.);
     }
 
     gsl_spline_init(spline, gbx_vel_mag, gby_vel_mag, 54);
@@ -99,34 +105,42 @@ void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en) {
     double eq_fac, dyn_fac;    // the two numbers that change equipartition are
                                // the jet dynamics and equipartition assumptions
     if (npsw == 0) {
-        eq_fac = en.av_gamma * emerg * (1. + 1. / en.pbeta);
-        dyn_fac = 2. * pi * pow(dyn.r0, 2.) * dyn.beta0 * dyn.gam0 * cee;
+        eq_fac = en.av_gamma * karcst::emerg * (1. + 1. / en.pbeta);
+        dyn_fac = 2. * karcst::pi * std::pow(dyn.r0, 2.) * dyn.beta0 *
+                  dyn.gam0 * karcst::cee;
         en.lepdens = en.Nj / (eq_fac * dyn_fac);
         en.protdens = 0;
-        en.bfield = pow(8. * pi * en.av_gamma * en.lepdens * emgm *
-                            pow(cee, 2.) / en.pbeta,
-                        1. / 2.);
+        en.bfield =
+            std::pow(8. * karcst::pi * en.av_gamma * en.lepdens * karcst::emgm *
+                         std::pow(karcst::cee, 2.) / en.pbeta,
+                     1. / 2.);
     } else if (npsw == 1) {
-        eq_fac = 2. * en.av_gamma * emerg * (1. + 1. / en.pbeta);
-        dyn_fac = 2. * pi * pow(dyn.r0, 2.) * dyn.beta0 * dyn.gam0 * cee;
+        eq_fac = 2. * en.av_gamma * karcst::emerg * (1. + 1. / en.pbeta);
+        dyn_fac = 2. * karcst::pi * std::pow(dyn.r0, 2.) * dyn.beta0 *
+                  dyn.gam0 * karcst::cee;
         en.lepdens = en.Nj / (eq_fac * dyn_fac);
-        en.protdens =
-            (1. + 1. / en.pbeta) * en.av_gamma * en.lepdens * (emgm / pmgm);
-        en.bfield = pow(8. * pi * en.av_gamma * en.lepdens * emgm *
-                            pow(cee, 2.) / en.pbeta,
-                        1. / 2.);
+        en.protdens = (1. + 1. / en.pbeta) * en.av_gamma * en.lepdens *
+                      (karcst::emgm / karcst::pmgm);
+        en.bfield =
+            std::pow(8. * karcst::pi * en.av_gamma * en.lepdens * karcst::emgm *
+                         std::pow(karcst::cee, 2.) / en.pbeta,
+                     1. / 2.);
     } else if (npsw == 2) {
-        eq_fac = emerg * (pmgm / emgm + en.av_gamma * (1. + 1. / en.pbeta));
-        dyn_fac = 2. * pi * pow(dyn.r0, 2.) * dyn.beta0 * dyn.gam0 * cee;
+        eq_fac = karcst::emerg * (karcst::pmgm / karcst::emgm +
+                                  en.av_gamma * (1. + 1. / en.pbeta));
+        dyn_fac = 2. * karcst::pi * std::pow(dyn.r0, 2.) * dyn.beta0 *
+                  dyn.gam0 * karcst::cee;
         en.lepdens = en.Nj / (eq_fac * dyn_fac);
         en.protdens = en.lepdens;
-        en.bfield = pow(8. * pi * en.av_gamma * en.lepdens * emgm *
-                            pow(cee, 2.) / en.pbeta,
-                        1. / 2.);
+        en.bfield =
+            std::pow(8. * karcst::pi * en.av_gamma * en.lepdens * karcst::emgm *
+                         std::pow(karcst::cee, 2.) / en.pbeta,
+                     1. / 2.);
     }
     en.eta = en.lepdens / en.protdens;
     en.sig0 =
-        pow(en.bfield, 2.) / (4. * pi * en.protdens * pmgm * pow(cee, 2.));
+        std::pow(en.bfield, 2.) / (4. * karcst::pi * en.protdens *
+                                   karcst::pmgm * std::pow(karcst::cee, 2.));
 }
 
 void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
@@ -139,19 +153,23 @@ void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
         en.eta = 1.;
         equip = (en.sig0 / 2.) *
                 (4. / 3. +
-                 (pmgm) / (en.av_gamma *
-                           emgm));    // NOTE: check energy vs lorentz factor
+                 (karcst::pmgm) /
+                     (en.av_gamma *
+                      karcst::emgm));    // NOTE: check energy vs lorentz factor
     } else {
         equip = 1. / en.pbeta;
-        en.eta = (en.sig0 * pmgm) /
-                 (en.av_gamma * emgm * (2. * equip - en.sig0 * 4. / 3.));
+        en.eta = (en.sig0 * karcst::pmgm) / (en.av_gamma * karcst::emgm *
+                                             (2. * equip - en.sig0 * 4. / 3.));
     }
-    eq_fac = pmgm * pow(cee, 2.) + en.eta * en.av_gamma * emerg * (1. + equip);
-    dyn_fac = 2. * pi * pow(dyn.r0, 2.) * dyn.gam0 * dyn.beta0 * cee;
+    eq_fac = karcst::pmgm * std::pow(karcst::cee, 2.) +
+             en.eta * en.av_gamma * karcst::emerg * (1. + equip);
+    dyn_fac = 2. * karcst::pi * std::pow(dyn.r0, 2.) * dyn.gam0 * dyn.beta0 *
+              karcst::cee;
     en.protdens = Nj / (eq_fac * dyn_fac);
     // step two: calculate lepton number density and magnetic field
     en.lepdens = en.eta * en.protdens;
-    en.bfield = sqrt(8. * pi * en.lepdens * en.av_gamma * emerg * equip);
+    en.bfield = std::sqrt(8. * karcst::pi * en.lepdens * en.av_gamma *
+                          karcst::emerg * equip);
 }
 
 // Function to set up distance grid for calculations along the jet axies
@@ -177,9 +195,11 @@ void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz,
         if (i == grid.cut) {
             grid.zcut = z + delz;
         }
-        zinc = (log10(dyn.max) - log10(grid.zcut)) / (grid.nz - grid.cut);
-        z = pow(10., log10(grid.zcut) + zinc * (i - grid.cut));
-        z_next = pow(10., log10(grid.zcut) + zinc * (i + 1 - grid.cut));
+        zinc = (std::log10(dyn.max) - std::log10(grid.zcut)) /
+               (grid.nz - grid.cut);
+        z = std::pow(10., std::log10(grid.zcut) + zinc * (i - grid.cut));
+        z_next =
+            std::pow(10., std::log10(grid.zcut) + zinc * (i + 1 - grid.cut));
         delz = z_next - z;
     }
 }
@@ -192,27 +212,29 @@ void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
     double gb;
     // Note on z_eval: for the old agnjet, the velocity is given as a function
     // of jet launching point min (see Crumley et al. 2016)
-    z_eval = log10((std::max(z - dyn.h0, 0.) + dyn.r0) / dyn.r0);
+    z_eval = std::log10((std::max(z - dyn.h0, 0.) + dyn.r0) / dyn.r0);
 
     if (z < dyn.h0) {
         gb = dyn.gam0 * dyn.beta0;
     } else {
-        gb = gsl_spline_eval(spline, pow(10., z_eval), acc);
+        gb = gsl_spline_eval(spline, std::pow(10., z_eval), acc);
     }
 
     mj = gb / (dyn.gam0 * dyn.beta0);
 
-    zone.gamma = sqrt(pow(gb, 2.) + 1.);
-    zone.beta = sqrt((pow(zone.gamma, 2.) - 1.) / pow(zone.gamma, 2.));
+    zone.gamma = std::sqrt(std::pow(gb, 2.) + 1.);
+    zone.beta =
+        std::sqrt((std::pow(zone.gamma, 2.) - 1.) / std::pow(zone.gamma, 2.));
     zone.r = dyn.r0 + std::max(z - dyn.h0, 0.) / mj;
-    zone.lepdens = en.lepdens * pow(dyn.r0 / zone.r, 2.) / mj;
+    zone.lepdens = en.lepdens * std::pow(dyn.r0 / zone.r, 2.) / mj;
 
     if (z < dyn.h0) {
-        zone.bfield = en.bfield * (dyn.r0 / zone.r) / pow(mj, 0.5);
+        zone.bfield = en.bfield * (dyn.r0 / zone.r) / std::pow(mj, 0.5);
         t = 1.;
     } else {
-        zone.bfield = en.bfield * (dyn.r0 / zone.r) / pow(mj, 0.5 + 1. / 6.);
-        t = 1. / pow(mj, 1. / 3.);
+        zone.bfield =
+            en.bfield * (dyn.r0 / zone.r) / std::pow(mj, 0.5 + 1. / 6.);
+        t = 1. / std::pow(mj, 1. / 3.);
     }
 }
 
@@ -224,28 +246,30 @@ void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
     double gb;
     // Note on z_eval: for the old agnjet, the velocity is given as a funct ion
     // of jet launching point min (see Crumley et al. 2016)
-    z_eval = log10((std::max(z - dyn.h0, 0.) + dyn.r0) / dyn.r0);
+    z_eval = std::log10((std::max(z - dyn.h0, 0.) + dyn.r0) / dyn.r0);
 
     if (z < dyn.h0) {
         gb = dyn.gam0 * dyn.beta0;
     } else {
-        gb = gsl_spline_eval(spline, pow(10., z_eval), acc);
+        gb = gsl_spline_eval(spline, std::pow(10., z_eval), acc);
     }
 
     mj = gb / (dyn.gam0 * dyn.beta0);
 
-    zone.gamma = sqrt(pow(gb, 2.) + 1.);
-    zone.beta = sqrt((pow(zone.gamma, 2.) - 1.) / pow(zone.gamma, 2.));
+    zone.gamma = std::sqrt(std::pow(gb, 2.) + 1.);
+    zone.beta =
+        std::sqrt((std::pow(zone.gamma, 2.) - 1.) / std::pow(zone.gamma, 2.));
 
     zone.r = dyn.r0 + std::max(z - dyn.h0, 0.) / mj;
-    zone.lepdens = en.lepdens * pow(dyn.r0 / zone.r, 2.) / mj;
+    zone.lepdens = en.lepdens * std::pow(dyn.r0 / zone.r, 2.) / mj;
 
     if (z < dyn.h0) {
-        zone.bfield = en.bfield * (dyn.r0 / zone.r) / pow(mj, 0.5);
+        zone.bfield = en.bfield * (dyn.r0 / zone.r) / std::pow(mj, 0.5);
         t = 1.;
     } else {
-        zone.bfield = en.bfield * (dyn.r0 / zone.r) / pow(mj, 0.5 + 1. / 6.);
-        t = 1. / pow(mj, 1. / 3.) / pow(zone.r / dyn.r0, 2. / 3.);
+        zone.bfield =
+            en.bfield * (dyn.r0 / zone.r) / std::pow(mj, 0.5 + 1. / 6.);
+        t = 1. / std::pow(mj, 1. / 3.) / std::pow(zone.r / dyn.r0, 2. / 3.);
     }
 }
 
@@ -254,7 +278,7 @@ void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
 
     double mj, theta, theta_acc, n_acc, b_acc, gb, r_acc;
     double gb0 = dyn.gam0 * dyn.beta0;
-    double gbf = sqrt(pow(dyn.gamf, 2.) - 1.);
+    double gbf = std::sqrt(std::pow(dyn.gamf, 2.) - 1.);
 
     if (z < dyn.h0) {
         gb = gb0;
@@ -266,15 +290,16 @@ void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
 
     mj = gb / gb0;
 
-    zone.gamma = sqrt(pow(gb, 2.) + 1.);
-    zone.beta = sqrt((pow(zone.gamma, 2.) - 1.) / pow(zone.gamma, 2.));
+    zone.gamma = std::sqrt(std::pow(gb, 2.) + 1.);
+    zone.beta =
+        std::sqrt((std::pow(zone.gamma, 2.) - 1.) / std::pow(zone.gamma, 2.));
 
     theta = 0.15 / zone.gamma;
     zone.r = dyn.r0 + std::max(z - dyn.h0, 0.) * tan(theta);
     theta_acc = 0.15 / dyn.gamf;
     r_acc = dyn.r0 + (dyn.acc - dyn.h0) * tan(theta_acc);
-    n_acc = en.lepdens * pow(dyn.r0 / r_acc, 2.) * (gb0 / gbf);
-    zone.lepdens = en.lepdens * pow(dyn.r0 / zone.r, 2.) / mj;
+    n_acc = en.lepdens * std::pow(dyn.r0 / r_acc, 2.) * (gb0 / gbf);
+    zone.lepdens = en.lepdens * std::pow(dyn.r0 / zone.r, 2.) / mj;
 
     if (z < dyn.h0) {
         b_profile(zone.gamma, zone.lepdens, dyn, en, zone.bfield);
@@ -297,25 +322,29 @@ void b_profile(double gam, double n, jet_dynpars &dyn, jet_enpars &en,
     // particles (Lucchini et al. 2018) This should not introduce any errors as
     // long as the average Lorentz factor of the electrons is below ~a few 10^2
     // and/or the pair content of the jet is limited
-    w = 4. / 3. * en.av_gamma * n * emgm * pow(cee, 2.);
+    w = 4. / 3. * en.av_gamma * n * karcst::emgm * std::pow(karcst::cee, 2.);
     sigma = (dyn.gam0 / gam) * (1. + en.sig0) - 1.;
-    field = sqrt(sigma * 4. * pi * (n / en.eta * pmgm * pow(cee, 2.) + w));
+    field =
+        std::sqrt(sigma * 4. * karcst::pi *
+                  (n / en.eta * karcst::pmgm * std::pow(karcst::cee, 2.) + w));
 }
 
 // This function is used to set up the external AGN photon fields (torus, BLR)
 // as a function of accretion rate See Ghisellini and Tavecchio 2009 for details
 void agn_photons_init(double lum, double f1, double f2, com_pars &agn_com) {
-    agn_com.rblr = 1.e17 * pow(lum / 1.e45, 1. / 2.);
-    agn_com.ublr =
-        (17. / 12.) * f1 * lum / (4. * pi * pow(agn_com.rblr, 2.) * cee);
+    agn_com.rblr = 1.e17 * std::pow(lum / 1.e45, 1. / 2.);
+    agn_com.ublr = (17. / 12.) * f1 * lum /
+                   (4. * karcst::pi * std::pow(agn_com.rblr, 2.) * karcst::cee);
     agn_com.tblr = 10.2e-3;    // temperature of the BLR photons in kev
-    agn_com.lblr =
-        (12. / 17.) * 4. * pi * pow(agn_com.rblr, 2.) * cee * agn_com.ublr;
+    agn_com.lblr = (12. / 17.) * 4. * karcst::pi * std::pow(agn_com.rblr, 2.) *
+                   karcst::cee * agn_com.ublr;
 
-    agn_com.rdt = 2.5e18 * pow(lum / 1.e45, 1. / 2.);
-    agn_com.udt = f2 * lum / (4. * pi * pow(agn_com.rdt, 2.) * cee);
+    agn_com.rdt = 2.5e18 * std::pow(lum / 1.e45, 1. / 2.);
+    agn_com.udt =
+        f2 * lum / (4. * karcst::pi * std::pow(agn_com.rdt, 2.) * karcst::cee);
     agn_com.tdt = 370.;    // temperature of the torus photons in Kelvin
-    agn_com.ldt = 4. * pi * pow(agn_com.rdt, 2.) * cee * agn_com.udt;
+    agn_com.ldt =
+        4. * karcst::pi * std::pow(agn_com.rdt, 2.) * karcst::cee * agn_com.udt;
 }
 
 // This function calculates the energy densities for the standard AGN photon
@@ -337,82 +366,89 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
                        // in the code
 
     if (z < agn_com.rblr) {    // for low z both photon fields are boosted
-        ublr_zone = pow(zone.delta, 2.) * agn_com.ublr;
-        udt_zone = pow(zone.delta, 2.) * agn_com.udt;
-        agn_com.urad_total = pow(zone.gamma, 2.) * (agn_com.udt + agn_com.ublr);
+        ublr_zone = std::pow(zone.delta, 2.) * agn_com.ublr;
+        udt_zone = std::pow(zone.delta, 2.) * agn_com.udt;
+        agn_com.urad_total =
+            std::pow(zone.gamma, 2.) * (agn_com.udt + agn_com.ublr);
     } else if (z <
                3. * agn_com.rblr) {    // BLR starts being slightly deboosted
         double blr_boost, blr_interp;
-        mu_blr1 = pow(10. / 9., -1. / 2.);
-        mu_blr2 = pow(8. / 9., 1. / 2.);
-        blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
-                   pow(1. - zone.beta * mu_blr2, 3.) - pow(1. - zone.beta, 3.);
-        blr_boost = pow(zone.delta, 2.) * agn_com.ublr;
-        blr_interp =
-            pow(zone.delta, 2.) * agn_com.ublr * blr_conv / (3. * zone.beta);
+        mu_blr1 = std::pow(10. / 9., -1. / 2.);
+        mu_blr2 = std::pow(8. / 9., 1. / 2.);
+        blr_conv = 2. * std::pow(1. - zone.beta * mu_blr1, 3.) -
+                   std::pow(1. - zone.beta * mu_blr2, 3.) -
+                   std::pow(1. - zone.beta, 3.);
+        blr_boost = std::pow(zone.delta, 2.) * agn_com.ublr;
+        blr_interp = std::pow(zone.delta, 2.) * agn_com.ublr * blr_conv /
+                     (3. * zone.beta);
 
         ublr_zone = blr_boost + (z - agn_com.rblr) / (2. * agn_com.rblr) *
                                     (blr_interp - blr_boost);
-        udt_zone = pow(zone.delta, 2.) * agn_com.udt;
+        udt_zone = std::pow(zone.delta, 2.) * agn_com.udt;
         agn_com.urad_total =
-            pow(zone.gamma, 2.) *
-            (agn_com.udt + ublr_zone * pow(zone.gamma / zone.delta, 2.));
+            std::pow(zone.gamma, 2.) *
+            (agn_com.udt + ublr_zone * std::pow(zone.gamma / zone.delta, 2.));
     } else if (z < agn_com.rdt) {    // for intermediate z BLR is deboosted,
                                      // torus is boosted
-        mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);    //
-        mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
-        blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
-                   pow(1. - zone.beta * mu_blr2, 3.) - pow(1. - zone.beta, 3.);
+        mu_blr1 = std::pow(1. + std::pow(agn_com.rblr / z, 2.), -1. / 2.);    //
+        mu_blr2 = std::pow(1. - std::pow(agn_com.rblr / z, 2.), 1. / 2.);
+        blr_conv = 2. * std::pow(1. - zone.beta * mu_blr1, 3.) -
+                   std::pow(1. - zone.beta * mu_blr2, 3.) -
+                   std::pow(1. - zone.beta, 3.);
 
-        ublr_zone =
-            pow(zone.delta, 2.) * agn_com.ublr * blr_conv / (3. * zone.beta);
-        udt_zone = pow(zone.delta, 2.) * agn_com.udt;
+        ublr_zone = std::pow(zone.delta, 2.) * agn_com.ublr * blr_conv /
+                    (3. * zone.beta);
+        udt_zone = std::pow(zone.delta, 2.) * agn_com.udt;
         agn_com.urad_total =
-            pow(zone.gamma, 2.) *
+            std::pow(zone.gamma, 2.) *
             (agn_com.udt + fr * agn_com.ublr * blr_conv / (3. * zone.beta));
     } else if (z <
                3. * agn_com
                         .rdt) {    // BLR fully deboosted, DT slightly deboosted
-        mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);
-        mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
-        blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
-                   pow(1. - zone.beta * mu_blr2, 3.) - pow(1. - zone.beta, 3.);
+        mu_blr1 = std::pow(1. + std::pow(agn_com.rblr / z, 2.), -1. / 2.);
+        mu_blr2 = std::pow(1. - std::pow(agn_com.rblr / z, 2.), 1. / 2.);
+        blr_conv = 2. * std::pow(1. - zone.beta * mu_blr1, 3.) -
+                   std::pow(1. - zone.beta * mu_blr2, 3.) -
+                   std::pow(1. - zone.beta, 3.);
 
-        ublr_zone =
-            pow(zone.delta, 2.) * agn_com.ublr * blr_conv / (3. * zone.beta);
+        ublr_zone = std::pow(zone.delta, 2.) * agn_com.ublr * blr_conv /
+                    (3. * zone.beta);
 
         double dt_boost, dt_interp;
-        mu_dt1 = pow(10. / 9., -1. / 2.);
-        mu_dt2 = pow(8. / 9., 1. / 2.);
-        dt_conv = 2. * pow(1. - zone.beta * mu_dt1, 3.) -
-                  pow(1. - zone.beta * mu_dt2, 3.) - pow(1. - zone.beta, 3.);
-        dt_boost = pow(zone.delta, 2.) * agn_com.udt;
+        mu_dt1 = std::pow(10. / 9., -1. / 2.);
+        mu_dt2 = std::pow(8. / 9., 1. / 2.);
+        dt_conv = 2. * std::pow(1. - zone.beta * mu_dt1, 3.) -
+                  std::pow(1. - zone.beta * mu_dt2, 3.) -
+                  std::pow(1. - zone.beta, 3.);
+        dt_boost = std::pow(zone.delta, 2.) * agn_com.udt;
         dt_interp =
-            pow(zone.delta, 2.) * agn_com.udt * dt_conv / (3. * zone.beta);
+            std::pow(zone.delta, 2.) * agn_com.udt * dt_conv / (3. * zone.beta);
 
         udt_zone = dt_boost + (z - agn_com.rdt) / (2. * agn_com.rdt) *
                                   (dt_interp - dt_boost);
-        agn_com.urad_total = pow(zone.gamma, 2.) *
-                             (udt_zone * pow(zone.gamma / zone.delta, 2.) +
+        agn_com.urad_total = std::pow(zone.gamma, 2.) *
+                             (udt_zone * std::pow(zone.gamma / zone.delta, 2.) +
                               fr * agn_com.ublr * blr_conv / (3. * zone.beta));
 
     } else {    // for high z both photon fields are deboosted
-        mu_blr1 = pow(1. + pow(agn_com.rblr / z, 2.), -1. / 2.);
-        mu_blr2 = pow(1. - pow(agn_com.rblr / z, 2.), 1. / 2.);
-        blr_conv = 2. * pow(1. - zone.beta * mu_blr1, 3.) -
-                   pow(1. - zone.beta * mu_blr2, 3.) - pow(1. - zone.beta, 3.);
+        mu_blr1 = std::pow(1. + std::pow(agn_com.rblr / z, 2.), -1. / 2.);
+        mu_blr2 = std::pow(1. - std::pow(agn_com.rblr / z, 2.), 1. / 2.);
+        blr_conv = 2. * std::pow(1. - zone.beta * mu_blr1, 3.) -
+                   std::pow(1. - zone.beta * mu_blr2, 3.) -
+                   std::pow(1. - zone.beta, 3.);
 
-        mu_dt1 = pow(1. + pow(agn_com.rdt / z, 2.), -1. / 2.);
-        mu_dt2 = pow(1. - pow(agn_com.rdt / z, 2.), 1. / 2.);
-        dt_conv = 2. * pow(1. - zone.beta * mu_dt1, 3.) -
-                  pow(1. - zone.beta * mu_dt2, 3.) - pow(1. - zone.beta, 3.);
+        mu_dt1 = std::pow(1. + std::pow(agn_com.rdt / z, 2.), -1. / 2.);
+        mu_dt2 = std::pow(1. - std::pow(agn_com.rdt / z, 2.), 1. / 2.);
+        dt_conv = 2. * std::pow(1. - zone.beta * mu_dt1, 3.) -
+                  std::pow(1. - zone.beta * mu_dt2, 3.) -
+                  std::pow(1. - zone.beta, 3.);
 
-        ublr_zone =
-            pow(zone.delta, 2.) * agn_com.ublr * blr_conv / (3. * zone.beta);
+        ublr_zone = std::pow(zone.delta, 2.) * agn_com.ublr * blr_conv /
+                    (3. * zone.beta);
         udt_zone =
-            pow(zone.delta, 2.) * agn_com.udt * dt_conv / (3. * zone.beta);
+            std::pow(zone.delta, 2.) * agn_com.udt * dt_conv / (3. * zone.beta);
         agn_com.urad_total =
-            pow(zone.gamma, 2.) *
+            std::pow(zone.gamma, 2.) *
             (agn_com.udt * dt_conv + fr * agn_com.ublr * blr_conv) /
             (3. * zone.beta);
     }

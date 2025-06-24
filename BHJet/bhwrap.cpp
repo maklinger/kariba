@@ -11,9 +11,7 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
-
-void read_params(string file, double *pars);
+void read_params(std::string file, double *pars);
 
 extern void jetinterp(double *ear, double *energ, double *phot, double *photar,
                       int ne, int newne);
@@ -46,7 +44,7 @@ int main() {
     delete[] ebins, delete[] param, delete[] spec, delete[] dumarr;
 
     double end = omp_get_wtime();
-    cout << "Total running time: " << end - start << " seconds" << endl;
+    std::cout << "Total running time: " << end - start << " seconds\n";
 
     // system("python3 Plot_separate.py");
 
@@ -59,18 +57,18 @@ int main() {
 //
 //  @return pars         Parameters
 //
-void read_params(string file, double *pars) {
-    ifstream inFile;
+void read_params(std::string file, double *pars) {
+    std::ifstream inFile;
     inFile.open(file.c_str());
-    string line;
+    std::string line;
     int line_nb = 0;
     if (!inFile) {
-        cerr << "Can't open input file" << endl;
+        std::cerr << "Can't open input file\n";
         exit(1);
     }
     while (getline(inFile, line)) {
         // Remove whitespace from the beginning of the line
-	line.erase(line.begin(),
+        line.erase(line.begin(),
                    std::find_if(line.begin(), line.end(), [](unsigned char c) {
                        return !std::isspace(c);
                    }));

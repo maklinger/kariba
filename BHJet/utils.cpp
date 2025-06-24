@@ -1,6 +1,12 @@
+#include <cmath>
+
 #include "Kariba/Radiation.hpp"
+#include "kariba/constants.hpp"
 
 #include "bhjet.hpp"
+
+namespace karcst =
+    kariba::constants;    // alias the kariba::constants namespace
 
 // This function determines very, very roughly whether the Compton emission from
 // a zone is worth computing or not. The criteria are a) are we in the first
@@ -15,11 +21,13 @@
 bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Urad,
                    double velsw, zone_pars &zone) {
     double Lumnorm, Ub, Usyn, Lsyn, Lcom;
-    Lumnorm = pi * pow(zone.r, 2.) * zone.delz * pow(zone.delta, 4.) *
-              zone.lepdens * sigtom * cee * zone.avgammasq;
-    Ub = pow(zone.bfield, 2.) / (8. * pi);
+    Lumnorm = karcst::pi * std::pow(zone.r, 2.) * zone.delz *
+              std::pow(zone.delta, 4.) * zone.lepdens * karcst::sigtom *
+              karcst::cee * zone.avgammasq;
+    Ub = std::pow(zone.bfield, 2.) / (8. * karcst::pi);
     Lsyn = Lumnorm * Ub;
-    Usyn = Lsyn / (pi * pow(zone.r, 2.) * cee * pow(zone.delta, 4.));
+    Usyn = Lsyn / (karcst::pi * std::pow(zone.r, 2.) * karcst::cee *
+                   std::pow(zone.delta, 4.));
     Lcom = Lumnorm * (Usyn + Urad);
 
     bool test1 = (Lcom / Lsyn > 1e-2);
@@ -69,8 +77,9 @@ void plot_write(int size, double *en, double *lum, std::string path,
     file.open(path.c_str(), std::ios::app);
 
     for (int k = 0; k < size; k++) {
-        file << en[k] / (herg * (1. + redsh)) << " "
-             << lum[k] * (1. + redsh) / (4. * pi * pow(dist, 2.) * mjy)
+        file << en[k] / (karcst::herg * (1. + redsh)) << " "
+             << lum[k] * (1. + redsh) /
+                    (4. * karcst::pi * std::pow(dist, 2.) * karcst::mjy)
              << std::endl;
     }
 
@@ -83,8 +92,9 @@ void plot_write(int size, const double *en, const double *lum, std::string path,
     file.open(path.c_str(), std::ios::app);
 
     for (int k = 0; k < size; k++) {
-        file << en[k] / (herg * (1. + redsh)) << " "
-             << lum[k] * (1. + redsh) / (4. * pi * pow(dist, 2.) * mjy)
+        file << en[k] / (karcst::herg * (1. + redsh)) << " "
+             << lum[k] * (1. + redsh) /
+                    (4. * karcst::pi * std::pow(dist, 2.) * karcst::mjy)
              << std::endl;
     }
 
@@ -120,10 +130,10 @@ void sum_counterjet(int size, const double *input_en, const double *input_lum,
     en_cj_min = input_en[size];
     en_j_max = input_en[size - 1];
     en_cj_max = input_en[2 * size - 1];
-    einc = (log10(en_j_max) - log10(en_cj_min)) / (size - 1);
+    einc = (std::log10(en_j_max) - std::log10(en_cj_min)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
-        en[i] = pow(10., log10(en_cj_min) + i * einc);
+        en[i] = std::pow(10., std::log10(en_cj_min) + i * einc);
         en_j[i] = input_en[i];
         en_cj[i] = input_en[i + size];
         lum_j[i] = std::max(input_lum[i], 1.e-50);
@@ -177,9 +187,10 @@ void output_spectrum(int size, double *en, double *lum, double *spec,
 
     for (int k = 0; k < size; k++) {
         if (en[k] * (1. + redsh) < en[size - 1]) {
-            spec[k] =
-                log10(gsl_spline_eval(input_spline, en[k] * (1. + redsh), acc) *
-                      (1. + redsh) / (4. * pi * pow(dist, 2.) * mjy));
+            spec[k] = std::log10(
+                gsl_spline_eval(input_spline, en[k] * (1. + redsh), acc) *
+                (1. + redsh) /
+                (4. * karcst::pi * std::pow(dist, 2.) * karcst::mjy));
         } else {
             spec[k] = -50.;
         }
@@ -230,9 +241,11 @@ double integrate_lum(int size, double numin, double numax,
                      const double *input_en, const double *input_lum) {
     double temp = 0.0;
     for (int i = 0; i < size - 1; i++) {
-        if (input_en[i] / herg > numin && input_en[i + 1] / herg < numax) {
+        if (input_en[i] / karcst::herg > numin &&
+            input_en[i + 1] / karcst::herg < numax) {
             temp = temp + (1. / 2.) *
-                              (input_en[i + 1] / herg - input_en[i] / herg) *
+                              (input_en[i + 1] / karcst::herg -
+                               input_en[i] / karcst::herg) *
                               (input_lum[i + 1] + input_lum[i]);
         }
     }
@@ -247,16 +260,17 @@ double photon_index(int size, double numin, double numax,
     int counter_1 = 0, counter_2 = 0;
     double delta_y = 0.0, delta_x = 0.0, gamma = 0.0;
     for (int i = 0; i < size; i++) {
-        if (input_en[i] / herg < numin) {
+        if (input_en[i] / karcst::herg < numin) {
             counter_1 = i;
         }
-        if (input_en[i] / herg < numax) {
+        if (input_en[i] / karcst::herg < numax) {
             counter_2 = i;
         }
     }
-    delta_y = log10(input_lum[counter_2]) - log10(input_lum[counter_1]);
-    delta_x =
-        log10(input_en[counter_2] / herg) - log10(input_en[counter_1] / herg);
+    delta_y =
+        std::log10(input_lum[counter_2]) - std::log10(input_lum[counter_1]);
+    delta_x = std::log10(input_en[counter_2] / karcst::herg) -
+              std::log10(input_en[counter_1] / karcst::herg);
     gamma = delta_y / delta_x - 1.;
     return gamma;
 }

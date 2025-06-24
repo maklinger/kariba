@@ -1,19 +1,23 @@
+#include <cmath>
+#include <cstdarg>
 #include <fstream>
-#include <stdarg.h>
 
+#include "kariba/EBL.hpp"
+#include "kariba/constants.hpp"
+#include <kariba/BBody.hpp>
 #include <kariba/Bknpower.hpp>
+#include <kariba/Compton.hpp>
+#include <kariba/Cyclosyn.hpp>
 #include <kariba/Mixed.hpp>
 #include <kariba/Powerlaw.hpp>
 #include <kariba/Radiation.hpp>
-#include <kariba/Thermal.hpp>
-#include <kariba/BBody.hpp>
-#include <kariba/Compton.hpp>
-#include <kariba/Cyclosyn.hpp>
 #include <kariba/ShSDisk.hpp>
+#include <kariba/Thermal.hpp>
 
 #include "bhjet.hpp"
 
-using namespace std;
+namespace karcst =
+    kariba::constants;    // alias the kariba::constants namespace
 
 void jetmain(double *ear, int ne, double *param, double *photeng,
              double *photspec) {
@@ -112,14 +116,15 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     double *tot_lum = new double[ne];    // specific luminosity array for sum of
                                          // all components
 
-    ofstream Numdensfile;    // ofstream plot file for particle distribution
-    ofstream Presyn, Postsyn,
+    std::ofstream
+        Numdensfile;    // ofstream plot file for particle distribution
+    std::ofstream Presyn, Postsyn,
         Syn_zones;    // ofstream plot files for synchrotron emission
-    ofstream Precom, Postcom,
+    std::ofstream Precom, Postcom,
         Com_zones;    // same as above but for inverse Comtpon
-    ofstream Diskfile, Corfile,
-        BBfile;          // same as above but for disk/corona/blackbody
-    ofstream Totfile;    // same as above but for total model emission
+    std::ofstream Diskfile, Corfile,
+        BBfile;               // same as above but for disk/corona/blackbody
+    std::ofstream Totfile;    // same as above but for total model emission
 
     grid_pars grid;            // structure with grid parameters
     jet_dynpars jet_dyn;       // structure with jet dynamical parameters
@@ -129,10 +134,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
                          // in AGN
 
     // External photon object declarations
-    ShSDisk Disk;
-    BBody BLR;
-    BBody Torus;
-    BBody BlackBody;
+    kariba::ShSDisk Disk;
+    kariba::BBody BLR;
+    kariba::BBody Torus;
+    kariba::BBody BlackBody;
 
     // splines for jet acceleration
     gsl_interp_accel *acc_speed = gsl_interp_accel_alloc();
@@ -148,9 +153,9 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     // STEP 2: PARAMETER/FILE INITIALIZATION
     Mbh = param[0];
     Eddlum = 1.25e38 * Mbh;
-    Rg = gconst * Mbh * msun / (cee * cee);
+    Rg = karcst::gconst * Mbh * karcst::msun / (karcst::cee * karcst::cee);
     theta = param[1];
-    dist = param[2] * kpc;
+    dist = param[2] * karcst::kpc;
     redsh = param[3];
     jetrat = param[4] * Eddlum;
     r_0 = param[5] * Rg;
@@ -184,7 +189,8 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
     // initialize total energy/luminosity arrays
     for (int i = 0; i < ne; i++) {
-        tot_en[i] = (ear[i] + (ear[i + 1] - ear[i]) / 2.) * herg / hkev;
+        tot_en[i] =
+            (ear[i] + (ear[i + 1] - ear[i]) / 2.) * karcst::herg / karcst::hkev;
         tot_syn_pre[i] = 1.;
         tot_syn_post[i] = 1.;
         tot_com_pre[i] = 1.;
@@ -220,7 +226,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         Disk.set_mbh(Mbh);
         Disk.set_rin(r_in);
         Disk.set_rout(r_out);
-        Disk.set_luminosity(abs(l_disk));
+        Disk.set_luminosity(std::abs(l_disk));
         Disk.set_inclination(theta);
         Disk.disk_spectrum();
         if (compsw != 2 && l_disk > 0) {
@@ -229,7 +235,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         }
         if (infosw >= 3) {
             Disk.test();
-            cout << endl;
+            std::cout << "\n";
         }
     }
 
@@ -257,10 +263,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
         Disk.cover_disk(compar1 + compar2);
         if (infosw >= 3) {
-            cout << "BLR radius in Rg: " << agn_com.rblr / Rg
-                 << " and in cm: " << agn_com.rblr << endl;
-            cout << "DT radius in Rg: " << agn_com.rdt / Rg
-                 << " and in cm: " << agn_com.rdt << endl;
+            std::cout << "BLR radius in Rg: " << agn_com.rblr / Rg
+                      << " and in cm: " << agn_com.rblr << "\n";
+            std::cout << "DT radius in Rg: " << agn_com.rdt / Rg
+                      << " and in cm: " << agn_com.rdt << "\n";
         }
         sum_ext(40, ne, Torus.get_energy_obs(), Torus.get_nphot_obs(), tot_en,
                 tot_lum);
@@ -275,7 +281,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     // equipartition function The number density is just set to unity, the
     // normalisation is not needed to calculate the average Lorenz factor of the
     // thermal distribution anyway
-    Thermal dummy_elec(nel);
+    kariba::Thermal dummy_elec(nel);
     dummy_elec.set_temp_kev(t_e);
     dummy_elec.set_p();
     dummy_elec.set_norm(1.);
@@ -322,28 +328,28 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     // check that the pair content is not negative, and also if running bljet
     // that it's not too high
     if (nozzle_ener.eta < 1) {
-        cout << "Unphysical pair content: " << nozzle_ener.eta
-             << " pairs per proton. Check the value of " << "plasma beta!"
-             << endl;
+        std::cout << "Unphysical pair content: " << nozzle_ener.eta
+                  << " pairs per proton. Check the value of "
+                  << "plasma beta!\n";
     } else if (velsw > 1 && dummy_elec.av_gamma() * nozzle_ener.eta >= 3e2) {
-        cout << "Pair content or temperature too high for  for bljet! " << endl;
-        cout << "Pair content: " << nozzle_ener.eta << " pairs per proton"
-             << endl;
-        cout << "Average lepton Lorenz factor: " << dummy_elec.av_gamma()
-             << endl;
-        cout << "Check the value of Te and/or plasma beta!" << endl;
+        std::cout << "Pair content or temperature too high for  for bljet!\n";
+        std::cout << "Pair content: " << nozzle_ener.eta
+                  << " pairs per proton\n";
+        std::cout << "Average lepton Lorenz factor: " << dummy_elec.av_gamma()
+                  << "\n";
+        std::cout << "Check the value of Te and/or plasma beta!\n";
     }
 
     if (infosw >= 3) {
-        cout << "Jet base parameters: " << endl;
-        cout << "Pair content (ne/np): " << nozzle_ener.eta << endl;
-        cout << "Initial magnetization: " << nozzle_ener.sig0 << endl;
-        cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma()
-             << endl;
-        cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << endl;
-        cout << "Jet nozzle optical depth: "
-             << jet_dyn.r0 * nozzle_ener.lepdens * sigtom << endl
-             << endl;
+        std::cout << "Jet base parameters: \n";
+        std::cout << "Pair content (ne/np): " << nozzle_ener.eta << "\n";
+        std::cout << "Initial magnetization: " << nozzle_ener.sig0 << "\n";
+        std::cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma()
+                  << "\n";
+        std::cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << "\n";
+        std::cout << "Jet nozzle optical depth: "
+                  << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom
+                  << "\n\n";
     }
 
     // STEP 5: TOTAL JET CALCULATIONS, LOOPING OVER EACH SEGMENT OF THE JET
@@ -361,14 +367,15 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
                       acc_speed);
         }
         zone.delta =
-            1. / (zone.gamma * (1. - zone.beta * cos(theta * pi / 180.)));
+            1. / (zone.gamma *
+                  (1. - zone.beta * std::cos(theta * karcst::pi / 180.)));
 
         // This is to avoid crashes due to low (sub 1 kev) particle temperatures
         if (z < z_diss) {
-            zone.eltemp = max(tshift * t_e, 1.);
+            zone.eltemp = std::max(tshift * t_e, 1.);
         } else {
-            zone.eltemp =
-                max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+            zone.eltemp = std::max(
+                tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
         }
 
         // This is to evolve the fraction of non thermal particles along the
@@ -387,10 +394,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         if (r_in < r_out) {
             double Rdisk = pow(r_in, 2.) + pow(z, 2.);
             double delta_disk, theta_disk;
-            theta_disk = pi - atan(r_in / z);
-            delta_disk = 1. / (zone.gamma - zone.beta * cos(theta_disk));
-            Urad =
-                pow(delta_disk, 2.) * l_disk * Eddlum / (4. * pi * Rdisk * cee);
+            theta_disk = karcst::pi - std::atan(r_in / z);
+            delta_disk = 1. / (zone.gamma - zone.beta * std::cos(theta_disk));
+            Urad = pow(delta_disk, 2.) * l_disk * Eddlum /
+                   (4. * karcst::pi * Rdisk * karcst::cee);
         } else {
             Urad = 0.;
         }
@@ -404,7 +411,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
         // calculate particle distribution in each zone
         if (zone.nth_frac == 0.) {
-            Thermal th_lep(nel);
+            kariba::Thermal th_lep(nel);
             th_lep.set_temp_kev(zone.eltemp);
             th_lep.set_p();
             th_lep.set_norm(zone.lepdens);
@@ -429,10 +436,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
             if (IsShock == false) {
                 t_e = f_heat * t_e;
                 IsShock = true;
-                zone.eltemp =
-                    max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(
+                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
             }
-            Mixed acc_lep(nel);
+            kariba::Mixed acc_lep(nel);
             acc_lep.set_temp_kev(zone.eltemp);
             acc_lep.set_pspec(pspec);
             acc_lep.set_plfrac(zone.nth_frac);
@@ -469,18 +476,18 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         } else if (zone.nth_frac < 1.) {
             if (IsShock == false) {
                 t_e = f_heat * t_e;
-                zone.eltemp =
-                    max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(
+                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
                 IsShock = true;
             }
-            Thermal dummy_elec(nel);
+            kariba::Thermal dummy_elec(nel);
             dummy_elec.set_temp_kev(zone.eltemp);
             dummy_elec.set_p();
             dummy_elec.set_norm(zone.lepdens);
             dummy_elec.set_ndens();
             double pbrk = dummy_elec.av_p();
 
-            Bknpower acc_lep(nel);
+            kariba::Bknpower acc_lep(nel);
             acc_lep.set_pspec1(-2.);
             acc_lep.set_pspec2(pspec);
 
@@ -515,18 +522,18 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         } else if (zone.nth_frac == 1.) {
             if (IsShock == false) {
                 t_e = f_heat * t_e;
-                zone.eltemp =
-                    max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(
+                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
                 IsShock = true;
             }
-            Thermal dummy_elec(nel);
+            kariba::Thermal dummy_elec(nel);
             dummy_elec.set_temp_kev(zone.eltemp);
             dummy_elec.set_p();
             dummy_elec.set_norm(zone.lepdens);
             dummy_elec.set_ndens();
             double pmin = dummy_elec.av_p();
 
-            Powerlaw acc_lep(nel);
+            kariba::Powerlaw acc_lep(nel);
             acc_lep.set_pspec(pspec);
 
             if (f_sc < 10.) {
@@ -560,27 +567,28 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         // Note: the energy density below assumes only cold protons
         if (infosw >= 5) {
             double Up, Ue, Ub;
-            Ue = sqrt(zone.avgammasq) * zone.lepdens * emerg;
-            Up = (zone.lepdens / nozzle_ener.eta) * pmgm * pow(cee, 2.);
-            Ub = pow(zone.bfield, 2.) / (8. * pi);
-            cout << endl
-                 << "Jetpars; Bfield: " << zone.bfield
-                 << ", Lepton ndens: " << zone.lepdens
-                 << ", speed: " << zone.gamma << ", delta: " << zone.delta
-                 << endl;
-            cout << "tshift: " << tshift
-                 << ", Temperature in keV: " << zone.eltemp << endl;
-            cout << "Grid; R: " << zone.r / Rg << ", delz: " << zone.delz / Rg
-                 << ", z: " << z / Rg << ", z+delz: " << (zone.delz + z) / Rg
-                 << endl;
-            cout << "Equipartition check; Sigma: " << 2. * Ub / Up
-                 << " Ue/Ub: " << Ue / Ub << endl;
+            Ue = sqrt(zone.avgammasq) * zone.lepdens * karcst::emerg;
+            Up = (zone.lepdens / nozzle_ener.eta) * karcst::pmgm *
+                 pow(karcst::cee, 2.);
+            Ub = pow(zone.bfield, 2.) / (8. * karcst::pi);
+            std::cout << "\n"
+                      << "Jetpars; Bfield: " << zone.bfield
+                      << ", Lepton ndens: " << zone.lepdens
+                      << ", speed: " << zone.gamma << ", delta: " << zone.delta
+                      << "\n";
+            std::cout << "tshift: " << tshift
+                      << ", Temperature in keV: " << zone.eltemp << "\n";
+            std::cout << "Grid; R: " << zone.r / Rg
+                      << ", delz: " << zone.delz / Rg << ", z: " << z / Rg
+                      << ", z+delz: " << (zone.delz + z) / Rg << "\n";
+            std::cout << "Equipartition check; Sigma: " << 2. * Ub / Up
+                      << " Ue/Ub: " << Ue / Ub << "\n";
 
             std::ofstream file;
             file.open("Output/Profiles.dat", std::ios::app);
             file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " "
                  << zone.lepdens << " " << zone.gamma << " " << zone.eltemp
-                 << " " << std::endl;
+                 << " \n";
             file.close();
         }
         // calculate emission of each zone
@@ -588,28 +596,29 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         // part, so it needs to include both the black body and disk part. This
         // is why the maximum frequency is taken as the maximum of the two scale
         // frequencies.
-        syn_min =
-            0.1 * pow(gmin, 2.) * charg * zone.bfield / (2. * pi * emgm * cee);
+        syn_min = 0.1 * pow(gmin, 2.) * karcst::charg * zone.bfield /
+                  (2. * karcst::pi * karcst::emgm * karcst::cee);
         if (r_in < r_out) {
-            syn_max = max(50. * pow(gmax, 2.) * charg * zone.bfield /
-                              (2. * pi * emgm * cee),
-                          20. * Disk.tin() * kboltz / herg);
+            syn_max =
+                std::max(50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
+                             (2. * karcst::pi * karcst::emgm * karcst::cee),
+                         20. * Disk.tin() * karcst::kboltz / karcst::herg);
         } else {
-            syn_max = 50. * pow(gmax, 2.) * charg * zone.bfield /
-                      (2. * pi * emgm * cee);
+            syn_max = 50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
+                      (2. * karcst::pi * karcst::emgm * karcst::cee);
         }
         nsyn = int(log10(syn_max) - log10(syn_min)) * syn_res;
         syn_en = new double[nsyn];
         syn_lum = new double[nsyn];
-        Cyclosyn Syncro(nsyn);
+        kariba::Cyclosyn Syncro(nsyn);
         Syncro.set_frequency(syn_min, syn_max);
 
         com_min = 0.1 * Syncro.nu_syn();
-        com_max = ear[ne - 1] / hkev;
+        com_max = ear[ne - 1] / karcst::hkev;
         ncom = int(log10(com_max) - log10(com_min)) * com_res;
         com_en = new double[ncom];
         com_lum = new double[ncom];
-        Compton InvCompton(ncom, nsyn);
+        kariba::Compton InvCompton(ncom, nsyn);
         InvCompton.set_frequency(com_min, com_max);
 
         if (infosw > 1) {
@@ -695,7 +704,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
                 sum_zones(ncom, ne, com_en, com_lum, tot_en, tot_com_post);
             }
         } else if (infosw >= 5) {
-            cout << "Out of the Comptonization region" << endl;
+            std::cout << "Out of the Comptonization region\n";
         }
         if (infosw >= 2) {
             plot_write(nsyn, syn_en, syn_lum, "Output/Cyclosyn_zones.dat", dist,
@@ -712,15 +721,17 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     for (int k = 0; k < ne; k++) {
         tot_lum[k] = (tot_lum[k] + tot_syn_pre[k] + tot_syn_post[k] +
                       tot_com_pre[k] + tot_com_post[k]);
-        photeng[k] = log10(tot_en[k] / herg);
+        photeng[k] = log10(tot_en[k] / karcst::herg);
     }
 
     // Apply EBL attenuation factor for extragalactic sources
     if (redsh > 0. && EBLsw == 1) {
-        ebl_atten_gil(ne, tot_en, tot_lum, redsh);    // correction for total
-                                                      // luminosity
-        ebl_atten_gil(ne, tot_en, tot_com_post,
-                      redsh);    // correction for post Compton luminosity
+        kariba::ebl_atten_gil(ne, tot_en, tot_lum,
+                              redsh);    // correction for total
+                                         // luminosity
+        kariba::ebl_atten_gil(
+            ne, tot_en, tot_com_post,
+            redsh);    // correction for post Compton luminosity
     }
     output_spectrum(ne, tot_en, tot_lum, photspec, redsh, dist);
 
@@ -756,30 +767,30 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
         Radio_index = 1. + photon_index(ne, 1e10, 1e11, tot_en, tot_lum);
         compactness = integrate_lum(ne, 0.1 * 2.41e17, 300. * 2.41e17, tot_en,
                                     tot_com_pre) *
-                      sigtom / (r_0 * emerg * cee);
-        cout << "Observed 0.3-5 keV disk luminosity: " << disk_lum << endl;
-        cout << "Observed 0.3-300 keV Inverse Compton luminosity: " << IC_lum
-             << endl;
-        cout << "Observed 1-10 keV total luminosity: " << Xray_lum << endl;
-        cout << "Observed 4-6 GHz luminosity: " << Radio_lum << endl;
-        cout << "X-ray 10-100 keV photon index estimate: " << Xray_index
-             << endl;
-        cout << "Radio 10-100 GHz spectral index estimate: " << Radio_index
-             << endl;
-        cout << "Jet base compactness: " << compactness << endl << endl;
+                      karcst::sigtom / (r_0 * karcst::emerg * karcst::cee);
+        std::cout << "Observed 0.3-5 keV disk luminosity: " << disk_lum << "\n";
+        std::cout << "Observed 0.3-300 keV Inverse Compton luminosity: "
+                  << IC_lum << "\n";
+        std::cout << "Observed 1-10 keV total luminosity: " << Xray_lum << "\n";
+        std::cout << "Observed 4-6 GHz luminosity: " << Radio_lum << "\n";
+        std::cout << "X-ray 10-100 keV photon index estimate: " << Xray_index
+                  << "\n";
+        std::cout << "Radio 10-100 GHz spectral index estimate: " << Radio_index
+                  << "\n";
+        std::cout << "Jet base compactness: " << compactness << "\n\n";
         std::ofstream file;
         file.open("Output/Spectral_properties.dat", std::ios::app);
         file << disk_lum << " " << IC_lum << " " << Xray_lum << " " << Radio_lum
              << " " << Xray_index << " " << Radio_index << " " << compactness
-             << std::endl;
+             << "\n";
         file.close();
         if (compactness >= 10. * (param[9] / 511.) * exp(511. / param[9])) {
-            cout << "Possible pair production in the jet base!" << endl;
-            cout << "Lower limit on allowed compactness: "
-                 << 10. * (param[9] / 511.) * exp(511. / param[9]) << endl;
-            cout << "Note: this is for a slab, a cylinder allows higher l by a "
-                    "factor of ~10"
-                 << std::endl;
+            std::cout << "Possible pair production in the jet base!" << "\n";
+            std::cout << "Lower limit on allowed compactness: "
+                      << 10. * (param[9] / 511.) * exp(511. / param[9]) << "\n";
+            std::cout
+                << "Note: this is for a slab, a cylinder allows higher l by a "
+                   "factor of ~10\n";
         }
     }
 

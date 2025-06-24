@@ -20,7 +20,6 @@
 #include <sstream>
 #include <string>
 
-
 // Most functions in the code use input parameters arranged in a structure
 // rather than passed as a long list of multiple int/double variables. The
 // reason for this is imply to make the code easier to read and understand.
@@ -143,4 +142,4 @@ void jetinterp(double *ear, double *energ, double *phot, double *photar, int ne,
 
 void ebl_atten_gil(int size, double *en, double *lum, double redsh);
 
-#endif  // BHJET_HPP
+#endif    // BHJET_HPP
