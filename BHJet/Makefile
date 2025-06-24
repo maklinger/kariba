@@ -16,7 +16,7 @@ LDLIBS = -lgsl -lm
 RM = rm -f
 
 
-SOURCES = bhjet.cpp EBL.cpp jetpars.cpp utils.cpp
+SOURCES = bhjet.cpp jetpars.cpp utils.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
 TARGET_OBJ = bhwrap.o
 TARGET = bhwrap

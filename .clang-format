@@ -5,3 +5,4 @@ BreakStringLiterals: true
 LineEnding: LF
 SpaceAfterCStyleCast: true
 SpacesBeforeTrailingComments: 4
+NamespaceIndentation: Inner

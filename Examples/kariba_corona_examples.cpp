@@ -1,8 +1,11 @@
 #include <kariba/Compton.hpp>
 #include <kariba/ShSDisk.hpp>
 #include <kariba/Thermal.hpp>
+#include <kariba/constants.hpp>
 
 #include "kariba_examples.hpp"
+
+namespace karcst = kariba::constants;
 
 // This example shows how to set up thermal Comptonisation of accretion disk
 // photons in Kariba by a spherical coronae, using the ShSDisk, Thermal and
@@ -11,8 +14,8 @@
 
 int main() {
 
-    int nel = 100;   // array size for particle distributions
-    int nfreq = 100; // array size for frequency arrays
+    int nel = 100;      // array size for particle distributions
+    int nfreq = 100;    // array size for frequency arrays
 
     // Input parameters:
     double Mbh;
@@ -35,7 +38,7 @@ int main() {
     // luminosity in Eddington units.
     Mbh = 10.;
     Eddlum = 1.25e38 * Mbh;
-    Rg = gconst * Mbh * msun / (cee * cee);
+    Rg = karcst::gconst * Mbh * karcst::msun / karcst::cee_cee;
     Rin = 10. * Rg;
     Rout = 1e4 * Rg;
     Ldisk = 1e-4;
@@ -54,7 +57,7 @@ int main() {
     // density. The values for the radii were chosen exclusively to make the SED
     // plot look nice.
     for (int i = 0; i < 6; i++) {
-        ndens[i] = Tau[i % 3] / (sigtom * R[i]);
+        ndens[i] = Tau[i % 3] / (karcst::sigtom * R[i]);
     }
 
     // Set up the disk:note that the constructor does not require an array size
@@ -65,7 +68,7 @@ int main() {
     // luminosity. The mass of the BH is needed because the luminosity is
     // expressed in Eddington units. After all this is done set the inclination,
     // calculate the spectrum, and save it to file
-    ShSDisk Disk;
+    kariba::ShSDisk Disk;
     Disk.set_mbh(Mbh);
     Disk.set_rin(Rin);
     Disk.set_rout(Rout);
@@ -81,7 +84,7 @@ int main() {
     // the momentum and Lorenz factor arrays with set_p() after specifying a
     // temperature, and you can only set up the number density arrays with
     // set_ndens() after specifying the temperature and number density.
-    Thermal elec_Tau260Te90(nel);
+    kariba::Thermal elec_Tau260Te90(nel);
     elec_Tau260Te90.set_temp_kev(Te[0]);
     elec_Tau260Te90.set_p();
     elec_Tau260Te90.set_norm(ndens[0]);
@@ -123,7 +126,7 @@ int main() {
     // distance from the BH, over the BH vertical axis, of the emitting region.
     // After doing this, take the Lorenz factor interval and GSL interpolations
     // of the particle distribution, compute the spectrum, and save it to file
-    Compton IC_Tau260Te90(nfreq, 50);
+    kariba::Compton IC_Tau260Te90(nfreq, 50);
     IC_Tau260Te90.set_frequency(1e15, 1e22);
     IC_Tau260Te90.set_beaming(0., 0., 1.);
     IC_Tau260Te90.set_geometry("sphere", R[0]);
@@ -143,7 +146,7 @@ int main() {
     // Thermal and Compton objects with the setter methods, which can in
     // principle improve performance by saving up a bit of memory. Obviously
     // that is not necessary for this example.
-    Thermal elec_Tau076Te90(nel);
+    kariba::Thermal elec_Tau076Te90(nel);
     elec_Tau076Te90.set_temp_kev(Te[0]);
     elec_Tau076Te90.set_p();
     elec_Tau076Te90.set_norm(ndens[1]);
@@ -157,7 +160,7 @@ int main() {
     gsl_spline_init(spline_deriv, elec_Tau076Te90.get_gamma(),
                     elec_Tau076Te90.get_gdens_diff(), nel);
 
-    Compton IC_Tau076Te90(nfreq, 50);
+    kariba::Compton IC_Tau076Te90(nfreq, 50);
     IC_Tau076Te90.set_frequency(1e15, 1e22);
     IC_Tau076Te90.set_beaming(0., 0., 1.);
     IC_Tau076Te90.set_geometry("sphere", R[1]);
@@ -172,7 +175,7 @@ int main() {
                0.);
 
     //---------------------------------------------------------------------------------------------------------------
-    Thermal elec_Tau019Te90(nel);
+    kariba::Thermal elec_Tau019Te90(nel);
     elec_Tau019Te90.set_temp_kev(Te[0]);
     elec_Tau019Te90.set_p();
     elec_Tau019Te90.set_norm(ndens[2]);
@@ -186,7 +189,7 @@ int main() {
     gsl_spline_init(spline_deriv, elec_Tau019Te90.get_gamma(),
                     elec_Tau019Te90.get_gdens_diff(), nel);
 
-    Compton IC_Tau019Te90(nfreq, 50);
+    kariba::Compton IC_Tau019Te90(nfreq, 50);
     IC_Tau019Te90.set_frequency(1e15, 1e22);
     IC_Tau019Te90.set_beaming(0., 0., 1.);
     IC_Tau019Te90.set_geometry("sphere", R[2]);
@@ -201,7 +204,7 @@ int main() {
                0.);
 
     //----------------------------------------------------------------------------------------------------------------
-    Thermal elec_Tau260Te900(nel);
+    kariba::Thermal elec_Tau260Te900(nel);
     elec_Tau260Te900.set_temp_kev(Te[1]);
     elec_Tau260Te900.set_p();
     elec_Tau260Te900.set_norm(ndens[3]);
@@ -215,7 +218,7 @@ int main() {
     gsl_spline_init(spline_deriv, elec_Tau260Te900.get_gamma(),
                     elec_Tau260Te900.get_gdens_diff(), nel);
 
-    Compton IC_Tau260Te900(nfreq, 50);
+    kariba::Compton IC_Tau260Te900(nfreq, 50);
     IC_Tau260Te900.set_frequency(1e15, 1e22);
     IC_Tau260Te900.set_beaming(0., 0., 1.);
     IC_Tau260Te900.set_geometry("sphere", R[3]);
@@ -230,7 +233,7 @@ int main() {
                0.);
 
     //---------------------------------------------------------------------------------------------------------------
-    Thermal elec_Tau076Te900(nel);
+    kariba::Thermal elec_Tau076Te900(nel);
     elec_Tau076Te900.set_temp_kev(Te[1]);
     elec_Tau076Te900.set_p();
     elec_Tau076Te900.set_norm(ndens[4]);
@@ -244,7 +247,7 @@ int main() {
     gsl_spline_init(spline_deriv, elec_Tau076Te900.get_gamma(),
                     elec_Tau076Te900.get_gdens_diff(), nel);
 
-    Compton IC_Tau076Te900(nfreq, 50);
+    kariba::Compton IC_Tau076Te900(nfreq, 50);
     IC_Tau076Te900.set_frequency(1e15, 1e22);
     IC_Tau076Te900.set_beaming(0., 0., 1.);
     IC_Tau076Te900.set_geometry("sphere", R[4]);
@@ -259,7 +262,7 @@ int main() {
                0.);
 
     //---------------------------------------------------------------------------------------------------------------
-    Thermal elec_Tau019Te900(nel);
+    kariba::Thermal elec_Tau019Te900(nel);
     elec_Tau019Te900.set_temp_kev(Te[1]);
     elec_Tau019Te900.set_p();
     elec_Tau019Te900.set_norm(ndens[5]);
@@ -273,7 +276,7 @@ int main() {
     gsl_spline_init(spline_deriv, elec_Tau019Te900.get_gamma(),
                     elec_Tau019Te900.get_gdens_diff(), nel);
 
-    Compton IC_Tau019Te900(nfreq, 50);
+    kariba::Compton IC_Tau019Te900(nfreq, 50);
     IC_Tau019Te900.set_frequency(1e15, 1e22);
     IC_Tau019Te900.set_beaming(0., 0., 1.);
     IC_Tau019Te900.set_geometry("sphere", R[5]);

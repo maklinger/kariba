@@ -1,15 +1,18 @@
 #include <kariba/Radiation.hpp>
+#include <kariba/constants.hpp>
 
 #include "kariba_examples.hpp"
 
+namespace karcst = kariba::constants;
+
 // Read input parameters from file, store them in an array
-void read_params(string file, double *pars) {
-    ifstream inFile;
+void read_params(std::string file, double *pars) {
+    std::ifstream inFile;
     inFile.open(file.c_str());
-    string line;
+    std::string line;
     int line_nb = 0;
     if (!inFile) {
-        cerr << "Can't open input file" << endl;
+        std::cerr << "Can't open input file\n";
         exit(1);
     }
     while (getline(inFile, line)) {
@@ -33,38 +36,38 @@ void read_params(string file, double *pars) {
 // to pass arrays directly from the radiation libraries note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, double *en, double *lum, char path[], double dist,
-                double redsh) {
-    std::ofstream file;
-    file.open(path, std::ios::app);
-
-    for (int k = 0; k < size; k++) {
-        file << en[k] / (herg * (1. + redsh)) << " " << lum[k] << std::endl;
-    }
-
-    file.close();
-}
-
-void plot_write(int size, const double *en, const double *lum, char path[],
+void plot_write(int size, double *en, double *lum, const std::string &path,
                 double dist, double redsh) {
     std::ofstream file;
     file.open(path, std::ios::app);
 
     for (int k = 0; k < size; k++) {
-        file << en[k] / (herg * (1. + redsh)) << " " << lum[k] << std::endl;
+        file << en[k] / (karcst::herg * (1. + redsh)) << " " << lum[k] << "\n";
+    }
+
+    file.close();
+}
+
+void plot_write(int size, const double *en, const double *lum,
+                const std::string &path, double dist, double redsh) {
+    std::ofstream file;
+    file.open(path, std::ios::app);
+
+    for (int k = 0; k < size; k++) {
+        file << en[k] / (karcst::herg * (1. + redsh)) << " " << lum[k] << "\n";
     }
 
     file.close();
 }
 
 void plot_write(int size, const double *p, const double *g, const double *pdens,
-                const double *gdens, char path[]) {
+                const double *gdens, const std::string &path) {
 
     std::ofstream file;
     file.open(path, std::ios::app);
     for (int k = 0; k < size; k++) {
         file << p[k] << " " << g[k] << " " << pdens[k] << " " << gdens[k]
-             << std::endl;
+             << "\n";
     }
 
     file.close();
@@ -113,9 +116,11 @@ double integrate_lum(int size, double numin, double numax,
                      const double *input_en, const double *input_lum) {
     double temp = 0.;
     for (int i = 0; i < size - 1; i++) {
-        if (input_en[i] / herg > numin && input_en[i + 1] / herg < numax) {
+        if (input_en[i] / karcst::herg > numin &&
+            input_en[i + 1] / karcst::herg < numax) {
             temp = temp + (1. / 2.) *
-                              (input_en[i + 1] / herg - input_en[i] / herg) *
+                              (input_en[i + 1] / karcst::herg -
+                               input_en[i] / karcst::herg) *
                               (input_lum[i + 1] + input_lum[i]);
         }
     }
@@ -130,16 +135,16 @@ double photon_index(int size, double numin, double numax,
     int counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
     for (int i = 0; i < size; i++) {
-        if (input_en[i] / herg < numin) {
+        if (input_en[i] / karcst::herg < numin) {
             counter_1 = i;
         }
-        if (input_en[i] / herg < numax) {
+        if (input_en[i] / karcst::herg < numax) {
             counter_2 = i;
         }
     }
     delta_y = log10(input_lum[counter_2]) - log10(input_lum[counter_1]);
-    delta_x =
-        log10(input_en[counter_2] / herg) - log10(input_en[counter_1] / herg);
+    delta_x = log10(input_en[counter_2] / karcst::herg) -
+              log10(input_en[counter_1] / karcst::herg);
     gamma = delta_y / delta_x - 1.;
     return gamma;
 }
@@ -151,18 +156,16 @@ double photon_index(int size, double numin, double numax,
 // path inside the write function. As a result, it's impossible to just truncate
 // and clean the files at the start of each iteration. This is only relevant for
 // the cyclosyn_zones, compton_zones, and numdens files
-void clean_file(char path[], bool check) {
+void clean_file(const std::string &path, bool check) {
     std::ofstream file;
     file.open(path, std::ios::trunc);
 
     if (check == true) {
-        file << std::left << std::setw(20) << "#nu [Hz] " << std::setw(20)
-             << "Flux [mJy] " << std::endl;
+        file << std::left << std::setw(20) << "#nu [Hz] " << "Flux [mJy]\n";
     } else {
         file << std::left << std::setw(20) << "#p [g cm s-1] " << std::setw(20)
              << "g [] " << std::setw(20) << " n(p) [# cm^-3 p^-1] "
-             << std::setw(20) << " n(g) [# cm^-3 g^-1]" << std::setw(20)
-             << std::endl;
+             << " n(g) [# cm^-3 g^-1]\n";
     }
 
     file.close();
