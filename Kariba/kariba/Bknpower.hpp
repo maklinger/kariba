@@ -1,7 +1,9 @@
 #ifndef BKNPOWER_HPP
 #define BKNPOWER_HPP
 
-#include "Particles.hpp"
+#include "kariba/Particles.hpp"
+
+namespace kariba {
 
 // Class for non-thermal particles, inherited from the generic Particles class
 // in Particles.hpp note: ndens is number density per unit momentum
@@ -32,5 +34,7 @@ class Bknpower : public Particles {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

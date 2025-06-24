@@ -1,8 +1,10 @@
 #ifndef SHSDISK_HPP
 #define SHSDISK_HPP
 
-#include "Radiation.hpp"
+#include "kariba/Radiation.hpp"
 #include <iostream>
+
+namespace kariba {
 
 // Class Shakura-Sunyeav disk, inherited from Radiation.hpp
 
@@ -40,5 +42,7 @@ class ShSDisk : public Radiation {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

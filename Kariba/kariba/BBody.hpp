@@ -1,7 +1,9 @@
 #ifndef BBODY_HPP
 #define BBODY_HPP
 
-#include "Radiation.hpp"
+#include "kariba/Radiation.hpp"
+
+namespace kariba {
 
 // Class black body photons, inherited from Radiation.hh
 
@@ -30,5 +32,7 @@ class BBody : public Radiation {
 
     void test();
 };
+
+}    // namespace kariba
 
 #endif

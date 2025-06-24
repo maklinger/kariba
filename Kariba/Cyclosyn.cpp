@@ -2,6 +2,9 @@
 
 #include "kariba/Cyclosyn.hpp"
 #include "kariba/Radiation.hpp"
+#include "kariba/constants.hpp"
+
+namespace kariba {
 
 // Synchrotron tables for F(nu/nuc) for calculation of single particle spectrum
 static double arg[47] = {
@@ -66,17 +69,20 @@ double cyclosyn_emis(double gamma, void *p) {
     gamma = exp(gamma);
     // this is in the synchrotron regime
     if (gamma > 2.) {
-        nu_c = (3. * charg * b * pow(gamma, 2.)) / (4. * pi * emgm * cee);
+        nu_c = (3. * constants::charg * b * pow(gamma, 2.)) /
+               (4. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_c;
         if (x <= 1.e-4) {
-            emisfunc = 4. * pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
+            emisfunc =
+                4. * constants::pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
         } else if (x > 50.) {
-            emisfunc = sqrt(pi * x / 2.) * exp(-x);
+            emisfunc = sqrt(constants::pi * x / 2.) * exp(-x);
         } else {
             emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
     } else {    // cyclotron regime
-        nu_larmor = (charg * b) / (2. * pi * emgm * cee);
+        nu_larmor = (constants::charg * b) /
+                    (2. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_larmor;
         psquared = pow(gamma, 2.) - 1.;
         emisfunc = (2. * psquared) / (1. + 3. * psquared) *
@@ -101,17 +107,20 @@ double cyclosyn_abs(double gamma, void *p) {
     gamma = exp(gamma);
     // this is in the synchrotron regime
     if (gamma > 2.) {
-        nu_c = (3. * charg * b * pow(gamma, 2.)) / (4. * pi * emgm * cee);
+        nu_c = (3. * constants::charg * b * pow(gamma, 2.)) /
+               (4. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_c;
         if (x <= 1.e-4) {
-            emisfunc = 4. * pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
+            emisfunc =
+                4. * constants::pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
         } else if (x > 50.) {
-            emisfunc = sqrt(pi * x / 2.) * exp(-x);
+            emisfunc = sqrt(constants::pi * x / 2.) * exp(-x);
         } else {
             emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
     } else {    // cyclotron regime
-        nu_larmor = (charg * b) / (2. * pi * emgm * cee);
+        nu_larmor = (constants::charg * b) /
+                    (2. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_larmor;
         psquared = pow(gamma, 2.) - 1.;
         emisfunc = (2. * psquared) / (1. + 3. * psquared) *
@@ -177,8 +186,9 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
         if (counterjet == true) {
             en_phot_obs[k + size] = en_phot[k] * dopfac_cj;
         }
-        emis = emis_integral(en_phot[k] / herg, gmin, gmax, eldis, acc_eldis);
-        abs = abs_integral(en_phot[k] / herg, gmin, gmax, eldis_diff,
+        emis = emis_integral(en_phot[k] / constants::herg, gmin, gmax, eldis,
+                             acc_eldis);
+        abs = abs_integral(en_phot[k] / constants::herg, gmin, gmax, eldis_diff,
                            acc_eldis_diff);
         if (log10(emis) < -50. || log10(abs) < -50.) {
             num_phot_obs[k] = 0;
@@ -186,15 +196,18 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 num_phot_obs[k + size] = 0;
             }
         } else {
-            elcons = sqrt(3.) * (charg * charg * charg) * bfield * sin(pitch) /
-                     emerg;
-            acons = -cee * cee / (8. * pi * pow(en_phot[k] / herg, 2.));
+            elcons = sqrt(3.) *
+                     (constants::charg * constants::charg * constants::charg) *
+                     bfield * sin(pitch) / constants::emerg;
+            acons =
+                -constants::cee * constants::cee /
+                (8. * constants::pi * pow(en_phot[k] / constants::herg, 2.));
             asyn = acons * elcons * abs;
             epsasyn = emis / (acons * abs);
             if (geometry == "cylinder") {
-                tsyn = pi / 2. * asyn * r;
+                tsyn = constants::pi / 2. * asyn * r;
             } else {
-                tsyn = pi / 3. * asyn * r;
+                tsyn = constants::pi / 3. * asyn * r;
             }
             if (tsyn >= 1.) {
                 absfac = (1. - exp(-tsyn));
@@ -203,9 +216,10 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
             }
             // This includes skin depth/viewing angle effects for cylinder case
             if (geometry == "cylinder") {
-                tsyn_obs = pi / 2. * asyn * r / (dopfac * sin(angle));
+                tsyn_obs =
+                    constants::pi / 2. * asyn * r / (dopfac * sin(angle));
             } else {
-                tsyn_obs = pi / 3. * asyn * r;
+                tsyn_obs = constants::pi / 3. * asyn * r;
             }
             if (tsyn_obs >= 1.) {
                 absfac_obs = (1. - exp(-tsyn_obs));
@@ -214,15 +228,16 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
                     tsyn_obs - pow(tsyn_obs, 2.) / 2. + pow(tsyn_obs, 3.) / 6.;
             }
 
-            num_phot[k] = pi * r * r * absfac * epsasyn;
+            num_phot[k] = constants::pi * r * r * absfac * epsasyn;
             num_phot_obs[k] =
                 2. * r * z * absfac_obs * epsasyn * pow(dopfac, dopnum);
 
             if (counterjet == true) {
                 if (geometry == "cylinder") {
-                    tsyn_obs = pi / 2. * asyn * r / (dopfac * sin(angle));
+                    tsyn_obs =
+                        constants::pi / 2. * asyn * r / (dopfac * sin(angle));
                 } else {
-                    tsyn_obs = pi / 3. * asyn * r;
+                    tsyn_obs = constants::pi / 3. * asyn * r;
                 }
                 if (tsyn_obs >= 1.) {
                     absfac_obs = (1. - exp(-tsyn_obs));
@@ -246,7 +261,8 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
 // the simple way, this accounts for the fact that the peak may be caused by
 // synchrotron self absorption rather than coinciding with the scale frequency
 double Cyclosyn::nu_syn(double gamma) {
-    return (3. * charg * bfield * pow(gamma, 2.)) / (4. * pi * emgm * cee);
+    return (3. * constants::charg * bfield * pow(gamma, 2.)) /
+           (4. * constants::pi * constants::emgm * constants::cee);
 }
 
 double Cyclosyn::nu_syn() {
@@ -258,7 +274,7 @@ double Cyclosyn::nu_syn() {
             temp = i;
         }
     }
-    return en_phot[temp] / herg;
+    return en_phot[temp] / constants::herg;
 }
 
 // Method to set up the frequency array over desired range
@@ -266,15 +282,20 @@ void Cyclosyn::set_frequency(double numin, double numax) {
     double nuinc = (log10(numax) - log10(numin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
-        en_phot[i] = pow(10., log10(numin) + i * nuinc) * herg;
+        en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
     }
 }
 
 // Method to set magnetic field
 void Cyclosyn::set_bfield(double b) { bfield = b; }
 
+// Method to set the particle mass
+void Cyclosyn::set_mass(double mass) { mass_gr = mass; }
+
 void Cyclosyn::test() {
     std::cout << "Bfield: " << bfield << " r: " << r << " z: " << z
               << " v.angle: " << angle << " speed: " << beta
               << " delta: " << dopfac << std::endl;
 }
+
+}    // namespace kariba

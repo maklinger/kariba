@@ -1,35 +1,7 @@
 #ifndef PARTICLES_HPP
 #define PARTICLES_HPP
 
-#include <gsl/gsl_const_cgsm.h>
-#include <gsl/gsl_const_num.h>
-#include <gsl/gsl_math.h>
-
-#define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
-#define emgm GSL_CONST_CGSM_MASS_ELECTRON
-#define pmgm GSL_CONST_CGSM_MASS_PROTON
-#define kboltz GSL_CONST_CGSM_BOLTZMANN
-#define kboltz_kev2erg 1.6022e-9
-#define gr_to_kev 5.6095883571872e+29
-#define me_kev 511.
-#define emerg                                                                  \
-    (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
-#define pi M_PI
-#define charg 4.8e-10
-#define sigtom GSL_CONST_CGSM_THOMSON_CROSS_SECTION
-#define herg GSL_CONST_CGSM_PLANCKS_CONSTANT_H
-#define hkev (GSL_CONST_CGSM_PLANCKS_CONSTANT_H * 6.2415e8)
-#define mjy 1.e-26
-#define re0 2.81794e-13
-#define gconst GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT
-#define sbconst GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT
-#define aconst 7.56e-15
-#define erg 6.24e11    // 1 erg = 6.24e11 eV
-#define Kpp 0.5        // Inelasticity Kpp. Here is considered constant
-#define barn 1.e-24
-#define mbarn (1.e-3 * barn)
-#define sigmapp 3.43e-26    // pp cross section in cm2
-
+namespace kariba {
 // Template class for particle distributions
 // This class contains members and methods that are used for thermal,
 // non-thermal and mixed distributions
@@ -134,4 +106,7 @@ class Particles {
 
     void test_arrays();
 };
+
+}    // namespace kariba
+
 #endif

@@ -1,44 +1,15 @@
 #ifndef RADIATION_HPP
 #define RADIATION_HPP
 
-#include <gsl/gsl_const_cgsm.h>
-#include <gsl/gsl_const_num.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_interp2d.h>
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_spline2d.h>
 #include <string>
 
-#define kpc (1e3 * GSL_CONST_CGSM_PARSEC)
-#define cee GSL_CONST_CGSM_SPEED_OF_LIGHT
-#define emgm GSL_CONST_CGSM_MASS_ELECTRON
-#define pmgm GSL_CONST_CGSM_MASS_PROTON
-#define kboltz GSL_CONST_CGSM_BOLTZMANN
-#define kboltz_kev2erg 1.6022e-9    // Boltzman constant in keV/erg
-#define emerg                                                                  \
-    (GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.))
-#define pi M_PI
-#define charg 4.8e-10
-#define sigtom GSL_CONST_CGSM_THOMSON_CROSS_SECTION
-#define herg GSL_CONST_CGSM_PLANCKS_CONSTANT_H
-#define hkev (GSL_CONST_CGSM_PLANCKS_CONSTANT_H * 6.2415e8)
-#define mjy 1.e-26
-#define re0 2.81794e-13
-#define gconst GSL_CONST_CGSM_GRAVITATIONAL_CONSTANT
-#define sbconst GSL_CONST_CGSM_STEFAN_BOLTZMANN_CONSTANT
-#define aconst 7.56e-15
-#define msun GSL_CONST_CGSM_SOLAR_MASS
-#define erg 6.24e11               // 1 erg = 6.24e11 eV
-#define mprotTeV 938.272046e-6    // mass of proton in TeV/c^2
-#define mpionTeV 139.57e-6        // mass of pion in TeV/c^2
-#define Kpp 0.5     // Inelasticity Kpp. Here is considered constant.
-#define Kpi 0.17    // fraction of E_kinetic of proton transferred to neutrinos
-#define hbar (herg / (2. * Pi))    // h bar
-#define barn 1.e-24
-#define mbarn (1.e-3 * barn)
+namespace kariba {
 
 // Template class for photon/neutrino distributions
 
@@ -109,7 +80,7 @@ class Radiation {
     double dopfac, angle;    // Viewing angle/Doppler factor of emitting region
     double dopnum;           // Doppler boosting exponent, depends on geometry
     bool counterjet;    // boolean switch if user wants to include counterjet
-                        // emission
+    // emission
     std::string geometry;    // string to track geometry of emitting region
 
   public:
@@ -118,6 +89,7 @@ class Radiation {
     double *get_energy_obs() const { return en_phot_obs; }
     double *get_nphot_obs() const { return num_phot_obs; }
     int get_size() const { return size; }
+    double get_volume() const { return vol; }
 
     double integrated_luminosity(double numin, double numax);
 
@@ -129,5 +101,6 @@ class Radiation {
     void set_counterjet(bool flag);
     void test_arrays();
 };
+}    // namespace kariba
 
 #endif

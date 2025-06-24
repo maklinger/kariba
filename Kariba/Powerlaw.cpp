@@ -8,6 +8,9 @@
 #include "kariba/Electrons.hpp"
 #include "kariba/Particles.hpp"
 #include "kariba/Powerlaw.hpp"
+#include "kariba/constants.hpp"
+
+namespace kariba {
 
 // Class constructor to initialize object
 Powerlaw::Powerlaw(int s) {
@@ -21,8 +24,8 @@ Powerlaw::Powerlaw(int s) {
 
     plnorm = 1.;
 
-    mass_gr = emgm;
-    mass_kev = emgm * gr_to_kev;
+    mass_gr = constants::emgm;
+    mass_kev = constants::emgm * constants::gr_to_kev;
 
     for (int i = 0; i < size; i++) {
         p[i] = 0;
@@ -43,19 +46,21 @@ void Powerlaw::set_p(double min, double ucom, double bfield, double betaeff,
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 void Powerlaw::set_p(double min, double gmax) {
     pmin = min;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
     double pinc = (log10(pmax) - log10(pmin)) / (size - 1);
 
     for (int i = 0; i < size; i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * cee), 2.) + 1., 1. / 2.);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -85,7 +90,7 @@ double injection_pl_int(double x, void *p) {
     double m = (params->m);
     double max = (params->max);
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * cee;
+    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
     return n * pow(mom_int, -s) * exp(-mom_int / max);
 }
@@ -94,11 +99,11 @@ double injection_pl_int(double x, void *p) {
 // included in IC cooling
 void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield,
                                    double r, double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    double pdot_ad = betaeff * cee / r;
-    double pdot_rad =
-        (4. * sigtom * cee * Urad) / (3. * mass_gr * pow(cee, 2.));
-    double tinj = r / (cee);
+    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double pdot_ad = betaeff * constants::cee / r;
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * pow(constants::cee, 2.));
+    double tinj = r / (constants::cee);
 
     double integral, error;
     gsl_function F1;
@@ -114,9 +119,10 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield,
                                 w1, &integral, &error);
             gsl_integration_workspace_free(w1);
 
-            ndens[i] = (integral / tinj) /
-                       (pdot_ad * p[i] / (mass_gr * cee) +
-                        pdot_rad * (gamma[i] * p[i] / (mass_gr * cee)));
+            ndens[i] =
+                (integral / tinj) /
+                (pdot_ad * p[i] / (mass_gr * constants::cee) +
+                 pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[size - 1] = ndens[size - 2] *
                               pow(p[size - 1] / p[size - 2], -pspec - 1) *
@@ -149,17 +155,18 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield,
 double Powerlaw::max_p(double ucom, double bfield, double betaeff, double r,
                        double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * pi) + ucom;
-    escom = betaeff * cee / r;
-    syncon = (4. * sigtom * Urad) / (3. * mass_gr * cee);
-    accon = (3. * fsc * charg * bfield) / (4. * mass_gr * cee);
+    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    escom = betaeff * constants::cee / r;
+    syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
+    accon = (3. * fsc * constants::charg * bfield) /
+            (4. * mass_gr * constants::cee);
 
     b = escom / syncon;
     c = accon / syncon;
 
     gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * cee;
+    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 // Methods to set energy array for protons
@@ -187,10 +194,10 @@ void Powerlaw::set_energy(double gpmin, double fsc, double f_beta,
 
     for (int i = 0; i < size; i++) {
         gamma[i] = pow(10., (log10(gpmin) + i * logdgp));
-        p[i] = sqrt(gamma[i] * gamma[i] - 1.) * mass_gr * cee;
+        p[i] = sqrt(gamma[i] * gamma[i] - 1.) * mass_gr * constants::cee;
     }
     pmin = p[0];
-    pmax = sqrt(gpmax * gpmax - 1.) * mass_gr * cee;
+    pmax = sqrt(gpmax * gpmax - 1.) * mass_gr * constants::cee;
 }
 
 void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta,
@@ -213,16 +220,20 @@ void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta,
 
     std::ofstream timescalesFile;
 
-    Tacc0 = 1. / (3. * fsc / 4. * charg * cee * bfield);    // acceleration
-    double Tesc = r / (f_beta * cee);                       // proton escape
-    double Tpp = 1. / (sigmapp * pp_targets * cee);         // pp
+    Tacc0 = 1. / (3. * fsc / 4. * constants::charg * constants::cee *
+                  bfield);                          // acceleration
+    double Tesc = r / (f_beta * constants::cee);    // proton escape
+    double Tpp =
+        1. / (constants::sigmapp * pp_targets * constants::cee);    // pp
 
     // The only photon field here is the companion's/external boosted radiation
-    double Tpg0 = 1. / (9.38 * 7.4e-17 * Uradjet / (mass_gr * cee * cee));
+    double Tpg0 = 1. / (9.38 * 7.4e-17 * Uradjet /
+                        (mass_gr * constants::cee * constants::cee));
 
-    double Tsynp0 = 6. * pi / (sigtom * bfield * bfield) *
-                    pow(mass_gr * cee, 4) /
-                    (emgm * emgm * cee);    // proton synchrotron
+    double Tsynp0 = 6. * constants::pi / (constants::sigtom * bfield * bfield) *
+                    pow(mass_gr * constants::cee, 4) /
+                    (constants::emgm * constants::emgm *
+                     constants::cee);    // proton synchrotron
 
     // The parameters used to solve Emax equation, i.e., Emax^2 + paramG*Emax -
     // paramH = 0 for protons:
@@ -232,8 +243,8 @@ void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta,
     // Maximun proton energy in erg as calculated by losses:
     double Epmax = (-paramG + sqrt(paramG * paramG + 4. * paramH)) / 2.;
 
-    gpmax = Epmax / (pmgm * cee * cee) + 1.;
-    if (Epmax > pmgm * cee * cee) {
+    gpmax = Epmax / (constants::pmgm * constants::cee * constants::cee) + 1.;
+    if (Epmax > constants::pmgm * constants::cee * constants::cee) {
         isEfficient = true;
         logdgp = log10(2. * gpmax / gpmin) /
                  (size - 1);    // so as to extend a bit further from γ_p,max
@@ -250,25 +261,33 @@ void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta,
         for (int i = 0; i < size; i++) {
             gp = pow(10., (log10(gpmin) + i * logdgp));
             betap = sqrt(gp * gp - 1.) / gp;
-            tescape = r / (cee * betap * f_beta);
+            tescape = r / (constants::cee * betap * f_beta);
 
-            EpTeV = pmgm * cee * cee * gp / 1.6;
+            EpTeV =
+                constants::pmgm * constants::cee * constants::cee * gp / 1.6;
             sinel = sigma_pp(EpTeV);
 
             // we set the correct Tpg0 in order to plot the timescales;
-            Tpg0 = (gp * mass_gr * cee * cee * erg >= 4.8e14)
-                       ? 1. / (9.38 * 7.4e-17 * Uradjet / (mass_gr * cee * cee))
+            Tpg0 = (gp * mass_gr * constants::cee * constants::cee *
+                        constants::erg >=
+                    4.8e14)
+                       ? 1. / (9.38 * 7.4e-17 * Uradjet /
+                               (mass_gr * constants::cee * constants::cee))
                        : 1.e100;
-            Tpp = 1. / (Kpp * mbarn * sinel * pp_targets * cee);
+            Tpp = 1. / (constants::Kpp * constants::mbarn * sinel * pp_targets *
+                        constants::cee);
 
             timescalesFile << std::left << std::setw(13) << z / r_g
                            << std::setw(13) << gp << std::setw(13)
-                           << Tacc0 * mass_gr * cee * cee * gp << std::setw(13)
-                           << tescape << std::setw(13)
-                           << Tsynp0 /
-                                  (mass_gr * cee * cee * gp * betap * betap)
+                           << Tacc0 * mass_gr * constants::cee *
+                                  constants::cee * gp
+                           << std::setw(13) << tescape << std::setw(13)
+                           << Tsynp0 / (mass_gr * constants::cee *
+                                        constants::cee * gp * betap * betap)
                            << std::setw(13) << Tpp << std::setw(15)
-                           << Tpg0 / (mass_gr * cee * cee) / gp;
+                           << Tpg0 /
+                                  (mass_gr * constants::cee * constants::cee) /
+                                  gp;
             timescalesFile << std::endl;
         }
         timescalesFile.close();
@@ -308,9 +327,10 @@ double Powerlaw::sigma_pp(double Ep) {    // cross section of pp in mb (that's
     return sinel;
 }
 double Powerlaw::set_normprot(double nprot) {
-    double Epmin = mass_gr * cee * cee * gamma[0];
-    double Epmax = sqrt((pmax * cee) * (pmax * cee) +
-                        (mass_gr * cee * cee) * (mass_gr * cee * cee));
+    double Epmin = mass_gr * constants::cee * constants::cee * gamma[0];
+    double Epmax = sqrt((pmax * constants::cee) * (pmax * constants::cee) +
+                        (mass_gr * constants::cee * constants::cee) *
+                            (mass_gr * constants::cee * constants::cee));
 
     // If break energy is higher than maximum energy, set normalisation for
     // uncooled distribution:
@@ -325,25 +345,38 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
     /* if plfrac_p>0, namely a frac of thermal of protons accelerate*/
     // plnormprot is in #/cm3/erg/sec and gdens is in #/cm3/gamma_p
     if (isEfficient) {
-        double plnormprot = set_normprot(protdens) * plfrac * cee / r;
+        double plnormprot =
+            set_normprot(protdens) * plfrac * constants::cee / r;
         double Tsynp0, Tchar, Tpp;
         double betap;
-        double gpmax = sqrt(pmax * pmax / (mass_gr * cee * mass_gr * cee) + 1.);
-        Tsynp0 = 6. * pi / (sigtom * bfield * bfield) * pow(mass_gr * cee, 4) /
-                 (emgm * emgm * cee);    // proton synchrotron
-        double Tpg0 = 1. / (9.38 * 7.4e-17 * Uradjet / (mass_gr * cee * cee));
+        double gpmax =
+            sqrt(pmax * pmax /
+                     (mass_gr * constants::cee * mass_gr * constants::cee) +
+                 1.);
+        Tsynp0 = 6. * constants::pi / (constants::sigtom * bfield * bfield) *
+                 pow(mass_gr * constants::cee, 4) /
+                 (constants::emgm * constants::emgm *
+                  constants::cee);    // proton synchrotron
+        double Tpg0 = 1. / (9.38 * 7.4e-17 * Uradjet /
+                            (mass_gr * constants::cee * constants::cee));
         for (int i = 0; i < size; i++) {
             betap = sqrt(gamma[i] * gamma[i] - 1.) / gamma[i];
-            Tpp = 1. /
-                  (nwind * sigma_pp(pmgm * cee * cee * gamma[i] / 1.6) * betap *
-                   cee * mbarn);    // proton energy in TeV for the function
-            Tchar = pow(cee / r + 1. / Tpp +
-                            gamma[i] * mass_gr * cee * cee *
-                                (1. / Tpg0 + 1. / Tsynp0),
+            Tpp =
+                1. /
+                (nwind *
+                 sigma_pp(constants::pmgm * constants::cee * constants::cee *
+                          gamma[i] / 1.6) *
+                 betap * constants::cee *
+                 constants::mbarn);    // proton energy in TeV for the function
+            Tchar = pow(constants::cee / r + 1. / Tpp +
+                            gamma[i] * mass_gr * constants::cee *
+                                constants::cee * (1. / Tpg0 + 1. / Tsynp0),
                         -1);
             gdens[i] = plnormprot *
-                       pow(gamma[i] * mass_gr * cee * cee, -pspec) *
-                       exp(-gamma[i] / gpmax) * Tchar * mass_gr * cee * cee;
+                       pow(gamma[i] * mass_gr * constants::cee * constants::cee,
+                           -pspec) *
+                       exp(-gamma[i] / gpmax) * Tchar * mass_gr *
+                       constants::cee * constants::cee;
         }
     } else {    // in case Emax<Emin
         for (int i = 0; i < size; i++)
@@ -360,7 +393,10 @@ void Powerlaw::set_gdens(double r, double beta, double Ljet, double ep,
     if (isEfficient) {
         double G_jet = 1. / sqrt(1. - beta * beta);    // bulk Lorentz factor
         double plnormprot;                             // in #/cm3
-        double gpmax = sqrt(pmax * pmax / (mass_gr * cee * mass_gr * cee) + 1.);
+        double gpmax =
+            sqrt(pmax * pmax /
+                     (mass_gr * constants::cee * mass_gr * constants::cee) +
+                 1.);
         double sum = 0;
         double dx = log10(gamma[2] / gamma[1]);
         for (int i = 0; i < size; i++)
@@ -369,7 +405,8 @@ void Powerlaw::set_gdens(double r, double beta, double Ljet, double ep,
 
         plnormprot =
             ep * Ljet /
-            (mass_gr * cee * cee * pi * r * r * G_jet * beta * cee * sum);
+            (mass_gr * constants::cee * constants::cee * constants::pi * r * r *
+             G_jet * beta * constants::cee * sum);
         for (int i = 0; i < size; i++)
             gdens[i] =
                 plnormprot * pow(gamma[i], -pspec) * exp(-gamma[i] / gpmax);
@@ -387,13 +424,17 @@ void Powerlaw::set_gdens(double r, double beta, double Ljet, double ep,
 void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
     /* If mass-loading, I use the specific enthalpy to work the normalisation */
     if (isEfficient) {
-        double gpmax = sqrt(pmax * pmax / (mass_gr * cee * mass_gr * cee) + 1.);
+        double gpmax =
+            sqrt(pmax * pmax /
+                     (mass_gr * constants::cee * mass_gr * constants::cee) +
+                 1.);
         double sum = 0;
         double dx = log10(gamma[2] / gamma[1]);
         for (int i = 0; i < size; i++)
             sum += log(10.) * pow(gamma[i], -pspec + 2.) *
                    exp(-gamma[i] / gpmax) * dx;
-        double K = std::max(Up / (sum * mass_gr * cee * cee), 0.);
+        double K = std::max(
+            Up / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
         sum = 0.;
         for (int i = 0; i < size; i++)
@@ -420,13 +461,15 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
     double ntilde = multiplicity(pspec);    // The number of produced pions for
                                             // a given proton distribution
     double pp_targets = target_protons(ntot_prot, nwind, plfrac);
-    double Epcode_max = Ep_max * erg * 1.e-12;    // The proton energy in TeV
+    double Epcode_max =
+        Ep_max * constants::erg * 1.e-12;    // The proton energy in TeV
 
     int N = 60;    // The number of steps of the secondary particle (e.g., pion)
                    // energy.
-    double gmin = 1.002;             // the min Lorentz factor of the secondary
-    double gmax = Ep_max / emerg;    // the max Lorentz factor of the secondary
-    double Ep;                       // the energy of the proton
+    double gmin = 1.002;    // the min Lorentz factor of the secondary
+    double gmax =
+        Ep_max / constants::emerg;    // the max Lorentz factor of the secondary
+    double Ep;                        // the energy of the proton
     double Bprob;    // Energy distribution of sec electrons for arbitrary pion
                      // distribution
     double xmin = 1.e-3,
@@ -472,20 +515,21 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
     // Loop for every electron energy
     for (int j = 0; j < size; j++) {
         gamma[j] = pow(10., log10(gmin) + j * log10(gmax / gmin) / (size - 1));
-        Ee = gamma[j] * emerg * erg * 1.e-12;    // in TeV
+        Ee = gamma[j] * constants::emerg * constants::erg * 1.e-12;    // in TeV
         if (Ee < transition) {
-            Epimin = Ee + mpionTeV * mpionTeV / (4. * Ee);
+            Epimin = Ee + constants::mpionTeV * constants::mpionTeV / (4. * Ee);
             Epimax = 1.e6;
             dw = (log10(Epimax / Epimin)) / (N - 1);
             sum = 0.;
             for (int i = 0; i < N; i++) {
                 lEpi = log10(Epimin) +
                        i * dw;    // The exponent of the pion energy.
-                Ep = mprotTeV +
-                     pow(10., lEpi) / Kpi;    // The mass of the proton in TeV.
+                Ep = constants::mprotTeV +
+                     pow(10., lEpi) /
+                         constants::Kpi;    // The mass of the proton in TeV.
                 sinel = sigma_pp(Ep);
                 Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp, acc_Jp);
-                qpi = 2. * ntilde / Kpi * sinel * Jp;
+                qpi = 2. * ntilde / constants::Kpi * sinel * Jp;
                 fe = elec_dist_pp(log10(Ee), lEpi);    // eq36 KAB16
                 //				Fpi = qpi*pow(10.,w)/ sqrt(
                 // pow(10.,(2.*w))- mpionTeV*mpionTeV)*fe*Bprob; Use the
@@ -495,7 +539,7 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
                       Bprob /**1.5*/;
                 sum += dw * (Fpi);
             }
-            Phie = cee * pp_targets * sum * 1.e-27 *
+            Phie = constants::cee * pp_targets * sum * 1.e-27 *
                    log(10.);    // eq 78 in #/cm3/TeV/sec
         } else if ((Ee >= transition) && (Ee <= Epcode_max)) {
             sum = 0.;
@@ -509,17 +553,17 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
                     Fespec = elec_spec_pp(Ep, y);
                     sum += dy * (sinel * Jp * Fespec);
                 }
-                Phie = cee * pp_targets * sum * 1.e-27 * log(10.);
+                Phie = constants::cee * pp_targets * sum * 1.e-27 * log(10.);
             }
         } else {
             Phie = 1.e-50;
         }
 
         beta_elec = sqrt(gamma[j] * gamma[j] - 1.) / gamma[j];
-        tesc = r / (beta_elec * cee);
-        tsyne =
-            6. * pi * emerg /
-            (sigtom * cee * bfield * bfield * gamma[j] * beta_elec * beta_elec);
+        tesc = r / (beta_elec * constants::cee);
+        tsyne = 6. * constants::pi * constants::emerg /
+                (constants::sigtom * constants::cee * bfield * bfield *
+                 gamma[j] * beta_elec * beta_elec);
         tchar = pow(1. / tsyne + 1. / tesc, -1.);
 
         gdens[j] = Phie * tchar * Ee / gamma[j];
@@ -533,12 +577,13 @@ void Powerlaw::set_pg_electrons(const double *energy, const double *density,
     /* the density is in erg/s/Hz (because it's a Radiation object)*/
     double tcool;    // cooling time to account for synchrotron losses
     for (int i = 0; i < size; i++) {
-        gamma[i] = energy[i] / emerg;
-        tcool = pow(sigtom * B * B * gamma[i] * cee / (6. * pi * emerg) +
-                        f_beta * cee / r,
+        gamma[i] = energy[i] / constants::emerg;
+        tcool = pow(constants::sigtom * B * B * gamma[i] * constants::cee /
+                            (6. * constants::pi * constants::emerg) +
+                        f_beta * constants::cee / r,
                     -1);
-        gdens[i] =
-            density[i] / (energy[i] * herg * vol) * tcool;    // in #/erg/cm3
+        gdens[i] = density[i] / (energy[i] * constants::herg * vol) *
+                   tcool;    // in #/erg/cm3
     }
 }
 
@@ -581,8 +626,9 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield,
     sum = 1.e-100;
     dx = log10(en_perseg[2] / en_perseg[1]);
     for (int i = 0; i < phot_number; i++) {
-        logx[i] = log10(en_perseg[i] / emerg);
-        Ngamma[i] = lum_perseg[i] * r / (herg * cee * en_perseg[i] * vol);
+        logx[i] = log10(en_perseg[i] / constants::emerg);
+        Ngamma[i] = lum_perseg[i] * r /
+                    (constants::herg * constants::cee * en_perseg[i] * vol);
         if (Ngamma[i] <= 1.e-100)
             Ngamma[i] = 1.e-100;
         logNgamma[i] = log10(Ngamma[i]);
@@ -595,11 +641,13 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield,
                           // considered merely targets
             tgg_ee[i] = 1.e100;
         } else {
-            R_gg = sigtom * cee * .652 * (x * x - 1.) / pow(x, 3) * log(x);
-            tgg_ee[i] = r / (cee * .652 * (x * x - 1.) / pow(x, 3) * log(x));
+            R_gg = constants::sigtom * constants::cee * .652 * (x * x - 1.) /
+                   pow(x, 3) * log(x);
+            tgg_ee[i] =
+                r / (constants::cee * .652 * (x * x - 1.) / pow(x, 3) * log(x));
         }
 
-        tcharg = pow(cee / r + /*1./tgICS +*/ 1. / tgg_ee[i], -1);
+        tcharg = pow(constants::cee / r + /*1./tgICS +*/ 1. / tgg_ee[i], -1);
         Ngamma[i] *=
             tcharg / tgg_ee[i];    // photons taken into account for γγ->ee
         logNgamma[i] = log10(Ngamma[i]);
@@ -629,22 +677,22 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield,
             sum += dx * pow(10., logNgamma[j] + logx[j]) * log(10.) * R_gg;
             // ln10 and the extra x term because of log integration
         }
-        Qgg_ee = 4. * ng * sum * emerg;    // #/cm3/erg/sec
+        Qgg_ee = 4. * ng * sum * constants::emerg;    // #/cm3/erg/sec
 
         beta_elec = sqrt(gamma[i] * gamma[i] - 1.) / gamma[i];
-        tsyn =
-            6. * pi * emerg /
-            (cee * sigtom * bfield * bfield * gamma[i] * beta_elec * beta_elec);
-        tchar = pow(cee / r + 1. / tsyn, -1);
+        tsyn = 6. * constants::pi * constants::emerg /
+               (constants::cee * constants::sigtom * bfield * bfield *
+                gamma[i] * beta_elec * beta_elec);
+        tchar = pow(constants::cee / r + 1. / tsyn, -1);
 
         Qgg_ee *= tchar;    // #/cm3/erg of pairs after photon-photon
 
-        Rann = 3. * sigtom * cee / (8. * gamma[i]) *
+        Rann = 3. * constants::sigtom * constants::cee / (8. * gamma[i]) *
                (pow(gamma[i], -0.5) + log(gamma[i]));
-        Ne = Qgg_ee * gamma[i] * emerg;
+        Ne = Qgg_ee * gamma[i] * constants::emerg;
         Lee_gg = Ne * Rann * Qgg_ee *
                  tchar;    //(non-)cooled pairs collide with cold pairs
-        gdens[i] = (Qgg_ee - Lee_gg) * emerg;    // #/cm3/γ
+        gdens[i] = (Qgg_ee - Lee_gg) * constants::emerg;    // #/cm3/γ
     }
 
     // we free the space occupied for interpolation
@@ -667,3 +715,5 @@ void Powerlaw::test() {
     std::cout << "Default normalization: " << plnorm << std::endl;
     std::cout << "Particle mass in grams: " << mass_gr << std::endl;
 }
+
+}    // namespace kariba
