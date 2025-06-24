@@ -1,5 +1,4 @@
-#ifndef KAPPA_HPP
-#define KAPPA_HPP
+#pragma once
 
 #include "kariba/Particles.hpp"
 
@@ -37,5 +36,3 @@ class Kappa : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

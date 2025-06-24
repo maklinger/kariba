@@ -1,8 +1,7 @@
 /*************************************************************************************************************
 Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 *************************************************************************************************************/
-#ifndef GAMMARAYS_HPP
-#define GAMMARAYS_HPP
+#pragma once
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
@@ -94,5 +93,3 @@ void tables_photomeson_gamma(double &s, double &delta, double &Beta,
 double PhiFunc_gamma(double eta, double eta0, double x);
 
 }    // namespace kariba
-
-#endif

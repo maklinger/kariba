@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_spline2d.h>
+
 #include "kariba/Compton.hpp"
 #include "kariba/Radiation.hpp"
 #include "kariba/constants.hpp"

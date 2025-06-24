@@ -1,5 +1,4 @@
-#ifndef COMPTON_HPP
-#define COMPTON_HPP
+#pragma once
 
 #include "kariba/Radiation.hpp"
 
@@ -74,5 +73,3 @@ class Compton : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

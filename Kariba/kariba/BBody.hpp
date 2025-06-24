@@ -1,5 +1,4 @@
-#ifndef BBODY_HPP
-#define BBODY_HPP
+#pragma once
 
 #include "kariba/Radiation.hpp"
 
@@ -34,5 +33,3 @@ class BBody : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef ELECTRONS_HPP
-#define ELECTRONS_HPP
+#pragma once
 
 #include <gsl/gsl_spline.h>
 
@@ -18,5 +17,3 @@ double proton_dist(double gpmin, double Ep, double Epcode_max,
 // function for electrons from γγ annihilation
 double production_rate(double ge, double x);
 }    // namespace kariba
-
-#endif

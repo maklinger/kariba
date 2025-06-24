@@ -1,5 +1,4 @@
-#ifndef MIXED_HPP
-#define MIXED_HPP
+#pragma once
 
 #include "kariba/Particles.hpp"
 
@@ -67,5 +66,3 @@ class Mixed : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

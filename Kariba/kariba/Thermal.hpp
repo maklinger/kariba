@@ -1,5 +1,4 @@
-#ifndef THERMAL_HPP
-#define THERMAL_HPP
+#pragma once
 
 #include "kariba/Particles.hpp"
 
@@ -26,5 +25,3 @@ class Thermal : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

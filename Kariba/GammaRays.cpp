@@ -2,6 +2,8 @@
 Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 *************************************************************************************************************/
 
+#include <gsl/gsl_integration.h>
+
 #include "kariba/GammaRays.hpp"
 #include "kariba/constants.hpp"
 

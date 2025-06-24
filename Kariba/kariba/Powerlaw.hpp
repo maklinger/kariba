@@ -1,5 +1,4 @@
-#ifndef POWERLAW_HPP
-#define POWERLAW_HPP
+#pragma once
 
 #include <gsl/gsl_spline.h>
 
@@ -70,5 +69,3 @@ class Powerlaw : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

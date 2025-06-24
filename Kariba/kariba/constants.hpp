@@ -4,7 +4,6 @@
 #include <gsl/gsl_const_num.h>
 #include <gsl/gsl_math.h>
 
-
 namespace kariba {
 
 namespace constants {
@@ -43,5 +42,4 @@ namespace constants {
 
 }    // namespace constants
 
-}    // namespace constants
-
+}    // namespace kariba

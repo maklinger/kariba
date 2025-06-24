@@ -1,3 +1,7 @@
+#include <iostream>
+
+#include <gsl/gsl_integration.h>
+
 #include "kariba/ShSDisk.hpp"
 #include "kariba/constants.hpp"
 

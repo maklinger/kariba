@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <gsl/gsl_integration.h>
+
 #include "kariba/Cyclosyn.hpp"
 #include "kariba/Radiation.hpp"
 #include "kariba/constants.hpp"

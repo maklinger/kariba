@@ -1,13 +1,8 @@
-#ifndef RADIATION_HPP
-#define RADIATION_HPP
+#pragma once
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_interp2d.h>
-#include <gsl/gsl_sf_bessel.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_spline2d.h>
 #include <string>
+
+#include <gsl/gsl_spline.h>
 
 namespace kariba {
 
@@ -102,5 +97,3 @@ class Radiation {
     void test_arrays();
 };
 }    // namespace kariba
-
-#endif

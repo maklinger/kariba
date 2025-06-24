@@ -1,5 +1,4 @@
-#ifndef PARTICLES_HPP
-#define PARTICLES_HPP
+#pragma once
 
 namespace kariba {
 // Template class for particle distributions
@@ -108,5 +107,3 @@ class Particles {
 };
 
 }    // namespace kariba
-
-#endif

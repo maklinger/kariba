@@ -1,4 +1,8 @@
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+
+#include <gsl/gsl_integration.h>
 
 #include "kariba/Neutrinos_pg.hpp"
 #include "kariba/Radiation.hpp"

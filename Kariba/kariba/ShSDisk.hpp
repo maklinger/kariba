@@ -1,8 +1,6 @@
-#ifndef SHSDISK_HPP
-#define SHSDISK_HPP
+#pragma once
 
 #include "kariba/Radiation.hpp"
-#include <iostream>
 
 namespace kariba {
 
@@ -44,5 +42,3 @@ class ShSDisk : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef CYCLOSYN_HPP
-#define CYCLOSYN_HPP
+#pragma once
 
 #include "kariba/Radiation.hpp"
 
@@ -45,5 +44,3 @@ class Cyclosyn : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

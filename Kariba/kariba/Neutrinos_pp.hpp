@@ -1,9 +1,6 @@
-#ifndef NEUTRINOS_PP_HPP
-#define NEUTRINOS_PP_HPP
+#pragma once
 
-#include <cstring>
-#include <fstream>
-#include <iomanip>
+#include <string>
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
@@ -40,5 +37,3 @@ double secondary_spectrum(double Ep, double y, std::string flavor);
 double prob_fve();
 
 }    // namespace kariba
-
-#endif

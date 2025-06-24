@@ -1,9 +1,6 @@
-#ifndef NEUTRINOS_PG_HPP
-#define NEUTRINOS_PG_HPP
+#pragma once
 
-#include <cstring>
-#include <fstream>
-#include <iomanip>
+#include <string>
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
@@ -51,5 +48,3 @@ void tables_photomeson(double &s, double &delta, double &Beta,
 double PhiFunc(double eta, double eta0, double x, std::string product);
 
 }    // namespace kariba
-
-#endif

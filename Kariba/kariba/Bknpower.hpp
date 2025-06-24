@@ -1,5 +1,4 @@
-#ifndef BKNPOWER_HPP
-#define BKNPOWER_HPP
+#pragma once
 
 #include "kariba/Particles.hpp"
 
@@ -36,5 +35,3 @@ class Bknpower : public Particles {
 };
 
 }    // namespace kariba
-
-#endif
