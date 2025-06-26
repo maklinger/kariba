@@ -94,7 +94,7 @@ class Particles {
     double *get_gdens() const { return gdens; }
     double *get_gdens_diff() const { return gdens_diff; }
 
-    double beta(int i);
+    // double beta(int i);  // todo: not implemented!
 
     double count_particles();
     double count_particles_energy();
