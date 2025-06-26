@@ -88,11 +88,11 @@ class Particles {
     void initialize_pdens();
     void gdens_differentiate();
 
-    const double *get_p() const { return p; }
-    const double *get_pdens() const { return ndens; }
-    const double *get_gamma() const { return gamma; }
-    const double *get_gdens() const { return gdens; }
-    const double *get_gdens_diff() const { return gdens_diff; }
+    double *get_p() const { return p; }
+    double *get_pdens() const { return ndens; }
+    double *get_gamma() const { return gamma; }
+    double *get_gdens() const { return gdens; }
+    double *get_gdens_diff() const { return gdens_diff; }
 
     double beta(int i);
 
