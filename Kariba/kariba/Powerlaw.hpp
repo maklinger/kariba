@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <gsl/gsl_spline.h>
 
 #include "kariba/Particles.hpp"
