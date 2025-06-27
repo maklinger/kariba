@@ -369,4 +369,35 @@ void Mixed::test() {
               << std::endl;
 }
 
+Mixed2::Mixed2(int s) : Mixed(s) {}
+
+// Methods to set momentum/energy arrays and number density arrays
+void Mixed2::set_p(double ucom, double bfield, double betaeff, double r,
+                   double fsc) {
+    pmin_pl = av_th_p();
+    pmax_pl = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax_th);
+
+    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (size - 1);
+
+    for (int i = 0; i < size; i++) {
+        p[i] = pow(10., log10(pmin_th) + i * pinc);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    }
+}
+
+// Same as above, but assuming a fixed maximum Lorentz factor
+void Mixed2::set_p(double gmax) {
+    pmin_pl = av_th_p();
+    pmax_pl = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+
+    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (size - 1);
+
+    for (int i = 0; i < size; i++) {
+        p[i] = pow(10., log10(pmin_th) + i * pinc);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    }
+}
+
 }    // namespace kariba

@@ -212,4 +212,31 @@ void Kappa::test() {
     std::cout << "Particle mass in grams: " << mass_gr << std::endl;
 }
 
+// Methods to set momentum/energy arrays and number density arrays
+void Kappa2::set_p(double ucom, double bfield, double betaeff, double r,
+                   double fsc) {
+    pmax = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax);
+
+    double pinc = (log10(pmax) - log10(pmin)) / size;
+
+    for (int i = 0; i < size; i++) {
+        p[i] = pow(10., log10(pmin) + i * pinc);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    }
+}
+
+// Same as above, but assuming a fixed maximum Lorentz factor
+void Kappa2::set_p(double gmax) {
+    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+
+    double pinc = (log10(pmax) - log10(pmin)) / size;
+
+    for (int i = 0; i < size; i++) {
+        p[i] = pow(10., log10(pmin) + i * pinc);
+        gamma[i] =
+            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    }
+}
+
 }    // namespace kariba

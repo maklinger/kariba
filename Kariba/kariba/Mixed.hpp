@@ -24,7 +24,7 @@ namespace kariba {
 // numerical value and use it elsewhere.
 
 class Mixed : public Particles {
-  private:
+  protected:
     double thnorm, theta, Temp;
     double pspec, plnorm;
     double pmin_th, pmax_th, pmin_pl, pmax_pl;
@@ -63,6 +63,14 @@ class Mixed : public Particles {
     double K2(double x);
 
     void test();
+};
+
+class Mixed2 : public Mixed {
+  public:
+    Mixed2(int s);
+    void set_p(double ucom, double bfield, double betaeff, double r,
+               double fsc);
+    void set_p(double gmax);
 };
 
 }    // namespace kariba
