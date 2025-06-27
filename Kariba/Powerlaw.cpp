@@ -386,8 +386,8 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
 }
 
 // if (Lumsw == 1)
-void Powerlaw::set_gdens(double r, double beta, double Ljet, double ep,
-                         double pspec, double &protdens, double Urad) {
+void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep,
+                         double pspec, double &protdens) {
     /*Sets the normalization of the accelerated protons assuming that a fraction
     --ep--  of the jet power goes into the proton acceleration, unless Emax<Emin
     so set to zero */

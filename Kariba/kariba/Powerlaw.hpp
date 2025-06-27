@@ -47,11 +47,11 @@ class Powerlaw : public Particles {
                           std::string outputConfiguration, std::string source);
     double sigma_pp(double Ep);
     double set_normprot(double nprot);
+    void set_gdens(double &plfrac_p, double Up, double protdens);
     void set_gdens(double r, double protdens, double nwind, double bfield,
                    double plfrac, double Urad);
-    void set_gdens(double r, double beta, double Ljet, double ep, double pspec,
-                   double &protdens, double Urad);
-    void set_gdens(double &plfrac_p, double Up, double protdens);
+    void set_gdens_pdens(double r, double beta, double Ljet, double ep, double pspec,
+			    double &protdens);
 
     // secondary electrons from pp
     void set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
