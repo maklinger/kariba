@@ -132,7 +132,7 @@ void Mixed::set_norm(double n) {
 
 // Injection function to be integrated in cooling
 double injection_mixed_int(double x, void *pars) {
-    InjectionMixedParams *params = static_cast<InjectionMixedParams*> (pars);
+    InjectionMixedParams *params = static_cast<InjectionMixedParams *>(pars);
     double s = params->s;
     double t = params->t;
     double nth = params->nth;
@@ -170,7 +170,8 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
 
     double integral, error;
     gsl_function F1;
-    auto params = InjectionMixedParams {pspec, theta, thnorm, plnorm, mass_gr, gam_min, gam_max, pmax_pl};
+    auto params = InjectionMixedParams{pspec,   theta,   thnorm,  plnorm,
+                                       mass_gr, gam_min, gam_max, pmax_pl};
     F1.function = &injection_mixed_int;
     F1.params = &params;
 
@@ -243,7 +244,7 @@ double Mixed::K2(double x) {
 
 // Methods to calculate number density and average energy in thermal part
 double th_num_dens_int(double x, void *pars) {
-    ThParams *params = static_cast<ThParams*> (pars);
+    ThParams *params = static_cast<ThParams *>(pars);
     double t = params->t;
     double n = params->n;
     double m = params->m;
@@ -254,7 +255,7 @@ double th_num_dens_int(double x, void *pars) {
 }
 
 double av_th_p_int(double x, void *pars) {
-    ThParams *params = static_cast<ThParams*> (pars);
+    ThParams *params = static_cast<ThParams *>(pars);
     double t = params->t;
     double n = params->n;
     double m = params->m;
@@ -269,7 +270,7 @@ double Mixed::count_th_particles() {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    auto params = ThParams {theta, thnorm, mass_gr};
+    auto params = ThParams{theta, thnorm, mass_gr};
     F1.function = &th_num_dens_int;
     F1.params = &params;
     gsl_integration_qag(&F1, pmin_th, pmax_th, 0, 1e-7, 100, 1, w1, &integral1,
@@ -284,7 +285,7 @@ double Mixed::av_th_p() {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    auto params = ThParams {theta, thnorm, mass_gr};
+    auto params = ThParams{theta, thnorm, mass_gr};
     F1.function = av_th_p_int;
     F1.params = &params;
     gsl_integration_qag(&F1, pmin_th, pmax_th, 0, 1e-7, 100, 1, w1, &integral1,
@@ -304,7 +305,7 @@ double Mixed::av_th_gamma() {
 
 // Methods to calculate number density and average energy in non-thermal part
 double pl_num_dens_int(double x, void *pars) {
-    PlParams *params = static_cast<PlParams*> (pars);
+    PlParams *params = static_cast<PlParams *>(pars);
     double s = params->s;
     double n = params->n;
 
@@ -312,7 +313,7 @@ double pl_num_dens_int(double x, void *pars) {
 }
 
 double av_pl_p_int(double x, void *pars) {
-    PlParams *params = static_cast<PlParams*> (pars);
+    PlParams *params = static_cast<PlParams *>(pars);
     double s = params->s;
     double n = params->n;
 
@@ -324,7 +325,7 @@ double Mixed::count_pl_particles() {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    auto params = PlParams {pspec, plnorm};
+    auto params = PlParams{pspec, plnorm};
     F1.function = &pl_num_dens_int;
     F1.params = &params;
     gsl_integration_qag(&F1, pmin_pl, pmax_pl, 0, 1e-7, 100, 1, w1, &integral1,
@@ -339,7 +340,7 @@ double Mixed::av_pl_p() {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    auto params = PlParams {pspec, plnorm};
+    auto params = PlParams{pspec, plnorm};
     F1.function = &av_pl_p_int;
     F1.params = &params;
     gsl_integration_qag(&F1, pmin_pl, pmax_pl, 0, 1e-7, 100, 1, w1, &integral1,

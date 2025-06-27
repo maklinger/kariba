@@ -87,14 +87,15 @@ double Thermal::K2(double x) {
 
 // simple method to check quantities.
 void Thermal::test() {
-    std::cout << "Thermal distribution;" << std::endl;
+    std::cout << "Thermal distribution;\n";
     std::cout << "Temperature: " << Temp << " erg, "
-              << Temp / constants::kboltz_kev2erg << " kev" << std::endl;
-    std::cout << "Array size: " << size << std::endl;
-    std::cout << "Normalization: " << thnorm << std::endl;
-    std::cout << "Particle mass in grams: " << mass_gr << std::endl;
-    std::cout << "Particle mass in keV: " << mass_kev << std::endl;
-    std::cout << "kT/mc^2: " << theta << std::endl;
+              << Temp / constants::kboltz_kev2erg << " kev\n";
+    ;
+    std::cout << "Array size: " << size << "\n";
+    std::cout << "Normalization: " << thnorm << "\n";
+    std::cout << "Particle mass in grams: " << mass_gr << "\n";
+    std::cout << "Particle mass in keV: " << mass_kev << "\n";
+    std::cout << "kT/mc^2: " << theta << "\n\n";
 }
 
 }    // namespace kariba

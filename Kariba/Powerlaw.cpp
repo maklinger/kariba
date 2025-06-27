@@ -84,7 +84,7 @@ void Powerlaw::set_norm(double n) {
 
 // Injection function to be integrated in cooling
 double injection_pl_int(double x, void *pars) {
-    InjectionPlParams *params = static_cast<InjectionPlParams*> (pars);
+    InjectionPlParams *params = static_cast<InjectionPlParams *>(pars);
     double s = params->s;
     double n = params->n;
     double m = params->m;
@@ -107,7 +107,7 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield,
 
     double integral, error;
     gsl_function F1;
-    auto params = InjectionPlParams {pspec, plnorm, mass_gr, pmax};
+    auto params = InjectionPlParams{pspec, plnorm, mass_gr, pmax};
     F1.function = &injection_pl_int;
     F1.params = &params;
 
@@ -379,8 +379,9 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
                        constants::cee * constants::cee;
         }
     } else {    // in case Emax<Emin
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             gdens[i] = 1.e-100;
+        }
     }
 }
 
@@ -399,25 +400,29 @@ void Powerlaw::set_gdens(double r, double beta, double Ljet, double ep,
                  1.);
         double sum = 0;
         double dx = log10(gamma[2] / gamma[1]);
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             sum += log(10.) * dx * pow(gamma[i], -pspec + 2) *
                    exp(-gamma[i] / gpmax);
+        }
 
         plnormprot =
             ep * Ljet /
             (mass_gr * constants::cee * constants::cee * constants::pi * r * r *
              G_jet * beta * constants::cee * sum);
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             gdens[i] =
                 plnormprot * pow(gamma[i], -pspec) * exp(-gamma[i] / gpmax);
+        }
 
         sum = 0.;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             sum += log(10.) * gdens[i] * gamma[i] * dx;
+        }
         protdens = sum;
     } else {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             gdens[i] = 1.e-100;
+        }
         protdens = 1.e-100;
     }
 }
@@ -430,25 +435,29 @@ void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
                  1.);
         double sum = 0;
         double dx = log10(gamma[2] / gamma[1]);
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             sum += log(10.) * pow(gamma[i], -pspec + 2.) *
                    exp(-gamma[i] / gpmax) * dx;
+        }
         double K = std::max(
             Up / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
         sum = 0.;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             sum += log(10.) * pow(gamma[i], -pspec + 1.) *
                    exp(-gamma[i] / gpmax) * dx;
+        }
         double n_nth = K * sum;
         plfrac_p = n_nth / protdens;
 
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             gdens[i] = K * pow(gamma[i], -pspec) * exp(-gamma[i] / gpmax);
+        }
     } else {
         plfrac_p = 0;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             gdens[i] = 1.e-100;
+        }
     }
 }
 
@@ -629,8 +638,9 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield,
         logx[i] = log10(en_perseg[i] / constants::emerg);
         Ngamma[i] = lum_perseg[i] * r /
                     (constants::herg * constants::cee * en_perseg[i] * vol);
-        if (Ngamma[i] <= 1.e-100)
+        if (Ngamma[i] <= 1.e-100) {
             Ngamma[i] = 1.e-100;
+        }
         logNgamma[i] = log10(Ngamma[i]);
         sum += en_perseg[i] * log(10.) * dx * Ngamma[i];
     }

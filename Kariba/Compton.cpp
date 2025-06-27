@@ -141,7 +141,7 @@ Compton::Compton(int s1, int s2) {
 // represents the scattered photon spectrum for a given electron and includes
 // the Klein-Nishina cross section.
 double comfnc(double ein, void *pars) {
-    ComfncParams *params = static_cast<ComfncParams*> (pars);
+    ComfncParams *params = static_cast<ComfncParams *>(pars);
     double game = params->game;
     double e1 = params->e1;
     gsl_spline *phodis = params->phodis;
@@ -174,7 +174,7 @@ double comfnc(double ein, void *pars) {
 // This function is the integral of comfnc above over the total seed photon
 // distribution
 double comint(double gam, void *pars) {
-    ComintParams *params = static_cast<ComintParams*> (pars);
+    ComintParams *params = static_cast<ComintParams *>(pars);
     double eph = (params->eph);
     double ephmin = (params->ephmin);
     double ephmax = (params->ephmax);
@@ -200,7 +200,7 @@ double comint(double gam, void *pars) {
         gsl_integration_workspace *w2;
         w2 = gsl_integration_workspace_alloc(100);
         gsl_function F2;
-        auto F2params = ComfncParams {game, e1, phodis, acc_phodis};
+        auto F2params = ComfncParams{game, e1, phodis, acc_phodis};
         F2.function = &comfnc;
         F2.params = &F2params;
         gsl_integration_qag(&F2, blim, ulim, 1e0, 1e0, 100, 2, w2, &result,
@@ -222,8 +222,10 @@ double Compton::comintegral(int it, double blim, double ulim, double enphot,
     w1 = gsl_integration_workspace_alloc(100);
 
     gsl_function F1;
-    auto F1params = ComintParams {enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed};
-    auto F1params_it = ComintParams {enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter};
+    auto F1params = ComintParams{enphot,    enphmin, enphmax, eldis,
+                                 acc_eldis, seed_ph, acc_seed};
+    auto F1params_it = ComintParams{enphot,    enphmin, enphmax, eldis,
+                                    acc_eldis, iter_ph, acc_iter};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;
@@ -377,7 +379,7 @@ void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
 // H, inner temperature Tin, inner radius Rin, at a distance z from the disk,
 // taking beaming into account
 double disk_integral(double alfa, void *pars) {
-    DiskIcParams *params = static_cast<DiskIcParams*> (pars);
+    DiskIcParams *params = static_cast<DiskIcParams *>(pars);
     double gamma = params->gamma;
     double beta = params->beta;
     double tin = params->tin;
@@ -427,7 +429,9 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_function F;
-            auto Fparams = DiskIcParams {Gamma, beta, tin, rin, rout, h, z, seed_energ[i] / constants::herg};
+            auto Fparams =
+                DiskIcParams{Gamma, beta, tin, rin,
+                             rout,  h,    z,   seed_energ[i] / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result,

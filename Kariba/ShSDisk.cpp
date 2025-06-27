@@ -36,12 +36,12 @@ ShSDisk::ShSDisk() {
 // return SD spectrum over a given radius, frequency to be integrated over
 // radius
 double disk_int(double lr, void *pars) {
-    DiskObsParams* params = static_cast<DiskObsParams*> (pars);
+    DiskObsParams *params = static_cast<DiskObsParams *>(pars);
     double tin = params->tin;
     double rin = params->rin;
     double nu = params->nu;
     double r, temp, fac, bb;
-    
+
     r = std::exp(lr);
     temp = tin * std::pow(rin / r, 0.75);
     fac = constants::herg * nu / (constants::kboltz * temp);

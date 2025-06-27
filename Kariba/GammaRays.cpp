@@ -204,9 +204,10 @@ double sigma_pp(double Ep) {    // cross section of pp in mb (that's why I
     double sinel;          // σ_inel in mb
 
     sinel = 1.e-50;
-    if (Ep >= Ethres)
+    if (Ep >= Ethres) {
         sinel = (34.3 + 1.88 * L + 0.25 * L * L) *
                 (1. - pow((Ethres / Ep), 4)) * (1. - pow((Ethres / Ep), 4));
+    }
     return sinel;
 }
 double proton_dist(double gpmin, double Ep, double Epcode_max,
@@ -377,21 +378,24 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
             gsl_function F1;
             for (int j = 0; j < N; j++) {
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
-                auto F1params = HetagParams {
-                    eta,    eta_zero,  Eg,     gp_min,
-                    gp_max, spline_Jp, acc_Jp,    // product,
-                    acc_ng, spline_ng, nu_min, nu_max};
+                auto F1params =
+                    HetagParams{eta,    eta_zero,  Eg,     gp_min,
+                                gp_max, spline_Jp, acc_Jp,    // product,
+                                acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Hetag;
                 F1.params = &F1params;
                 double max = std::log10(Eg / (gp_min * constants::pmgm *
-                                         constants::cee * constants::cee));
+                                              constants::cee * constants::cee));
                 double min = std::log10(Eg / (gp_max * constants::pmgm *
-                                         constants::cee * constants::cee));
+                                              constants::cee * constants::cee));
                 gsl_integration_qag(&F1, min, max, 1e0, 1e0, 100, 1, w1,
                                     &result1, &error1);
-                Hg = std::pow(constants::pmgm * constants::cee * constants::cee, 2) /
+                Hg = std::pow(constants::pmgm * constants::cee * constants::cee,
+                              2) /
                      4. * result1;
-                sum += Hg * deta * eta * std::log(10.); // todo: replace log(10) with std::M_LN10
+                sum +=
+                    Hg * deta * eta *
+                    std::log(10.);    // todo: replace log(10) with std::M_LN10
             }
             dNdEg = sum;    // in #/erg/cm3/sec
             gsl_integration_workspace_free(w1);
@@ -416,7 +420,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
 }
 double Hetag(double x, void *pars) {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
-    HetagParams* params = static_cast<HetagParams*> (pars);
+    HetagParams *params = static_cast<HetagParams *>(pars);
     double eta = params->eta;
     double eta_zero = params->eta_zero;
     double Eg = params->Eg;
@@ -456,8 +460,9 @@ double colliding_protons(gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp,
     gp = Ep / (constants::pmgm * constants::cee * constants::cee);
 
     Jp = 1.0e-100;
-    if (gp >= gp_min && gp <= gp_max)
+    if (gp >= gp_min && gp <= gp_max) {
         Jp = gsl_spline_eval(spline_Jp, gp, acc_Jp);    // in #/γ/cm3
+    }
     return Jp / (constants::pmgm * constants::cee *
                  constants::cee);    // in #/erg/cm3
 }

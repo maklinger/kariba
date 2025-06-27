@@ -154,8 +154,9 @@ void Neutrinos_pp::set_neutrinos_pp(
                             << std::endl;
         }
     }    // End of for loop for all the neutrino energies.
-    if (infosw >= 2)
+    if (infosw >= 2) {
         NeutrinosppFile.close();
+    }
 }    // End of function that produces the neutrinos from pp
 
 //***********************************************************************************************************

@@ -166,10 +166,13 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
     double *Uphot =
         new double[nphot];    // diff energy density per segment in #/cm3/erg
 
-    if (flavor.compare("electrons") == 0 || flavor.compare("antielectron") == 0)
+    if (flavor.compare("electrons") == 0 ||
+        flavor.compare("antielectron") == 0) {
         eta_min = 3.001;
-    if (flavor.compare("gamma_rays") == 0)
+    }
+    if (flavor.compare("gamma_rays") == 0) {
         Epion = 137.5e6 / constants::erg;
+    }
 
     for (int k = 0; k < nphot; k++) {
         freq[k] = en_perseg[k] / constants::herg;    // Hz from erg
@@ -199,9 +202,9 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
             gsl_function F1;
             for (int j = 0; j < N; j++) {    // eq 69 from KA08
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
-                auto F1params = HetaParams {eta,    eta_zero,  Ev,     gp_min,
-                                        gp_max, spline_Jp, acc_Jp, flavor,
-                                        acc_ng, spline_ng, nu_min, nu_max};
+                auto F1params = HetaParams{eta,    eta_zero,  Ev,     gp_min,
+                                           gp_max, spline_Jp, acc_Jp, flavor,
+                                           acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;
                 F1.params = &F1params;
                 double max = log10(Ev / (gp_min * constants::pmgm *
@@ -242,8 +245,9 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         }
     }
 
-    if (infosw >= 2)
+    if (infosw >= 2) {
         PhotopionFile.close();
+    }
     gsl_spline_free(spline_ng);
     gsl_interp_accel_free(acc_ng);
     delete[] freq;
@@ -252,7 +256,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
 double Heta(double x, void *pars) {
     // eq 70 from KA08 for pairs and writen as {0< x=Ee/Ep <1} Ee/Epmax <
     // x=Ee/Ep <Ee/Epmin
-    HetaParams* params = static_cast<HetaParams*> (pars);
+    HetaParams *params = static_cast<HetaParams *>(pars);
     double eta = params->eta;
     double eta_zero = params->eta_zero;
     double E = params->E;
@@ -280,7 +284,8 @@ double Heta(double x, void *pars) {
     //	double Tstar = 2.7;
     //	fph = photon_field(eta,Ep,Tstar);
     Phi = PhiFunc(eta, eta_zero, pow(10., x), product);
-    return fp * fph * Phi * log(10.) / Ep;  // tod: replace log(10) with m_ln10
+    return fp * fph * Phi * log(10.) /
+           Ep;    // tod: replace log(10) with m_ln10
 }
 
 //************************************************************************************************************

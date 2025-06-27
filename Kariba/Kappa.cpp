@@ -89,7 +89,7 @@ void Kappa::set_ndens() {
 
 // Methods to calculate the normalization of the function
 double norm_kappa_int(double x, void *pars) {
-    KParams* params = static_cast<KParams*> (pars);
+    KParams *params = static_cast<KParams *>(pars);
     double t = params->t;
     double k = params->k;
 
@@ -104,7 +104,7 @@ void Kappa::set_norm(double n) {
     max = pow(pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     gsl_function F1;
-    auto params = KParams {theta, kappa};
+    auto params = KParams{theta, kappa};
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     F1.function = &norm_kappa_int;
@@ -119,7 +119,7 @@ void Kappa::set_norm(double n) {
 // Method to solve steady state continuity equation. NOTE: KN cross section not
 // included in IC cooling
 double injection_kappa_int(double x, void *pars) {
-    InjectionKappaParams *params = static_cast<InjectionKappaParams*> (pars);
+    InjectionKappaParams *params = static_cast<InjectionKappaParams *>(pars);
     double t = params->t;
     double k = params->k;
     double n = params->n;
@@ -144,7 +144,7 @@ void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
 
     double integral, error;
     gsl_function F1;
-    auto params = InjectionKappaParams {theta, kappa, knorm, mass_gr};
+    auto params = InjectionKappaParams{theta, kappa, knorm, mass_gr};
     F1.function = &injection_kappa_int;
     F1.params = &params;
 
