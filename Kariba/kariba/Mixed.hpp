@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 

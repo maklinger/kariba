@@ -4,7 +4,7 @@
 
 #include <gsl/gsl_spline.h>
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 

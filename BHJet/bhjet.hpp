@@ -1,5 +1,4 @@
-#ifndef BHJET_HPP
-#define BHJET_HPP
+#pragma once
 
 #include <algorithm>
 #include <cmath>
@@ -141,5 +140,3 @@ void jetinterp(double *ear, double *energ, double *phot, double *photar, int ne,
                int newne);
 
 void ebl_atten_gil(int size, double *en, double *lum, double redsh);
-
-#endif    // BHJET_HPP

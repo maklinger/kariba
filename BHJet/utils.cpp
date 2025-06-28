@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "Kariba/Radiation.hpp"
-#include "kariba/constants.hpp"
+#include <kariba/Radiation.hpp>
+#include <kariba/constants.hpp>
 
 #include "bhjet.hpp"
 

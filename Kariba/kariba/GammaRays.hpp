@@ -6,7 +6,7 @@ Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 

@@ -2,7 +2,7 @@
 
 #include <gsl/gsl_spline2d.h>
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 
