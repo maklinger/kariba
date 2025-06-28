@@ -32,24 +32,11 @@ void read_params(std::string file, double *pars) {
 }
 
 // Plots a given array in units of ergs (x axis) and erg/s/Hz (y axis) to the
-// file on the provided path. The overloard with or without const is to be able
-// to pass arrays directly from the radiation libraries note: the factor 1+z in
+// file on the provided path. Note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, double *en, double *lum, const std::string &path,
-                double dist, double redsh) {
-    std::ofstream file;
-    file.open(path, std::ios::app);
-
-    for (int k = 0; k < size; k++) {
-        file << en[k] / (karcst::herg * (1. + redsh)) << " " << lum[k] << "\n";
-    }
-
-    file.close();
-}
-
 void plot_write(int size, const double *en, const double *lum,
-                const std::string &path, double dist, double redsh) {
+                const std::string &path, double redsh) {
     std::ofstream file;
     file.open(path, std::ios::app);
 

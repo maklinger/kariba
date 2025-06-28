@@ -19,7 +19,6 @@ int main() {
 
     // Input parameters:
     double Mbh;
-    double Eddlum;
     double Rg;
     double Rin, Rout;
     double Ldisk;
@@ -37,7 +36,6 @@ int main() {
     // and gravitational radii, innermost and outermost radii, bolometric
     // luminosity in Eddington units.
     Mbh = 10.;
-    Eddlum = 1.25e38 * Mbh;
     Rg = karcst::gconst * Mbh * karcst::msun / karcst::cee_cee;
     Rin = 10. * Rg;
     Rout = 1e4 * Rg;
@@ -76,7 +74,7 @@ int main() {
     Disk.set_inclination(0.);
     Disk.disk_spectrum();
     plot_write(50, Disk.get_energy_obs(), Disk.get_nphot_obs(),
-               "Output/Disk.dat", 1., 0.);
+               "Output/Disk.dat", 0.);
 
     // Set up the first electron distribution. Call the constructor, which only
     // requires the size of the arrays for the particles. As for the disk class,
@@ -137,8 +135,7 @@ int main() {
     IC_Tau260Te90.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau260Te90.get_energy_obs(),
-               IC_Tau260Te90.get_nphot_obs(), "Output/IC_Tau260Te90.dat", 1.,
-               0.);
+               IC_Tau260Te90.get_nphot_obs(), "Output/IC_Tau260Te90.dat", 0.);
 
     //---------------------------------------------------------------------------------------------------------------
     // These parts are exactly the same as above. Rather than declare new
@@ -171,8 +168,7 @@ int main() {
     IC_Tau076Te90.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau076Te90.get_energy_obs(),
-               IC_Tau076Te90.get_nphot_obs(), "Output/IC_Tau076Te90.dat", 1.,
-               0.);
+               IC_Tau076Te90.get_nphot_obs(), "Output/IC_Tau076Te90.dat", 0.);
 
     //---------------------------------------------------------------------------------------------------------------
     kariba::Thermal elec_Tau019Te90(nel);
@@ -200,8 +196,7 @@ int main() {
     IC_Tau019Te90.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau019Te90.get_energy_obs(),
-               IC_Tau019Te90.get_nphot_obs(), "Output/IC_Tau019Te90.dat", 1.,
-               0.);
+               IC_Tau019Te90.get_nphot_obs(), "Output/IC_Tau019Te90.dat", 0.);
 
     //----------------------------------------------------------------------------------------------------------------
     kariba::Thermal elec_Tau260Te900(nel);
@@ -229,8 +224,7 @@ int main() {
     IC_Tau260Te900.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau260Te900.get_energy_obs(),
-               IC_Tau260Te900.get_nphot_obs(), "Output/IC_Tau260Te900.dat", 1.,
-               0.);
+               IC_Tau260Te900.get_nphot_obs(), "Output/IC_Tau260Te900.dat", 0.);
 
     //---------------------------------------------------------------------------------------------------------------
     kariba::Thermal elec_Tau076Te900(nel);
@@ -258,8 +252,7 @@ int main() {
     IC_Tau076Te900.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau076Te900.get_energy_obs(),
-               IC_Tau076Te900.get_nphot_obs(), "Output/IC_Tau076Te900.dat", 1.,
-               0.);
+               IC_Tau076Te900.get_nphot_obs(), "Output/IC_Tau076Te900.dat", 0.);
 
     //---------------------------------------------------------------------------------------------------------------
     kariba::Thermal elec_Tau019Te900(nel);
@@ -287,8 +280,7 @@ int main() {
     IC_Tau019Te900.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
 
     plot_write(nfreq, IC_Tau019Te900.get_energy_obs(),
-               IC_Tau019Te900.get_nphot_obs(), "Output/IC_Tau019Te900.dat", 1.,
-               0.);
+               IC_Tau019Te900.get_nphot_obs(), "Output/IC_Tau019Te900.dat", 0.);
 
     // system("python3 Coronae.py");
 

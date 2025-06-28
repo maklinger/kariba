@@ -20,10 +20,8 @@
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_spline.h>
 
-void plot_write(int size, double *en, double *lum, const std::string &path,
-                double dist, double redshift);
 void plot_write(int size, const double *en, const double *lum,
-                const std::string &path, double dist, double redshift);
+                const std::string &path, double redshift);
 void plot_write(int size, const double *p, const double *g, const double *pdens,
                 const double *gdens, const std::string &path);
 
