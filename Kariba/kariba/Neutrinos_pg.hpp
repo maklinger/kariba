@@ -28,12 +28,12 @@ struct HetaParams {
 class Neutrinos_pg : public Radiation {
     //	private:
   public:
-    ~Neutrinos_pg();
-    Neutrinos_pg(int s1, double Emin, double Emax);
+    Neutrinos_pg(size_t, double Emin, double Emax);
 
     void set_neutrinos(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                       gsl_spline *spline_Jp, double *en_perseg,
-                       double *lum_perseg, int nphot,
+                       gsl_spline *spline_Jp,
+                       const std::vector<double> &en_perseg,
+                       const std::vector<double> &lum_perseg, size_t nphot,
                        std::string outputConfiguration, std::string flavor,
                        int infosw, std::string source);
 };

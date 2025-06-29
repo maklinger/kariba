@@ -10,38 +10,39 @@
 #include <omp.h>
 #include <sstream>
 #include <string>
+#include <vector>
 
-void read_params(std::string file, double *pars);
+void read_params(std::string file, std::vector<double> &pars);
 
-extern void jetinterp(double *ear, double *energ, double *phot, double *photar,
-                      int ne, int newne);
-extern void jetmain(double *ear, int ne, double *param, double *photeng,
-                    double *photspec);
+extern void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
+                      std::vector<double> &phot, std::vector<double> &photar,
+                      size_t ne, size_t newne);
+extern void jetmain(std::vector<double> &ear, size_t ne,
+                    std::vector<double> &param, std::vector<double> &photeng,
+                    std::vector<double> &photspec);
 
 int main() {
 
     double start = omp_get_wtime();
 
-    int npar = 28;
-    int ne = 201;
+    size_t npar = 28;
+    size_t ne = 201;
     double emin = -10;
     double emax = 10;
     double einc = (emax - emin) / ne;
 
-    double *ebins = new double[ne]();
-    double *param = new double[npar]();
-    double *spec = new double[ne - 1]();
-    double *dumarr = new double[ne - 1]();
+    std::vector<double> ebins(ne, 0.0);
+    std::vector<double> param(npar, 0.0);
+    std::vector<double> spec(ne - 1, 0.0);
+    std::vector<double> dumarr(ne - 1, 0.0);
 
-    for (int i = 0; i < ne; i++) {
+    for (size_t i = 0; i < ne; i++) {
         ebins[i] = pow(10, (emin + i * einc));
     }
 
     read_params("Input/ip.dat", param);
 
     jetmain(ebins, ne - 1, param, spec, dumarr);
-
-    delete[] ebins, delete[] param, delete[] spec, delete[] dumarr;
 
     double end = omp_get_wtime();
     std::cout << "Total running time: " << end - start << " seconds\n";
@@ -57,7 +58,7 @@ int main() {
 //
 //  @return pars         Parameters
 //
-void read_params(std::string file, double *pars) {
+void read_params(std::string file, std::vector<double> &pars) {
     std::ifstream inFile;
     inFile.open(file.c_str());
     std::string line;

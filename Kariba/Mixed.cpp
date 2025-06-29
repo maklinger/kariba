@@ -11,28 +11,12 @@
 namespace kariba {
 
 // Class constructors to initialize object
-Mixed::Mixed(int s) {
-    size = s;
-
-    p = new double[size];
-    ndens = new double[size];
-    gamma = new double[size];
-    gdens = new double[size];
-    gdens_diff = new double[size];
-
+Mixed::Mixed(size_t size) : Particles(size) {
     thnorm = 1.;
     plnorm = 1.;
 
     mass_gr = constants::emgm;
     mass_kev = constants::emgm * constants::gr_to_kev;
-
-    for (int i = 0; i < size; i++) {
-        p[i] = 0;
-        ndens[i] = 0;
-        gamma[i] = 0;
-        gdens[i] = 0;
-        gdens_diff[i] = 0;
-    }
 }
 
 // Methods to set momentum/energy arrays and number density arrays
@@ -41,9 +25,9 @@ void Mixed::set_p(double ucom, double bfield, double betaeff, double r,
     pmin_pl = av_th_p();
     pmax_pl = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax_th);
 
-    double pinc = (log10(pmax_pl) - log10(pmin_th)) / (size - 1);
+    double pinc = (log10(pmax_pl) - log10(pmin_th)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin_th) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -57,7 +41,7 @@ void Mixed::set_p(double gmax) {
 
     double pinc = (log10(pmax_pl) - log10(pmin_th)) / (size - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin_th) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -65,7 +49,7 @@ void Mixed::set_p(double gmax) {
 }
 
 void Mixed::set_ndens() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         if (p[i] <= pmin_pl) {
             ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta);
         } else if (p[i] < pmax_th) {
@@ -106,7 +90,7 @@ void Mixed::set_plfrac(double Le, double r, double eldens) {
              1.);
     double sum = 0;
     double dx = log10(gamma[2] / gamma[1]);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         sum +=
             log(10.) * pow(gamma[i], -pspec + 2.) * exp(-gamma[i] / gpmax) * dx;
     }
@@ -115,7 +99,7 @@ void Mixed::set_plfrac(double Le, double r, double eldens) {
         std::max(Ue / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
     sum = 0.;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < gamma.size(); i++) {
         sum +=
             log(10.) * pow(gamma[i], -pspec + 1.) * exp(-gamma[i] / gpmax) * dx;
     }
@@ -175,8 +159,8 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
     F1.function = &injection_mixed_int;
     F1.params = &params;
 
-    for (int i = 0; i < size; i++) {
-        if (i < size - 1) {
+    for (size_t i = 0; i < ndens.size(); i++) {
+        if (i < ndens.size() - 1) {
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1,
@@ -188,8 +172,9 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
                 (pdot_ad * p[i] / (mass_gr * constants::cee) +
                  pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
-            ndens[size - 1] =
-                ndens[size - 2] * pow(p[size - 1] / p[size - 2], -pspec - 1);
+            ndens[ndens.size() - 1] =
+                ndens[ndens.size() - 2] *
+                pow(p[p.size() - 1] / p[p.size() - 2], -pspec - 1);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -203,7 +188,7 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
     // array ndens[i] by the appropriate constant.
     double renorm = count_particles() / n0;
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < ndens.size(); i++) {
         ndens[i] = ndens[i] / renorm;
     }
     initialize_gdens();
@@ -377,9 +362,9 @@ void Mixed2::set_p(double ucom, double bfield, double betaeff, double r,
     pmin_pl = av_th_p();
     pmax_pl = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax_th);
 
-    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (size - 1);
+    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin_th) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -391,9 +376,9 @@ void Mixed2::set_p(double gmax) {
     pmin_pl = av_th_p();
     pmax_pl = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (size - 1);
+    double pinc = (log10(2. * pmax_pl) - log10(pmin_th)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin_th) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);

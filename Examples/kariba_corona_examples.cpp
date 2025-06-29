@@ -100,10 +100,10 @@ int main() {
     gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
     gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-    gsl_spline_init(spline_eldis, elec_Tau260Te90.get_gamma(),
-                    elec_Tau260Te90.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau260Te90.get_gamma(),
-                    elec_Tau260Te90.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau260Te90.get_gamma().data(),
+                    elec_Tau260Te90.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau260Te90.get_gamma().data(),
+                    elec_Tau260Te90.get_gdens_diff().data(), nel);
 
     // Set up the inverse Compton calculation. As usual, you need to do some
     // book-keeping before running the code. The constructor this time requires
@@ -152,10 +152,10 @@ int main() {
     gmin = elec_Tau076Te90.get_gamma()[0];
     gmax = elec_Tau076Te90.get_gamma()[nel - 1];
 
-    gsl_spline_init(spline_eldis, elec_Tau076Te90.get_gamma(),
-                    elec_Tau076Te90.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau076Te90.get_gamma(),
-                    elec_Tau076Te90.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau076Te90.get_gamma().data(),
+                    elec_Tau076Te90.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau076Te90.get_gamma().data(),
+                    elec_Tau076Te90.get_gdens_diff().data(), nel);
 
     kariba::Compton IC_Tau076Te90(nfreq, 50);
     IC_Tau076Te90.set_frequency(1e15, 1e22);
@@ -180,10 +180,10 @@ int main() {
     gmin = elec_Tau019Te90.get_gamma()[0];
     gmax = elec_Tau019Te90.get_gamma()[nel - 1];
 
-    gsl_spline_init(spline_eldis, elec_Tau019Te90.get_gamma(),
-                    elec_Tau019Te90.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau019Te90.get_gamma(),
-                    elec_Tau019Te90.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau019Te90.get_gamma().data(),
+                    elec_Tau019Te90.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau019Te90.get_gamma().data(),
+                    elec_Tau019Te90.get_gdens_diff().data(), nel);
 
     kariba::Compton IC_Tau019Te90(nfreq, 50);
     IC_Tau019Te90.set_frequency(1e15, 1e22);
@@ -208,10 +208,10 @@ int main() {
     gmin = elec_Tau260Te900.get_gamma()[0];
     gmax = elec_Tau260Te900.get_gamma()[nel - 1];
 
-    gsl_spline_init(spline_eldis, elec_Tau260Te900.get_gamma(),
-                    elec_Tau260Te900.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau260Te900.get_gamma(),
-                    elec_Tau260Te900.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau260Te900.get_gamma().data(),
+                    elec_Tau260Te900.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau260Te900.get_gamma().data(),
+                    elec_Tau260Te900.get_gdens_diff().data(), nel);
 
     kariba::Compton IC_Tau260Te900(nfreq, 50);
     IC_Tau260Te900.set_frequency(1e15, 1e22);
@@ -236,10 +236,10 @@ int main() {
     gmin = elec_Tau076Te900.get_gamma()[0];
     gmax = elec_Tau076Te900.get_gamma()[nel - 1];
 
-    gsl_spline_init(spline_eldis, elec_Tau076Te900.get_gamma(),
-                    elec_Tau076Te900.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau076Te900.get_gamma(),
-                    elec_Tau076Te900.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau076Te900.get_gamma().data(),
+                    elec_Tau076Te900.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau076Te900.get_gamma().data(),
+                    elec_Tau076Te900.get_gdens_diff().data(), nel);
 
     kariba::Compton IC_Tau076Te900(nfreq, 50);
     IC_Tau076Te900.set_frequency(1e15, 1e22);
@@ -264,10 +264,10 @@ int main() {
     gmin = elec_Tau019Te900.get_gamma()[0];
     gmax = elec_Tau019Te900.get_gamma()[nel - 1];
 
-    gsl_spline_init(spline_eldis, elec_Tau019Te900.get_gamma(),
-                    elec_Tau019Te900.get_gdens(), nel);
-    gsl_spline_init(spline_deriv, elec_Tau019Te900.get_gamma(),
-                    elec_Tau019Te900.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, elec_Tau019Te900.get_gamma().data(),
+                    elec_Tau019Te900.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, elec_Tau019Te900.get_gamma().data(),
+                    elec_Tau019Te900.get_gdens_diff().data(), nel);
 
     kariba::Compton IC_Tau019Te900(nfreq, 50);
     IC_Tau019Te900.set_frequency(1e15, 1e22);

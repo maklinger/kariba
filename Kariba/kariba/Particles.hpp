@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace kariba {
 // Template class for particle distributions
 // This class contains members and methods that are used for thermal,
@@ -66,21 +68,24 @@ struct InjectionBknParams {
 
 class Particles {
   protected:
-    int size;
+    size_t size;
 
     double mass_gr;    // particle mass in grams
     double
         mass_kev;    // same as above but in keV, using electrons as "reference"
 
-    double *p;    // array of particle momenta
-    double
-        *ndens;    // array of number density per unit volume, per unit momentum
-    double *gamma;    // array of particle kinetic energies for each momentum
-    double *gdens;    // array of number density per unit volume, per unit gamma
-    double *gdens_diff;    // array with differential of number density for
-                           // radiation calculation
+    std::vector<double> p;    // array of particle momenta
+    std::vector<double>
+        ndens;    // array of number density per unit volume, per unit momentum
+    std::vector<double>
+        gamma;    // array of particle kinetic energies for each momentum
+    std::vector<double>
+        gdens;    // array of number density per unit volume, per unit gamma
+    std::vector<double> gdens_diff;    // array with differential of number
+                                       // density for radiation calculation
 
   public:
+    Particles(size_t size);
     ~Particles();
 
     void set_mass(double m);
@@ -88,11 +93,16 @@ class Particles {
     void initialize_pdens();
     void gdens_differentiate();
 
-    double *get_p() const { return p; }
-    double *get_pdens() const { return ndens; }
-    double *get_gamma() const { return gamma; }
-    double *get_gdens() const { return gdens; }
-    double *get_gdens_diff() const { return gdens_diff; }
+    const std::vector<double> &get_p() const { return p; }
+    const std::vector<double> &get_pdens() const { return ndens; }
+    const std::vector<double> &get_gamma() const { return gamma; }
+    const std::vector<double> &get_gdens() const { return gdens; }
+    const std::vector<double> &get_gdens_diff() const { return gdens_diff; }
+    // std::vector<double>& get_p() { return p; }
+    // std::vector<double>& get_pdens() { return ndens; }
+    // std::vector<double>& get_gamma() { return gamma; }
+    // std::vector<double>& get_gdens() { return gdens; }
+    // std::vector<double>& get_gdens_diff() { return gdens_diff; }
 
     // double beta(int i);  // todo: not implemented!
 

@@ -28,8 +28,7 @@ struct HetagParams {
 class Grays : public Radiation {
     //	private:
   public:
-    ~Grays();
-    Grays(int s1, double numin, double numax);
+    Grays(size_t size, double numin, double numax);
 
     // Method to set the gamma-rays from pp inelastic interactions. p: pspec_p,
     // ntot_prot: total proton number density of the jet segment,
@@ -40,15 +39,19 @@ class Grays : public Radiation {
                       gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp);
 
     void set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                      gsl_spline *spline_Jp, double *nu_per_seg,
-                      double *ng_per_seg, int ne);
+                      gsl_spline *spline_Jp, std::vector<double> &nu_per_seg,
+                      std::vector<double> &ng_per_seg, int ne);
 };
 
 // Adds up in the lum_perseg the target photon luminosity (in erg/sec/Hz)
-void sum_photons(int nphot, double *en_perseg, double *lum_perseg, int ntarg,
-                 const double *targ_en, const double *targ_lum);
-void sum_photons(int nphot, const double *en_perseg, double *lum_perseg,
-                 int ntarg, const double *targ_en, const double *targ_lum);
+void sum_photons(size_t nphot, std::vector<double> &en_perseg,
+                 std::vector<double> &lum_perseg, size_t ntarg,
+                 const std::vector<double> &targ_en,
+                 const std::vector<double> &targ_lum);
+void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
+                 std::vector<double> &lum_perseg, size_t ntarg,
+                 const std::vector<double> &targ_en,
+                 const std::vector<double> &targ_lum);
 
 // funtions for γ rays from pγ
 double Hetag(double x, void *p);

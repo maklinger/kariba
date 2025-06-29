@@ -15,7 +15,7 @@ class Cyclosyn : public Radiation {
 
   public:
     ~Cyclosyn();
-    Cyclosyn(int s);
+    Cyclosyn(size_t size);
 
     friend double emis(double gamma, void *p);
     friend double abs(double gamma, void *p);

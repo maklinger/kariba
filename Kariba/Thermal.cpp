@@ -9,24 +9,11 @@
 namespace kariba {
 
 // Class constructor to initialize object
-Thermal::Thermal(int s) {
-    size = s;
-
-    p = new double[size];
-    ndens = new double[size];
-    gamma = new double[size];
-    gdens = new double[size];
-    gdens_diff = new double[size];
-
+Thermal::Thermal(size_t size) : Particles(size) {
     thnorm = 1.;
 
     mass_gr = constants::emgm;
     mass_kev = constants::emgm * constants::gr_to_kev;
-
-    for (int i = 0; i < size; i++) {
-        p[i] = 0;
-        ndens[i] = 0;
-    }
 }
 
 // Method to initialize momentum array a with default interval
@@ -41,9 +28,9 @@ void Thermal::set_p() {    //
 
     pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
     pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-    pinc = (log10(pmax) - log10(pmin)) / (size - 1);
+    pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -53,7 +40,7 @@ void Thermal::set_p() {    //
 // Method to set differential electron number density from known temperature,
 // normalization, and momentum array
 void Thermal::set_ndens() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta);
     }
     initialize_gdens();
@@ -91,7 +78,7 @@ void Thermal::test() {
     std::cout << "Temperature: " << Temp << " erg, "
               << Temp / constants::kboltz_kev2erg << " kev\n";
     ;
-    std::cout << "Array size: " << size << "\n";
+    std::cout << "Array size: " << p.size() << "\n";
     std::cout << "Normalization: " << thnorm << "\n";
     std::cout << "Particle mass in grams: " << mass_gr << "\n";
     std::cout << "Particle mass in keV: " << mass_kev << "\n";

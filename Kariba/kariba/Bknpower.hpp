@@ -13,7 +13,7 @@ class Bknpower : public Particles {
     double pmin, pbrk, pmax;
 
   public:
-    Bknpower(int s);
+    Bknpower(size_t size);
 
     void set_p(double min, double brk, double ucom, double bfield,
                double betaeff, double r, double fsc);

@@ -12,7 +12,7 @@ class Thermal : public Particles {
     double Temp, thnorm, theta;
 
   public:
-    Thermal(int s);
+    Thermal(size_t size);
 
     void set_p();
     void set_ndens();

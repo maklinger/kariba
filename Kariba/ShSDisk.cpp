@@ -7,31 +7,10 @@
 
 namespace kariba {
 
-ShSDisk::~ShSDisk() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-}
-
 // Constructor for the disk. No input parameters because the sized of the arrays
 // is set automatically, and every other property needs to be handled by the
 // setters below
-ShSDisk::ShSDisk() {
-    size = 50;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[size];
-    num_phot_obs = new double[size];
-
-    for (int i = 0; i < size; i++) {
-        en_phot[i] = 0.;
-        en_phot_obs[i] = 0.;
-        num_phot[i] = 0.;
-        num_phot_obs[i] = 0.;
-    }
-}
+ShSDisk::ShSDisk(size_t size) : Radiation(size) {}
 
 // return SD spectrum over a given radius, frequency to be integrated over
 // radius
@@ -60,7 +39,7 @@ double disk_int(double lr, void *pars) {
 void ShSDisk::disk_spectrum() {
     double result, error;
 
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < en_phot_obs.size(); k++) {
         gsl_integration_workspace *w1;
         w1 = gsl_integration_workspace_alloc(100);
         gsl_function F1;
@@ -80,7 +59,7 @@ void ShSDisk::disk_spectrum() {
 // that it was absorbed and reprocessed into some other unspecified radiative
 // mechanism
 void ShSDisk::cover_disk(double f) {
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < num_phot_obs.size(); k++) {
         num_phot_obs[k] = num_phot_obs[k] * (1. - f);
     }
 }
@@ -89,7 +68,7 @@ void ShSDisk::cover_disk(double f) {
 // luminosity of the disk
 double ShSDisk::total_luminosity() {
     double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < en_phot_obs.size() - 1; i++) {
         temp = temp + (1. / 2.) *
                           (en_phot_obs[i + 1] / constants::herg -
                            en_phot_obs[i] / constants::herg) *
@@ -123,9 +102,9 @@ void ShSDisk::set_luminosity(double L) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot_obs[i] = pow(10., log10(emin) + i * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;
@@ -143,9 +122,9 @@ void ShSDisk::set_tin_kev(double T) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot_obs[i] = pow(10., log10(emin) + i * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;
@@ -162,9 +141,9 @@ void ShSDisk::set_tin_k(double T) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot_obs[i] = pow(10., log10(emin) + i * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;

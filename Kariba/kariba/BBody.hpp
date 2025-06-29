@@ -13,8 +13,7 @@ class BBody : public Radiation {
     double normbb;
 
   public:
-    ~BBody();
-    BBody();
+    BBody(size_t size = 40);
 
     void set_temp_kev(double T);
     void set_temp_k(double T);

@@ -14,7 +14,7 @@ class Kappa : public Particles {
     double pmin, pmax;
 
   public:
-    Kappa(int s);
+    Kappa(size_t size);
 
     void set_p(double ucom, double bfield, double betaeff, double r,
                double fsc);

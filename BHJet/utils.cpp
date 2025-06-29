@@ -55,11 +55,11 @@ bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Urad,
     }
 }
 
-void param_write(const double *par, std::string path) {
+void param_write(const std::vector<double> &par, std::string path) {
     std::ofstream file;
     file.open(path.c_str(), std::ios::trunc);
 
-    for (int k = 0; k < 27; k++) {
+    for (size_t k = 0; k < 27; k++) {
         file << par[k] << std::endl;
     }
 
@@ -71,8 +71,8 @@ void param_write(const double *par, std::string path) {
 // to pass arrays directly from the radiation libraries note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, double *en, double *lum, std::string path,
-                double dist, double redsh) {
+void plot_write(int size, std::vector<double> &en, std::vector<double> &lum,
+                std::string path, double dist, double redsh) {
     std::ofstream file;
     file.open(path.c_str(), std::ios::app);
 
@@ -86,8 +86,9 @@ void plot_write(int size, double *en, double *lum, std::string path,
     file.close();
 }
 
-void plot_write(int size, const double *en, const double *lum, std::string path,
-                double dist, double redsh) {
+void plot_write(int size, const std::vector<double> &en,
+                const std::vector<double> &lum, std::string path, double dist,
+                double redsh) {
     std::ofstream file;
     file.open(path.c_str(), std::ios::app);
 
@@ -102,8 +103,9 @@ void plot_write(int size, const double *en, const double *lum, std::string path,
 }
 
 // Same as above but for particle distributions
-void plot_write(int size, const double *p, const double *g, const double *pdens,
-                const double *gdens, std::string path) {
+void plot_write(int size, const std::vector<double> &p,
+                const std::vector<double> &g, const std::vector<double> &pdens,
+                const std::vector<double> &gdens, std::string path) {
 
     std::ofstream file;
     file.open(path.c_str(), std::ios::app);
@@ -118,13 +120,14 @@ void plot_write(int size, const double *p, const double *g, const double *pdens,
 // This function takes the observed arrays of the Cyclosyn and Compton classes
 // for jet/counterjet sums up the contributions of both and stores them in one
 // array of observed frequencies and one of comoving luminosities
-void sum_counterjet(int size, const double *input_en, const double *input_lum,
-                    double *en, double *lum) {
+void sum_counterjet(size_t size, const std::vector<double> &input_en,
+                    const std::vector<double> &input_lum,
+                    std::vector<double> &en, std::vector<double> &lum) {
     double en_cj_min, en_j_min, en_cj_max, en_j_max, einc;
-    double *en_j = new double[size];
-    double *en_cj = new double[size];
-    double *lum_j = new double[size];
-    double *lum_cj = new double[size];
+    std::vector<double> en_j(size, 0.0);
+    std::vector<double> en_cj(size, 0.0);
+    std::vector<double> lum_j(size, 0.0);
+    std::vector<double> lum_cj(size, 0.0);
 
     en_j_min = input_en[0];
     en_cj_min = input_en[size];
@@ -132,7 +135,7 @@ void sum_counterjet(int size, const double *input_en, const double *input_lum,
     en_cj_max = input_en[2 * size - 1];
     einc = (std::log10(en_j_max) - std::log10(en_cj_min)) / (size - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         en[i] = std::pow(10., std::log10(en_cj_min) + i * einc);
         en_j[i] = input_en[i];
         en_cj[i] = input_en[i + size];
@@ -142,13 +145,13 @@ void sum_counterjet(int size, const double *input_en, const double *input_lum,
 
     gsl_interp_accel *acc_j = gsl_interp_accel_alloc();
     gsl_spline *spline_j = gsl_spline_alloc(gsl_interp_akima, size);
-    gsl_spline_init(spline_j, en_j, lum_j, size);
+    gsl_spline_init(spline_j, en_j.data(), lum_j.data(), size);
 
     gsl_interp_accel *acc_cj = gsl_interp_accel_alloc();
     gsl_spline *spline_cj = gsl_spline_alloc(gsl_interp_akima, size);
-    gsl_spline_init(spline_cj, en_cj, lum_cj, size);
+    gsl_spline_init(spline_cj, en_cj.data(), lum_cj.data(), size);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         if (i == 0) {
             lum[i] = lum_cj[i];
         } else if (i == size - 1) {
@@ -170,22 +173,21 @@ void sum_counterjet(int size, const double *input_en, const double *input_lum,
     gsl_spline_free(spline_j), gsl_interp_accel_free(acc_j);
     gsl_spline_free(spline_cj), gsl_interp_accel_free(acc_cj);
 
-    delete[] en_j, delete[] en_cj, delete[] lum_j, delete[] lum_cj;
-
     return;
 }
 
 // Calculates the redshifted spectrum as seen by the observer, starting from the
 // emitted spectrum in the frame comoving with the source. Only applicable to
 // (distant) AGN, not to galactic XRBs.
-void output_spectrum(int size, double *en, double *lum, double *spec,
+void output_spectrum(size_t size, std::vector<double> &en,
+                     std::vector<double> &lum, std::vector<double> &spec,
                      double redsh, double dist) {
 
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size);
-    gsl_spline_init(input_spline, en, lum, size);
+    gsl_spline_init(input_spline, en.data(), lum.data(), size);
 
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < size; k++) {
         if (en[k] * (1. + redsh) < en[size - 1]) {
             spec[k] = std::log10(
                 gsl_spline_eval(input_spline, en[k] * (1. + redsh), acc) *
@@ -204,13 +206,14 @@ void output_spectrum(int size, double *en, double *lum, double *spec,
 // sums the disk/corona/bb to the total jet spectrum. The reason for the const
 // arryas in input is that the input arrays are directly accessed from the
 // ShSDisk class, which are const
-void sum_zones(int size_in, int size_out, double *input_en, double *input_lum,
-               double *en, double *lum) {
+void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
+               std::vector<double> &input_lum, std::vector<double> &en,
+               std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size_in);
-    gsl_spline_init(input_spline, input_en, input_lum, size_in);
+    gsl_spline_init(input_spline, input_en.data(), input_lum.data(), size_in);
 
-    for (int i = 0; i < size_out; i++) {
+    for (size_t i = 0; i < size_out; i++) {
         if (en[i] > input_en[0] && en[i] < input_en[size_in - 1]) {
             lum[i] = lum[i] + gsl_spline_eval(input_spline, en[i], acc);
         }
@@ -218,13 +221,15 @@ void sum_zones(int size_in, int size_out, double *input_en, double *input_lum,
     gsl_spline_free(input_spline), gsl_interp_accel_free(acc);
 }
 
-void sum_ext(int size_in, int size_out, const double *input_en,
-             const double *input_lum, double *en, double *lum) {
+void sum_ext(size_t size_in, size_t size_out,
+             const std::vector<double> &input_en,
+             const std::vector<double> &input_lum, std::vector<double> &en,
+             std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size_in);
-    gsl_spline_init(input_spline, input_en, input_lum, size_in);
+    gsl_spline_init(input_spline, input_en.data(), input_lum.data(), size_in);
 
-    for (int i = 0; i < size_out; i++) {
+    for (size_t i = 0; i < size_out; i++) {
         if (en[i] > input_en[0] && en[i] < input_en[size_in - 1]) {
             lum[i] = lum[i] + gsl_spline_eval(input_spline, en[i], acc);
         }
@@ -237,10 +242,11 @@ void sum_ext(int size_in, int size_out, const double *input_en,
 // erg/s/Hz for the luminosity array to be integrated, Hz for the integration
 // bounds; size is the dimension of the input arrays Note: this uses a VERY
 // rough method and wide bins, so thread carefully
-double integrate_lum(int size, double numin, double numax,
-                     const double *input_en, const double *input_lum) {
+double integrate_lum(size_t size, double numin, double numax,
+                     const std::vector<double> &input_en,
+                     const std::vector<double> &input_lum) {
     double temp = 0.0;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < size - 1; i++) {
         if (input_en[i] / karcst::herg > numin &&
             input_en[i + 1] / karcst::herg < numax) {
             temp = temp + (1. / 2.) *
@@ -255,11 +261,12 @@ double integrate_lum(int size, double numin, double numax,
 // Overly simplified estimate of the photon index between numin and numax of a
 // given array; input is the same as integrate_lum. Note that this assumes
 // input_lum is a power-law in shape
-double photon_index(int size, double numin, double numax,
-                    const double *input_en, const double *input_lum) {
+double photon_index(size_t size, double numin, double numax,
+                    const std::vector<double> &input_en,
+                    const std::vector<double> &input_lum) {
     int counter_1 = 0, counter_2 = 0;
     double delta_y = 0.0, delta_x = 0.0, gamma = 0.0;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         if (input_en[i] / karcst::herg < numin) {
             counter_1 = i;
         }
@@ -308,7 +315,8 @@ void clean_file(std::string path, int check) {
 }
 
 // Used for interpolation by slang code
-void jetinterp(double *ear, double *energ, double *phot, double *photar, int ne,
+void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
+               std::vector<double> &phot, std::vector<double> &photar, int ne,
                int newne) {
     int i, iplus1, j, jplus1;
     double emid, phflux;

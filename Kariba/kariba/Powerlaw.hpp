@@ -18,7 +18,7 @@ class Powerlaw : public Particles {
     bool isEfficient;    // Proton acceleration
 
   public:
-    Powerlaw(int s);
+    Powerlaw(size_t size);
 
     void set_p(double min, double ucom, double bfield, double betaeff, double r,
                double fsc);
@@ -50,8 +50,8 @@ class Powerlaw : public Particles {
     void set_gdens(double &plfrac_p, double Up, double protdens);
     void set_gdens(double r, double protdens, double nwind, double bfield,
                    double plfrac, double Urad);
-    void set_gdens_pdens(double r, double beta, double Ljet, double ep, double pspec,
-			    double &protdens);
+    void set_gdens_pdens(double r, double beta, double Ljet, double ep,
+                         double pspec, double &protdens);
 
     // secondary electrons from pp
     void set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
@@ -60,12 +60,14 @@ class Powerlaw : public Particles {
                       double r);
     // convert secondary electrons from pg from Neutrinos units proper units for
     // synchrotron radiation
-    void set_pg_electrons(const double *energy, const double *density,
-                          double f_beta, double r, double vol, double B);
+    void set_pg_electrons(const std::vector<double> &energy,
+                          const std::vector<double> &density, double f_beta,
+                          double r, double vol, double B);
 
     // function for electrons from γγ annihilation
-    void Qggeefunction(double r, double vol, double bfield, int phot_number,
-                       double *en_perseg, double *lum_perseg, double gmax);
+    void Qggeefunction(double r, double vol, double bfield, size_t phot_number,
+                       const std::vector<double> &en_perseg,
+                       const std::vector<double> &lum_perseg, double gmax);
 
     void test();
 };

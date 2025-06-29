@@ -5,6 +5,10 @@
 
 namespace kariba {
 
+Radiation::Radiation(size_t size)
+    : size(size), en_phot(size, 0.0), num_phot(size, 0.0),
+      en_phot_obs(size, 0.0), num_phot_obs(size, 0.0) {}
+
 // Methods to set viewing angle, beaming and geometry of emission region
 void Radiation::set_beaming(double theta, double speed, double doppler) {
     angle = theta * constants::pi / 180.;
@@ -71,7 +75,7 @@ void Radiation::set_geometry(std::string geom, double l1) {
 // between numin and numax
 double Radiation::integrated_luminosity(double numin, double numax) {
     double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < en_phot_obs.size() - 1; i++) {
         if (en_phot_obs[i] / constants::herg > numin &&
             en_phot_obs[i + 1] / constants::herg < numax) {
             temp = temp + (1. / 2.) *
@@ -88,7 +92,7 @@ void Radiation::set_counterjet(bool flag) { counterjet = flag; }
 
 // simple method to check arrays; only meant for debugging
 void Radiation::test_arrays() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         std::cout << en_phot[i] << " " << num_phot[i] << " "
                   << num_phot[i] * en_phot[i] * constants::herg << std::endl;
     }

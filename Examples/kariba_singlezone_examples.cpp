@@ -85,10 +85,10 @@ int main() {
                Electrons.get_pdens(), Electrons.get_gdens(),
                "Output/Singlezone_Particles.dat");
 
-    gsl_spline_init(spline_eldis, Electrons.get_gamma(), Electrons.get_gdens(),
-                    nel);
-    gsl_spline_init(spline_deriv, Electrons.get_gamma(),
-                    Electrons.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, Electrons.get_gamma().data(),
+                    Electrons.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, Electrons.get_gamma().data(),
+                    Electrons.get_gdens_diff().data(), nel);
 
     // Set up the cyclo-synchrotron emission, by specifying the size of the
     // arrays for frequency and flux. Then, specify the frequency range over

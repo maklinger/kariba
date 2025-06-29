@@ -12,8 +12,7 @@ namespace kariba {
 class Neutrinos_pp : public Radiation {
     //	private:
   public:
-    ~Neutrinos_pp();
-    Neutrinos_pp(int s1, double Emin, double Emax);
+    Neutrinos_pp(size_t size, double Emin, double Emax);
 
     void set_neutrinos_pp(double p, double gammap_min, double gammap_max,
                           double ntot_prot, double nwind, double plfrac,

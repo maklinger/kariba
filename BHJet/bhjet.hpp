@@ -86,32 +86,41 @@ typedef struct com_pars {
     double urad_total;    // total energy density
 } com_pars;
 
-void jetmain(double *ear, int ne, double *param, double *photeng,
-             double *photspec);
+void jetmain(std::vector<double> &ear, int ne, std::vector<double> &param,
+             std::vector<double> &photeng, std::vector<double> &photspec);
 
-void param_write(const double *par, std::string path);
-void plot_write(int size, double *en, double *lum, std::string path,
-                double dist, double redshift);
-void plot_write(int size, const double *en, const double *lum, std::string path,
-                double dist, double redshift);
-void plot_write(int size, const double *p, const double *g, const double *pdens,
-                const double *gdens, std::string path);
+void param_write(const std::vector<double> &par, std::string path);
+void plot_write(int size, std::vector<double> &en, std::vector<double> &lum,
+                std::string path, double dist, double redshift);
+void plot_write(int size, const std::vector<double> &en,
+                const std::vector<double> &lum, std::string path, double dist,
+                double redshift);
+void plot_write(int size, const std::vector<double> &p,
+                const std::vector<double> &g, const std::vector<double> &pdens,
+                const std::vector<double> &gdens, std::string path);
 
 bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Ucom,
                    double velsw, zone_pars &zone);
 
-void sum_counterjet(int size, const double *input_en, const double *input_lum,
-                    double *en, double *lum);
-void output_spectrum(int size, double *en, double *lum, double *spec,
+void sum_counterjet(size_t size, const std::vector<double> &input_en,
+                    const std::vector<double> &input_lum,
+                    std::vector<double> &en, std::vector<double> &lum);
+void output_spectrum(size_t size, std::vector<double> &en,
+                     std::vector<double> &lum, std::vector<double> &spec,
                      double redsh, double dist);
-void sum_zones(int size_in, int size_out, double *input_en, double *input_lum,
-               double *en, double *lum);
-void sum_ext(int size_in, int size_out, const double *input_en,
-             const double *input_lum, double *en, double *lum);
-double integrate_lum(int size, double numin, double numax,
-                     const double *input_en, const double *input_lum);
-double photon_index(int size, double numin, double numax,
-                    const double *input_en, const double *input_lum);
+void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
+               std::vector<double> &input_lum, std::vector<double> &en,
+               std::vector<double> &lum);
+void sum_ext(size_t size_in, size_t size_out,
+             const std::vector<double> &input_en,
+             const std::vector<double> &input_lum, std::vector<double> &en,
+             std::vector<double> &lum);
+double integrate_lum(size_t size, double numin, double numax,
+                     const std::vector<double> &input_en,
+                     const std::vector<double> &input_lum);
+double photon_index(size_t size, double numin, double numax,
+                    const std::vector<double> &input_en,
+                    const std::vector<double> &input_lum);
 
 void velprof_ad(gsl_spline *spline);
 void velprof_iso(gsl_spline *spline);
@@ -136,7 +145,9 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
                        double &udt_zone, com_pars &agn_com);
 
 void clean_file(std::string path, int check);
-void jetinterp(double *ear, double *energ, double *phot, double *photar, int ne,
+void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
+               std::vector<double> &phot, std::vector<double> &photar, int ne,
                int newne);
 
-void ebl_atten_gil(int size, double *en, double *lum, double redsh);
+void ebl_atten_gil(int size, std::vector<double> &en, std::vector<double> &lum,
+                   double redsh);

@@ -26,30 +26,16 @@ static const double BetagTable[NITEMS] = {
     1.37e-16, 1.62e-16, 1.71e-16, 1.78e-16, 1.84e-16, 1.93e-16,
     4.74e-16, 7.70e-16, 1.06e-15, 2.73e-15};
 
-Grays::~Grays() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-}
+Grays::Grays(size_t size, double numin, double numax) : Radiation(size) {
+    en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
+    num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
-Grays::Grays(int s1, double numin, double numax) {
-
-    size = s1;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[2 * size];
-    num_phot_obs = new double[2 * size];
-
-    double nuinc = (log10(numax) - log10(numin)) / (size - 1);
-    for (int i = 0; i < size; i++) {
+    size_t lsize = en_phot.size();
+    double nuinc = (log10(numax) - log10(numin)) / (lsize - 1);
+    for (size_t i = 0; i < lsize; i++) {
         en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
         en_phot_obs[i] = en_phot[i];
-        en_phot_obs[i + size] = en_phot[i];
-        num_phot[i] = 0;
-        num_phot_obs[i] = 0;
-        num_phot_obs[i + size] = 0;
+        en_phot_obs[i + lsize] = en_phot[i];
     }
 }
 
@@ -100,7 +86,8 @@ void Grays::set_grays_pp(double p, double gammap_min, double gammap_max,
     transition = 0.10;    // The transition between delta approximation and
                           // distributions.
 
-    for (int j = 0; j < size; j++) {
+    size_t size = en_phot.size();
+    for (size_t j = 0; j < size; j++) {
         Eg = en_phot[j] * 1.0e-12 * constants::erg;
         if (Eg < transition) {    // Delta approximation for distribution
             Epimin =
@@ -250,8 +237,10 @@ double gspec_pp(double Ep, double y) {
     return Fg;
 }
 //************************************************************************************************************
-void sum_photons(int nphot, double *en_perseg, double *lum_perseg, int ntarg,
-                 const double *targ_en, const double *targ_lum) {
+void sum_photons(size_t nphot, std::vector<double> &en_perseg,
+                 std::vector<double> &lum_perseg, size_t ntarg,
+                 const std::vector<double> &targ_en,
+                 const std::vector<double> &targ_lum) {
 
     double lx[ntarg];    // log10 of targ_en[]/emerg
     double lL[ntarg];    // log10 of Luminosity of targets in erg/s/Hz
@@ -259,7 +248,7 @@ void sum_photons(int nphot, double *en_perseg, double *lum_perseg, int ntarg,
     double logx;
 
     // std::cout<<"\n\n";
-    for (int i = 0; i < ntarg;
+    for (size_t i = 0; i < ntarg;
          i++) {    // lx = log10(hv/mec2) of target photons with energy hv
         lx[i] = log10(targ_en[i] / constants::emerg);
         if (targ_lum[i] == 0.) {
@@ -276,7 +265,7 @@ void sum_photons(int nphot, double *en_perseg, double *lum_perseg, int ntarg,
     gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
     gsl_spline_init(spline_targ, lx, lL, ntarg);
 
-    for (int i = 0; i < nphot; i++) {
+    for (size_t i = 0; i < nphot; i++) {
         logx = log10(en_perseg[i] / constants::emerg);
         if (logx >= lx[0] && logx <= lx[ntarg - 5]) {
             lum_perseg[i] += std::max(
@@ -288,16 +277,18 @@ void sum_photons(int nphot, double *en_perseg, double *lum_perseg, int ntarg,
     gsl_spline_free(spline_targ), gsl_interp_accel_free(acc_targ);
 }
 
-void sum_photons(int nphot, const double *en_perseg, double *lum_perseg,
-                 int ntarg, const double *targ_en, const double *targ_lum) {
+void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
+                 std::vector<double> &lum_perseg, size_t ntarg,
+                 const std::vector<double> &targ_en,
+                 const std::vector<double> &targ_lum) {
 
-    double lx[ntarg];    // log10 of targ_en[]/emerg
-    double lL[ntarg];    // log10 of Luminosity of targets in erg/s/Hz
+    std::vector<double> lx(ntarg, 0.0);    // log10 of targ_en[]/emerg
+    std::vector<double> lL(
+        ntarg, 0.0);    // log10 of Luminosity of targets in erg/s/Hz
 
     double logx;
 
-    // std::cout<<"\n\n";
-    for (int i = 0; i < ntarg;
+    for (size_t i = 0; i < ntarg;
          i++) {    // lx = log10(hv/mec2) of target photons with energy hv
         lx[i] = log10(targ_en[i] / constants::emerg);
         if (targ_lum[i] == 0.) {
@@ -312,9 +303,9 @@ void sum_photons(int nphot, const double *en_perseg, double *lum_perseg,
     // We interpolate over the targets
     gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
     gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
-    gsl_spline_init(spline_targ, lx, lL, ntarg);
+    gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
-    for (int i = 0; i < nphot; i++) {
+    for (size_t i = 0; i < nphot; i++) {
         logx = log10(en_perseg[i] / constants::emerg);
         if (logx >= lx[0] && logx <= lx[ntarg - 5]) {
             lum_perseg[i] += std::max(
@@ -328,8 +319,8 @@ void sum_photons(int nphot, const double *en_perseg, double *lum_perseg,
 
 //************************************************************************************************************
 void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                         gsl_spline *spline_Jp, double *en_perseg,
-                         double *lum_perseg, int nphot) {
+                         gsl_spline *spline_Jp, std::vector<double> &en_perseg,
+                         std::vector<double> &lum_perseg, int nphot) {
 
     int N = 10;
     double mpion = 137.5e6 / constants::erg /
@@ -366,10 +357,11 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     gsl_spline_init(spline_ng, freq, Uphot, nphot);
 
     deta = log10(eta_max / eta_min) / (N - 1);
+    size_t size = en_phot.size();
 #pragma omp parallel for private(                                              \
         eta, Hg, dNdEg)    // possibly lost: 9,424 bytes in 31 blocks
-    for (int i = 0; i < size; i++) {    // for every produced γ ray energy
-        double Eg = en_phot[i];         // in erg
+    for (size_t i = 0; i < size; i++) {    // for every produced γ ray energy
+        double Eg = en_phot[i];            // in erg
         if (Eg > mpion * constants::cee * constants::cee) {
             double sum = 0.0;
             gsl_integration_workspace *w1 =

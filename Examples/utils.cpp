@@ -6,7 +6,7 @@
 namespace karcst = kariba::constants;
 
 // Read input parameters from file, store them in an array
-void read_params(std::string file, double *pars) {
+void read_params(std::string file, std::vector<double> &pars) {
     std::ifstream inFile;
     inFile.open(file.c_str());
     std::string line;
@@ -35,8 +35,9 @@ void read_params(std::string file, double *pars) {
 // file on the provided path. Note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, const double *en, const double *lum,
-                const std::string &path, double redsh) {
+void plot_write(int size, const std::vector<double> &en,
+                const std::vector<double> &lum, const std::string &path,
+                double redsh) {
     std::ofstream file;
     file.open(path, std::ios::app);
 
@@ -47,8 +48,9 @@ void plot_write(int size, const double *en, const double *lum,
     file.close();
 }
 
-void plot_write(int size, const double *p, const double *g, const double *pdens,
-                const double *gdens, const std::string &path) {
+void plot_write(int size, const std::vector<double> &p,
+                const std::vector<double> &g, const std::vector<double> &pdens,
+                const std::vector<double> &gdens, const std::string &path) {
 
     std::ofstream file;
     file.open(path, std::ios::app);
@@ -66,13 +68,14 @@ void plot_write(int size, const double *p, const double *g, const double *pdens,
 // sums the disk/corona/bb to the total jet spectrum. The reason for the const
 // arryas in input is that the input arrays are directly accessed from the
 // ShSDisk class, which are const
-void sum_zones(int size_in, int size_out, double *input_en, double *input_lum,
-               double *en, double *lum) {
+void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
+               std::vector<double> &input_lum, std::vector<double> &en,
+               std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size_in);
-    gsl_spline_init(input_spline, input_en, input_lum, size_in);
+    gsl_spline_init(input_spline, input_en.data(), input_lum.data(), size_in);
 
-    for (int i = 0; i < size_out; i++) {
+    for (size_t i = 0; i < size_out; i++) {
         if (en[i] > input_en[0] && en[i] < input_en[size_in - 1]) {
             lum[i] = lum[i] + gsl_spline_eval(input_spline, en[i], acc);
         }
@@ -80,13 +83,15 @@ void sum_zones(int size_in, int size_out, double *input_en, double *input_lum,
     gsl_spline_free(input_spline), gsl_interp_accel_free(acc);
 }
 
-void sum_ext(int size_in, int size_out, const double *input_en,
-             const double *input_lum, double *en, double *lum) {
+void sum_ext(size_t size_in, size_t size_out,
+             const std::vector<double> &input_en,
+             const std::vector<double> &input_lum, std::vector<double> &en,
+             std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size_in);
-    gsl_spline_init(input_spline, input_en, input_lum, size_in);
+    gsl_spline_init(input_spline, input_en.data(), input_lum.data(), size_in);
 
-    for (int i = 0; i < size_out; i++) {
+    for (size_t i = 0; i < size_out; i++) {
         if (en[i] > input_en[0] && en[i] < input_en[size_in - 1]) {
             lum[i] = lum[i] + gsl_spline_eval(input_spline, en[i], acc);
         }
@@ -100,7 +105,8 @@ void sum_ext(int size_in, int size_out, const double *input_en,
 // bounds; size is the dimension of the input arrays Note: this uses a VERY
 // rough method and wide bins, so thread carefully
 double integrate_lum(int size, double numin, double numax,
-                     const double *input_en, const double *input_lum) {
+                     const std::vector<double> &input_en,
+                     const std::vector<double> &input_lum) {
     double temp = 0.;
     for (int i = 0; i < size - 1; i++) {
         if (input_en[i] / karcst::herg > numin &&
@@ -118,7 +124,8 @@ double integrate_lum(int size, double numin, double numax,
 // given array; input is the same as integrate_lum. Note that this assumes
 // input_lum is a power-law in shape
 double photon_index(int size, double numin, double numax,
-                    const double *input_en, const double *input_lum) {
+                    const std::vector<double> &input_en,
+                    const std::vector<double> &input_lum) {
     int counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
     for (int i = 0; i < size; i++) {

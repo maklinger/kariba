@@ -31,7 +31,7 @@ class Mixed : public Particles {
     double plfrac;
 
   public:
-    Mixed(int s);
+    Mixed(size_t size);
 
     void set_p(double ucom, double bfield, double betaeff, double r,
                double fsc);

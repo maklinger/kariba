@@ -17,8 +17,7 @@ class ShSDisk : public Radiation {
                        // another up to the end of the nozzle
 
   public:
-    ~ShSDisk();
-    ShSDisk();
+    ShSDisk(size_t size = 50);
 
     double hdisk() const { return Hratio; };
     double tin() const { return Tin; };
