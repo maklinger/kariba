@@ -112,14 +112,12 @@ Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax)
     }
 }
 //************************************************************************************************************
-void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
-                                 gsl_interp_accel *acc_Jp,
-                                 gsl_spline *spline_Jp,
-                                 const std::vector<double> &en_perseg,
-                                 const std::vector<double> &lum_perseg,
-                                 size_t nphot, std::string outputConfiguration,
-                                 std::string flavor, int infosw,
-                                 std::string source) {
+void Neutrinos_pg::set_neutrinos(
+    double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
+    gsl_spline *spline_Jp, const std::vector<double> &en_perseg,
+    const std::vector<double> &lum_perseg, size_t nphot,
+    const std::string &outputConfiguration, const std::string &flavor,
+    int infosw, std::string_view source) {
 
     std::ofstream PhotopionFile;    // for plotting
     if (infosw >= 2) {
@@ -274,7 +272,7 @@ double Heta(double x, void *pars) {
 }
 
 //************************************************************************************************************
-double PhiFunc(double eta, double eta0, double x, std::string product) {
+double PhiFunc(double eta, double eta0, double x, std::string_view product) {
     // eqs 27,28,29 etc for gamma rays with interpolation in the tables given by
     // KA08 and eqs 31,32,33,34,35,36,37,38,39,40,41 and tables for leptons
 
@@ -379,7 +377,7 @@ double PhiFunc(double eta, double eta0, double x, std::string product) {
 }
 // The tables from KA08 for photomeson that give s,δ and B
 void tables_photomeson(double &s, double &delta, double &Beta,
-                       std::string product, double xeta) {
+                       std::string_view product, double xeta) {
     // Gamma rays from neutral pion decay:
     size_t sizeTable;
     if (product.compare("electrons") == 0 ||

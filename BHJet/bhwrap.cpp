@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-void read_params(std::string file, std::vector<double> &pars);
+void read_params(const std::string &path, std::vector<double> &pars);
 
 extern void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
                       std::vector<double> &phot, std::vector<double> &photar,
@@ -58,9 +58,9 @@ int main() {
 //
 //  @return pars         Parameters
 //
-void read_params(std::string file, std::vector<double> &pars) {
+void read_params(const std::string &path, std::vector<double> &pars) {
     std::ifstream inFile;
-    inFile.open(file.c_str());
+    inFile.open(path);
     std::string line;
     int line_nb = 0;
     if (!inFile) {

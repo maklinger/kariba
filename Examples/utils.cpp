@@ -6,9 +6,9 @@
 namespace karcst = kariba::constants;
 
 // Read input parameters from file, store them in an array
-void read_params(std::string file, std::vector<double> &pars) {
+void read_params(const std::string &path, std::vector<double> &pars) {
     std::ifstream inFile;
-    inFile.open(file.c_str());
+    inFile.open(path);
     std::string line;
     int line_nb = 0;
     if (!inFile) {

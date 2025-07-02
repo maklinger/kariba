@@ -42,4 +42,4 @@ double photon_index(int size, double numin, double numax,
                     const std::vector<double> &input_lum);
 
 void clean_file(const std::string &path, bool check);
-void read_params(std::string file, std::vector<double> &pars);
+void read_params(const std::string &path, std::vector<double> &pars);

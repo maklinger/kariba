@@ -38,13 +38,15 @@ class Powerlaw : public Particles {
     void set_energy(double gpmin, double fsc, double f_beta, double bfield,
                     double r_g, double z, double r, int infosw, double protdens,
                     double nwind, double Uradjet,
-                    std::string outputConfiguration, std::string source);
+                    const std::string &outputConfiguration,
+                    const std::string &source);
     void check_secondary_charged_syn(double bfield, double gpmax);
     void ProtonTimescales(double &logdgp, double fsc, double f_beta,
                           double bfield, double gpmin, double &gpmax,
                           double r_g, double z, double r, int infosw,
                           double nwind, double Uradjet,
-                          std::string outputConfiguration, std::string source);
+                          const std::string &outputConfiguration,
+                          const std::string &source);
     double sigma_pp(double Ep);
     double set_normprot(double nprot);
     void set_gdens(double &plfrac_p, double Up, double protdens);

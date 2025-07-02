@@ -24,8 +24,8 @@ Neutrinos_pp::Neutrinos_pp(size_t size, double Emin, double Emax)
 void Neutrinos_pp::set_neutrinos_pp(
     double pspec, double gammap_min, double gammap_max, double ntot_prot,
     double nwind, double plfrac, gsl_interp_accel *acc_Jp,
-    gsl_spline *spline_Jp, std::string outputConfiguration, std::string flavor,
-    int infosw, std::string source) {
+    gsl_spline *spline_Jp, const std::string &outputConfiguration,
+    const std::string &flavor, int infosw, std::string_view source) {
 
     std::ofstream NeutrinosppFile;    // for plotting
     if (infosw >= 2) {
@@ -183,7 +183,7 @@ double prob_fve() {    // it is the same as of electrons
     return Bprob;
 }
 
-double distr_pp(double lEv, double lEpi, std::string flavor) {
+double distr_pp(double lEv, double lEpi, std::string_view flavor) {
     double rmasses = .573;    // r = 1-λ = m_μ^2/m_p^2 = 0.573.The ratio of muon
                               // and proton energies
     double k = pow(10., (lEv - lEpi));    // x=Ev/Epion
@@ -244,7 +244,7 @@ double distr_pp(double lEv, double lEpi, std::string flavor) {
     return Fvespec;
 }
 
-double secondary_spectrum(double Ep, double y, std::string flavor) {
+double secondary_spectrum(double Ep, double y, std::string_view flavor) {
     double L = log(Ep);     // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
                             // for the cross section
     double Fvespec = 0.;    // The spectrum of secondary electrons from pion

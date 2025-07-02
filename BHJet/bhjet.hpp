@@ -89,15 +89,16 @@ typedef struct com_pars {
 void jetmain(std::vector<double> &ear, int ne, std::vector<double> &param,
              std::vector<double> &photeng, std::vector<double> &photspec);
 
-void param_write(const std::vector<double> &par, std::string path);
-void plot_write(int size, std::vector<double> &en, std::vector<double> &lum,
-                std::string path, double dist, double redshift);
-void plot_write(int size, const std::vector<double> &en,
-                const std::vector<double> &lum, std::string path, double dist,
-                double redshift);
-void plot_write(int size, const std::vector<double> &p,
+void param_write(const std::vector<double> &par, const std::string &path);
+void plot_write(size_t size, const std::vector<double> &en,
+                const std::vector<double> &lum, const std::string &path,
+                double dist, double redshift);
+// void plot_write(size_t size, const std::vector<double> &en, const
+// std::vector<double> &lum, 		const std::string& path, double dist, double
+//redshift);
+void plot_write(size_t size, const std::vector<double> &p,
                 const std::vector<double> &g, const std::vector<double> &pdens,
-                const std::vector<double> &gdens, std::string path);
+                const std::vector<double> &gdens, const std::string &path);
 
 bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Ucom,
                    double velsw, zone_pars &zone);

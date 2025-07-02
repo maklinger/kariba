@@ -158,8 +158,9 @@ double Powerlaw::max_p(double ucom, double bfield, double betaeff, double r,
 void Powerlaw::set_energy(double gpmin, double fsc, double f_beta,
                           double bfield, double r_g, double z, double r,
                           int infosw, double protdens, double ntargets,
-                          double Uradjet, std::string outputConfiguration,
-                          std::string source) {
+                          double Uradjet,
+                          const std::string &outputConfiguration,
+                          const std::string &source) {
 
     double gpmax, logdgp;
     if (fsc < 1.) {
@@ -190,8 +191,8 @@ void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta,
                                 double bfield, double gpmin, double &gpmax,
                                 double r_g, double z, double r, int infosw,
                                 double pp_targets, double Uradjet,
-                                std::string outputConfiguration,
-                                std::string source) {
+                                const std::string &outputConfiguration,
+                                const std::string &source) {
 
     double Tacc0;    // Tacc = Ep*Tacc,0 ==> Tacc,0 = 1/(ηecB)
     double paramG,

@@ -55,9 +55,9 @@ bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Urad,
     }
 }
 
-void param_write(const std::vector<double> &par, std::string path) {
+void param_write(const std::vector<double> &par, const std::string &path) {
     std::ofstream file;
-    file.open(path.c_str(), std::ios::trunc);
+    file.open(path, std::ios::trunc);
 
     for (size_t k = 0; k < 27; k++) {
         file << par[k] << std::endl;
@@ -71,12 +71,13 @@ void param_write(const std::vector<double> &par, std::string path) {
 // to pass arrays directly from the radiation libraries note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, std::vector<double> &en, std::vector<double> &lum,
-                std::string path, double dist, double redsh) {
+void plot_write(size_t size, const std::vector<double> &en,
+                const std::vector<double> &lum, const std::string &path,
+                double dist, double redsh) {
     std::ofstream file;
-    file.open(path.c_str(), std::ios::app);
+    file.open(path, std::ios::app);
 
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < size; k++) {
         file << en[k] / (karcst::herg * (1. + redsh)) << " "
              << lum[k] * (1. + redsh) /
                     (4. * karcst::pi * std::pow(dist, 2.) * karcst::mjy)
@@ -85,7 +86,7 @@ void plot_write(int size, std::vector<double> &en, std::vector<double> &lum,
 
     file.close();
 }
-
+/*
 void plot_write(int size, const std::vector<double> &en,
                 const std::vector<double> &lum, std::string path, double dist,
                 double redsh) {
@@ -101,15 +102,15 @@ void plot_write(int size, const std::vector<double> &en,
 
     file.close();
 }
-
+*/
 // Same as above but for particle distributions
-void plot_write(int size, const std::vector<double> &p,
+void plot_write(size_t size, const std::vector<double> &p,
                 const std::vector<double> &g, const std::vector<double> &pdens,
-                const std::vector<double> &gdens, std::string path) {
+                const std::vector<double> &gdens, const std::string &path) {
 
     std::ofstream file;
     file.open(path.c_str(), std::ios::app);
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < size; k++) {
         file << p[k] << " " << g[k] << " " << pdens[k] << " " << gdens[k]
              << std::endl;
     }

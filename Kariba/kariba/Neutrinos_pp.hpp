@@ -17,8 +17,9 @@ class Neutrinos_pp : public Radiation {
     void set_neutrinos_pp(double p, double gammap_min, double gammap_max,
                           double ntot_prot, double nwind, double plfrac,
                           gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
-                          std::string outputConfiguration, std::string flavor,
-                          int infosw, std::string source);
+                          const std::string &outputConfiguration,
+                          const std::string &flavor, int infosw,
+                          std::string_view source);
 };
 
 double multiplicity(double pspec);    // in Electrons.cpp
@@ -30,8 +31,8 @@ double proton_dist(double gpmin, double Ep, double Epcode_max,
                    gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp);
 // in Gamma_rays.cpp
 
-double distr_pp(double lEv, double lEpi, std::string flavor);
-double secondary_spectrum(double Ep, double y, std::string flavor);
+double distr_pp(double lEv, double lEpi, std::string_view flavor);
+double secondary_spectrum(double Ep, double y, std::string_view flavor);
 
 double prob_fve();
 
