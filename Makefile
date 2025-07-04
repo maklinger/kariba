@@ -7,10 +7,10 @@ $(info $(GSL))
 #include Kariba/Makefile
 
 
-.PHONY: all kariba examples bhjet clean distclean
+.PHONY: all kariba examples bhjet tests clean distclean
 
 
-all: kariba examples bhjet
+all: kariba tests examples bhjet
 
 kariba:
 	$(MAKE) -C Kariba
@@ -21,15 +21,20 @@ examples: kariba
 bhjet: kariba
 	$(MAKE) -C BHJet
 
+tests: kariba
+	$(MAKE) -C tests
+
 clean:
 	$(MAKE) -C Kariba clean
 	$(MAKE) -C Examples clean
 	$(MAKE) -C BHJet clean
+	$(MAKE) -C tests clean
 
 distclean:
 	$(MAKE) -C Kariba distclean
 	$(MAKE) -C Examples distclean
 	$(MAKE) -C BHJet distclean
+	$(MAKE) -C tests distclean
 
 help:
 	@echo Possible targets
