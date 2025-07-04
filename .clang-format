@@ -8,3 +8,4 @@ SpaceAfterCStyleCast: true
 SpacesBeforeTrailingComments: 4
 InsertNewlineAtEOF: true
 InsertBraces: true
+ColumnLimit: 100
