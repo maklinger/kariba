@@ -1,5 +1,6 @@
-#ifndef PARTICLES_HPP
-#define PARTICLES_HPP
+#pragma once
+
+#include <vector>
 
 namespace kariba {
 // Template class for particle distributions
@@ -7,31 +8,31 @@ namespace kariba {
 // non-thermal and mixed distributions
 
 // Structures used for GSL integration
-typedef struct pl_params {
+struct PlParams {
     double s;
     double n;
-} pl_params;
+};
 
-typedef struct bkn_params {
+struct BknParams {
     double s1;
     double s2;
     double brk;
     double max;
     double m;
-} bkn_params;
+};
 
-typedef struct th_params {
+struct ThParams {
     double t;
     double n;
     double m;
-} th_params;
+};
 
-typedef struct k_params {
+struct KParams {
     double t;
     double k;
-} k_params;
+};
 
-typedef struct injection_mixed_params {
+struct InjectionMixedParams {
     double s;
     double t;
     double nth;
@@ -40,48 +41,51 @@ typedef struct injection_mixed_params {
     double min;
     double max;
     double cutoff;
-} injection_mixed_params;
+};
 
-typedef struct injection_kappa_params {
+struct InjectionKappaParams {
     double t;
     double k;
     double n;
     double m;
-} injection_kappa_params;
+};
 
-typedef struct injection_pl_params {
+struct InjectionPlParams {
     double s;
     double n;
     double m;
     double max;
-} injection_pl_params;
+};
 
-typedef struct injection_bkn_params {
+struct InjectionBknParams {
     double s1;
     double s2;
     double brk;
     double max;
     double m;
     double n;
-} injection_bkn_params;
+};
 
 class Particles {
   protected:
-    int size;
+    size_t size;
 
     double mass_gr;    // particle mass in grams
     double
         mass_kev;    // same as above but in keV, using electrons as "reference"
 
-    double *p;    // array of particle momenta
-    double
-        *ndens;    // array of number density per unit volume, per unit momentum
-    double *gamma;    // array of particle kinetic energies for each momentum
-    double *gdens;    // array of number density per unit volume, per unit gamma
-    double *gdens_diff;    // array with differential of number density for
-                           // radiation calculation
+    std::vector<double> p;    // array of particle momenta
+    std::vector<double>
+        ndens;    // array of number density per unit volume, per unit momentum
+    std::vector<double>
+        gamma;    // array of particle kinetic energies for each momentum
+    std::vector<double>
+        gdens;    // array of number density per unit volume, per unit gamma
+    std::vector<double> gdens_diff;    // array with differential of number
+                                       // density for radiation calculation
 
   public:
+    Particles(size_t size);
     ~Particles();
 
     void set_mass(double m);
@@ -89,13 +93,18 @@ class Particles {
     void initialize_pdens();
     void gdens_differentiate();
 
-    const double *get_p() const { return p; }
-    const double *get_pdens() const { return ndens; }
-    const double *get_gamma() const { return gamma; }
-    const double *get_gdens() const { return gdens; }
-    const double *get_gdens_diff() const { return gdens_diff; }
+    const std::vector<double> &get_p() const { return p; }
+    const std::vector<double> &get_pdens() const { return ndens; }
+    const std::vector<double> &get_gamma() const { return gamma; }
+    const std::vector<double> &get_gdens() const { return gdens; }
+    const std::vector<double> &get_gdens_diff() const { return gdens_diff; }
+    // std::vector<double>& get_p() { return p; }
+    // std::vector<double>& get_pdens() { return ndens; }
+    // std::vector<double>& get_gamma() { return gamma; }
+    // std::vector<double>& get_gdens() { return gdens; }
+    // std::vector<double>& get_gdens_diff() { return gdens_diff; }
 
-    double beta(int i);
+    // double beta(int i);  // todo: not implemented!
 
     double count_particles();
     double count_particles_energy();
@@ -108,5 +117,3 @@ class Particles {
 };
 
 }    // namespace kariba
-
-#endif

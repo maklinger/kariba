@@ -5,29 +5,7 @@
 
 namespace kariba {
 
-BBody::~BBody() {
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-
-    delete[] en_phot;
-    delete[] num_phot;
-}
-
-BBody::BBody() {
-    size = 40;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[size];
-    num_phot_obs = new double[size];
-
-    for (int i = 0; i < size; i++) {
-        en_phot[i] = 0.;
-        num_phot[i] = 0.;
-        en_phot_obs[i] = 0.;
-        num_phot_obs[i] = 0.;
-    }
-}
+BBody::BBody(size_t size) : Radiation(size) {}
 
 // Methods to set BB quantities
 void BBody::set_temp_kev(double T) {
@@ -38,9 +16,9 @@ void BBody::set_temp_kev(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot[i] = pow(10., log10(emin) + i * einc);
         en_phot_obs[i] = en_phot[i];
     }
@@ -54,9 +32,9 @@ void BBody::set_temp_k(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot[i] = pow(10., log10(emin) + i * einc);
         en_phot_obs[i] = en_phot[i];
     }
@@ -70,9 +48,9 @@ void BBody::set_temp_hz(double nu) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (size - 1);
+    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot[i] = pow(10., log10(emin) + i * einc);
         en_phot_obs[i] = en_phot[i];
     }
@@ -85,7 +63,7 @@ void BBody::set_lum(double L) {
 
 // Method to set BB spectrum
 void BBody::bb_spectrum() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < num_phot.size(); i++) {
         num_phot[i] = normbb * 2. * constants::pi * constants::herg *
                       pow(en_phot_obs[i] / constants::herg, 3.) /
                       (pow(constants::cee, 2.) *

@@ -9,27 +9,11 @@
 
 namespace kariba {
 
-Bknpower::Bknpower(int s) {
-    size = s;
-
-    p = new double[size];
-    ndens = new double[size];
-    gamma = new double[size];
-    gdens = new double[size];
-    gdens_diff = new double[size];
-
+Bknpower::Bknpower(size_t size) : Particles(size) {
     norm = 1.;
 
     mass_gr = constants::emgm;
     mass_kev = constants::emgm * constants::gr_to_kev;
-
-    for (int i = 0; i < size; i++) {
-        p[i] = 0;
-        ndens[i] = 0;
-        gamma[i] = 0;
-        gdens[i] = 0;
-        gdens_diff[i] = 0;
-    }
 }
 
 // Methods to set momentum/energy arrays
@@ -39,9 +23,9 @@ void Bknpower::set_p(double min, double brk, double ucom, double bfield,
     pbrk = brk;
     pmax = max_p(ucom, bfield, betaeff, r, fsc);
 
-    double pinc = (log10(pmax) - log10(pmin)) / (size - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -53,9 +37,9 @@ void Bknpower::set_p(double min, double brk, double gmax) {
     pbrk = brk;
     pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax) - log10(pmin)) / (size - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
         gamma[i] =
             pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
@@ -65,7 +49,7 @@ void Bknpower::set_p(double min, double brk, double gmax) {
 // Method to set differential electron number density from known pspec,
 // normalization, and momentum array
 void Bknpower::set_ndens() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         ndens[i] = norm * pow(p[i] / pbrk, -pspec1) /
                    (1. + pow(p[i] / pbrk, -pspec1 + pspec2)) *
                    exp(-p[i] / pmax);
@@ -82,14 +66,14 @@ void Bknpower::set_pspec2(double s2) { pspec2 = s2; }
 void Bknpower::set_brk(double brk) { pbrk = brk; }
 
 // Methods to calculate the normalization of the function
-double norm_bkn_int(double x, void *p) {
-    struct bkn_params *params = (struct bkn_params *) p;
+double norm_bkn_int(double x, void *pars) {
+    BknParams *params = static_cast<BknParams *>(pars);
 
-    double s1 = (params->s1);
-    double s2 = (params->s2);
-    double brk = (params->brk);
-    double max = (params->max);
-    double m = (params->m);
+    double s1 = params->s1;
+    double s2 = params->s2;
+    double brk = params->brk;
+    double max = params->max;
+    double m = params->m;
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
@@ -106,7 +90,7 @@ void Bknpower::set_norm(double n) {
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct bkn_params params = {pspec1, pspec2, pbrk, pmax, mass_gr};
+    auto params = BknParams{pspec1, pspec2, pbrk, pmax, mass_gr};
     F1.function = &norm_bkn_int;
     F1.params = &params;
     gsl_integration_qag(&F1, min, max, 0, 1e-7, 100, 1, w1, &norm_integral,
@@ -117,15 +101,14 @@ void Bknpower::set_norm(double n) {
 }
 
 // Injection function to be integrated in cooling
-double injection_bkn_int(double x, void *p) {
-    struct injection_bkn_params *params = (struct injection_bkn_params *) p;
-
-    double s1 = (params->s1);
-    double s2 = (params->s2);
-    double brk = (params->brk);
-    double max = (params->max);
-    double m = (params->m);
-    double n = (params->n);
+double injection_bkn_int(double x, void *pars) {
+    InjectionBknParams *params = static_cast<InjectionBknParams *>(pars);
+    double s1 = params->s1;
+    double s2 = params->s2;
+    double brk = params->brk;
+    double max = params->max;
+    double m = params->m;
+    double n = params->n;
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
@@ -145,13 +128,12 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
 
     double integral, error;
     gsl_function F1;
-    struct injection_bkn_params params = {pspec1, pspec2,  pbrk,
-                                          pmax,   mass_gr, n0};
+    auto params = InjectionBknParams{pspec1, pspec2, pbrk, pmax, mass_gr, n0};
     F1.function = &injection_bkn_int;
     F1.params = &params;
 
-    for (int i = 0; i < size; i++) {
-        if (i < size - 1) {
+    for (size_t i = 0; i < p.size(); i++) {
+        if (i < p.size() - 1) {
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1,
@@ -163,8 +145,9 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
                 (pdot_ad * p[i] / (mass_gr * constants::cee) +
                  pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
-            ndens[size - 1] =
-                ndens[size - 2] * pow(p[size - 1] / p[size - 2], -pspec2 - 1);
+            ndens[p.size() - 1] =
+                ndens[p.size() - 2] *
+                pow(p[p.size() - 1] / p[p.size() - 2], -pspec2 - 1);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -178,7 +161,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
     // array ndens[i] by the appropriate constant.
     double renorm = count_particles() / n0;
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < ndens.size(); i++) {
         ndens[i] = ndens[i] / renorm;
     }
 

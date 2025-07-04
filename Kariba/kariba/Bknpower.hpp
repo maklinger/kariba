@@ -1,7 +1,6 @@
-#ifndef BKNPOWER_HPP
-#define BKNPOWER_HPP
+#pragma once
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 
@@ -14,7 +13,7 @@ class Bknpower : public Particles {
     double pmin, pbrk, pmax;
 
   public:
-    Bknpower(int s);
+    Bknpower(size_t size);
 
     void set_p(double min, double brk, double ucom, double bfield,
                double betaeff, double r, double fsc);
@@ -36,5 +35,3 @@ class Bknpower : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

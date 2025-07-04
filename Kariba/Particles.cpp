@@ -10,26 +10,24 @@
 namespace kariba {
 
 // Class destructor to de-allocate arrays
-Particles::~Particles() {
-    delete[] p;
-    delete[] ndens;
-    delete[] gamma;
-    delete[] gdens;
-    delete[] gdens_diff;
-}
+Particles::~Particles() {}
+
+Particles::Particles(size_t size)
+    : size(size), p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0),
+      gdens(size, 0.0), gdens_diff(size, 0.0) {}
 
 // Simple numerical integrals /w trapeze method
 double Particles::count_particles() {
-    double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    double temp = 0.0;
+    for (size_t i = 0; i < ndens.size() - 1; i++) {
         temp = temp + (1. / 2.) * (p[i + 1] - p[i]) * (ndens[i + 1] + ndens[i]);
     }
     return temp;
 }
 
 double Particles::count_particles_energy() {
-    double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    double temp = 0.0;
+    for (size_t i = 0; i < gamma.size() - 1; i++) {
         temp = temp + (1. / 2.) * (gamma[i + 1] - gamma[i]) *
                           (gdens[i + 1] + gdens[i]);
     }
@@ -38,7 +36,7 @@ double Particles::count_particles_energy() {
 
 double Particles::av_p() {
     double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < p.size() - 1; i++) {
         temp = temp + (1. / 2.) * (p[i + 1] - p[i]) *
                           (p[i + 1] * ndens[i + 1] + p[i] * ndens[i]);
     }
@@ -51,7 +49,7 @@ double Particles::av_gamma() {
 
 double Particles::av_psq() {
     double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < p.size() - 1; i++) {
         temp = temp + (1. / 2.) * (p[i + 1] - p[i]) *
                           (pow(p[i + 1], 2.) * ndens[i + 1] +
                            pow(p[i], 2.) * ndens[i]);
@@ -66,7 +64,7 @@ double Particles::av_gammasq() {
 // Methods to set up energy space number density, as a function of momentum
 // space number density
 void Particles::initialize_gdens() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < gdens.size(); i++) {
         gdens[i] = ndens[i] * gamma[i] * mass_gr * constants::cee /
                    (pow(pow(gamma[i], 2.) - 1., 1. / 2.));
     }
@@ -74,7 +72,7 @@ void Particles::initialize_gdens() {
 
 // Same as above but the other way around
 void Particles::initialize_pdens() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < gdens.size(); i++) {
         ndens[i] =
             gdens[i] * p[i] /
             (pow(mass_gr * constants::cee, 2.) *
@@ -83,21 +81,19 @@ void Particles::initialize_pdens() {
 }
 
 void Particles::gdens_differentiate() {
-    double *temp = new double[size];
+    std::vector<double> temp;
 
-    for (int i = 0; i < size; i++) {
-        temp[i] = gdens[i] / (pow(gamma[i], 1.));
+    for (size_t i = 0; i < gdens.size(); i++) {
+        temp.push_back(gdens[i] / (pow(gamma[i], 1.)));
     }
 
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < temp.size() - 1; i++) {
         gdens_diff[i] =
             (temp[i + 1] - temp[i]) /
             (mass_gr * pow(constants::cee, 2.) * (gamma[i + 1] - gamma[i]));
     }
 
     gdens_diff[size - 1] = gdens_diff[size - 2];
-
-    delete[] temp;
 }
 
 void Particles::set_mass(double m) {
@@ -107,7 +103,7 @@ void Particles::set_mass(double m) {
 
 // simple method to check arrays; only meant for debugging
 void Particles::test_arrays() {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < p.size(); i++) {
         std::cout << p[i] << " " << gamma[i] << " " << ndens[i] << " "
                   << ndens[i] * p[i] << std::endl;
     }

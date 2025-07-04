@@ -19,19 +19,19 @@
 namespace karcst =
     kariba::constants;    // alias the kariba::constants namespace
 
-void jetmain(double *ear, int ne, double *param, double *photeng,
-             double *photspec) {
+void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
+             std::vector<double> &photeng, std::vector<double> &photspec) {
 
     // STEP 1: VARIABLE/OBJECT DEFINITIONS
     //----------------------------------------------------------------------------------------------
 
     bool IsShock = false;    // flag to set shock heating
 
-    int nz = 100;    // total number of zones
-    int nel = 70;
-    int syn_res = 10;    // number of bins per decade in synch frequency;
-    int com_res = 6;     // number of bins per decade in compton frequency;
-    int nsyn = 0, ncom = 0;    // number of bins in synch/compton frequency;
+    size_t nz = 100;    // total number of zones
+    size_t nel = 70;
+    size_t syn_res = 10;    // number of bins per decade in synch frequency;
+    size_t com_res = 6;     // number of bins per decade in compton frequency;
+    size_t nsyn = 0, ncom = 0;    // number of bins in synch/compton frequency;
     int npsw =
         1;    // switch to define number of protons calculations in agnjet
               // 0: no protons
@@ -96,25 +96,26 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
            com_max =
                0.0;    // interval for inverse Compton calculation in each zone
 
-    double *syn_en =
-        nullptr;    // sychrotron energy array for jet+counterjet summed
-    double *syn_lum =
-        nullptr;    // synchrotron luminosity array for jet+counterjet summed
-    double *com_en =
-        nullptr;    // compton energy array for jet+counterjet summed
-    double *com_lum =
-        nullptr;    // compton luminosity array for jet+counterjet summed
-    double *tot_en = new double[ne];    // energy arrray for sum of all zones
-                                        // and/or components
-    double *tot_syn_pre = new double[ne];     // specific synchrotron luminosity
-                                              // arrays for all zones
-    double *tot_syn_post = new double[ne];    // pre/post particle
-                                              // acceleration
-    double *tot_com_pre =
-        new double[ne];    // same as above but for the inverse Compton part
-    double *tot_com_post = new double[ne];
-    double *tot_lum = new double[ne];    // specific luminosity array for sum of
-                                         // all components
+    // std::vector<double> syn_en;
+    //  sychrotron energy array for jet+counterjet summed
+    // std::vector<double> syn_lum;
+    //  synchrotron luminosity array for jet+counterjet summed
+    // std::vector<double> com_en =
+    //  compton energy array for jet+counterjet summed
+    // std::vector<double> com_lum =
+    //  compton luminosity array for jet+counterjet summed
+    std::vector<double> tot_en(ne, 0.0);    // energy arrray for sum of all
+                                            // zones and/or components
+    std::vector<double> tot_syn_pre(ne,
+                                    0.0);    // specific synchrotron luminosity
+                                             // arrays for all zones
+    std::vector<double> tot_syn_post(ne, 0.0);    // pre/post particle
+                                                  // acceleration
+    std::vector<double> tot_com_pre(ne, 0.0);
+    ;    // same as above but for the inverse Compton part
+    std::vector<double> tot_com_post(ne, 0.0);
+    std::vector<double> tot_lum(ne, 0.0);    // specific luminosity array for
+                                             // sum of all components
 
     std::ofstream
         Numdensfile;    // ofstream plot file for particle distribution
@@ -188,7 +189,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     }
 
     // initialize total energy/luminosity arrays
-    for (int i = 0; i < ne; i++) {
+    for (size_t i = 0; i < ne; i++) {
         tot_en[i] =
             (ear[i] + (ear[i + 1] - ear[i]) / 2.) * karcst::herg / karcst::hkev;
         tot_syn_pre[i] = 1.;
@@ -353,7 +354,7 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     }
 
     // STEP 5: TOTAL JET CALCULATIONS, LOOPING OVER EACH SEGMENT OF THE JET
-    for (int i = 0; i < nz; i++) {
+    for (size_t i = 0; i < nz; i++) {
         // calculate dynamics/energetics in each zone
         jetgrid(i, grid, jet_dyn, zone.r, zone.delz, z);
         if (velsw == 0) {
@@ -422,10 +423,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
             zone.avgammasq = pow(th_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, th_lep.get_gamma(),
-                            th_lep.get_gdens(), nel);
-            gsl_spline_init(spline_deriv, th_lep.get_gamma(),
-                            th_lep.get_gdens_diff(), nel);
+            gsl_spline_init(spline_eldis, th_lep.get_gamma().data(),
+                            th_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_deriv, th_lep.get_gamma().data(),
+                            th_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
                 plot_write(nel, th_lep.get_p(), th_lep.get_gamma(),
@@ -463,10 +464,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma(),
-                            acc_lep.get_gdens(), nel);
-            gsl_spline_init(spline_deriv, acc_lep.get_gamma(),
-                            acc_lep.get_gdens_diff(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
                 plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
@@ -509,10 +510,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma(),
-                            acc_lep.get_gdens(), nel);
-            gsl_spline_init(spline_deriv, acc_lep.get_gamma(),
-                            acc_lep.get_gdens_diff(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
                 plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
@@ -553,10 +554,10 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma(),
-                            acc_lep.get_gdens(), nel);
-            gsl_spline_init(spline_deriv, acc_lep.get_gamma(),
-                            acc_lep.get_gdens_diff(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
+                            acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
                 plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
@@ -607,23 +608,22 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
             syn_max = 50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
                       (2. * karcst::pi * karcst::emgm * karcst::cee);
         }
-        nsyn = int(log10(syn_max) - log10(syn_min)) * syn_res;
-        syn_en = new double[nsyn];
-        syn_lum = new double[nsyn];
+        nsyn = (size_t) (int(log10(syn_max) - log10(syn_min)) * syn_res);
+        std::vector<double> syn_en(nsyn, 0.0);
+        std::vector<double> syn_lum(nsyn, 0.0);
         kariba::Cyclosyn Syncro(nsyn);
         Syncro.set_frequency(syn_min, syn_max);
 
         com_min = 0.1 * Syncro.nu_syn();
         com_max = ear[ne - 1] / karcst::hkev;
-        ncom = int(log10(com_max) - log10(com_min)) * com_res;
-        com_en = new double[ncom];
-        com_lum = new double[ncom];
+        ncom = (size_t) (int(log10(com_max) - log10(com_min)) * com_res);
+        std::vector<double> com_en(ncom, 0.0);
+        std::vector<double> com_lum(ncom, 0.0);
         kariba::Compton InvCompton(ncom, nsyn);
         InvCompton.set_frequency(com_min, com_max);
 
         if (infosw > 1) {
-            for (int k = 0; k < ncom; k++) {
-                com_lum[k] = 0;
+            for (size_t k = 0; k < ncom; k++) {
                 com_en[k] = InvCompton.get_energy()[k];
             }
         }
@@ -712,13 +712,11 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
             plot_write(ncom, com_en, com_lum, "Output/Compton_zones.dat", dist,
                        redsh);
         }
-        delete[] syn_en, delete[] syn_lum;
-        delete[] com_en, delete[] com_lum;
     }
 
     // FINAL STEP: SUM JET COMPONENTS TO TOTAL OUTPUT, WRITE/CLOSE PLOT FILES,
     // FREE MEMORY
-    for (int k = 0; k < ne; k++) {
+    for (size_t k = 0; k < ne; k++) {
         tot_lum[k] = (tot_lum[k] + tot_syn_pre[k] + tot_syn_post[k] +
                       tot_com_pre[k] + tot_com_post[k]);
         photeng[k] = log10(tot_en[k] / karcst::herg);
@@ -797,7 +795,4 @@ void jetmain(double *ear, int ne, double *param, double *photeng,
     gsl_spline_free(spline_eldis), gsl_interp_accel_free(acc_eldis);
     gsl_spline_free(spline_deriv), gsl_interp_accel_free(acc_deriv);
     gsl_spline_free(spline_speed), gsl_interp_accel_free(acc_speed);
-    delete[] tot_en, delete[] tot_lum;
-    delete[] tot_syn_pre, delete[] tot_syn_post;
-    delete[] tot_com_pre, delete[] tot_com_post;
 }

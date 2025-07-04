@@ -1,18 +1,15 @@
-#ifndef NEUTRINOS_PG_HPP
-#define NEUTRINOS_PG_HPP
+#pragma once
 
-#include <cstring>
-#include <fstream>
-#include <iomanip>
+#include <string>
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 
-typedef struct Heta_params {
+struct HetaParams {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
     double eta;
     double eta_zero;
@@ -26,19 +23,20 @@ typedef struct Heta_params {
     gsl_spline *spline_ng;
     double nu_min;
     double nu_max;
-} Heta_params;
+};
 
 class Neutrinos_pg : public Radiation {
     //	private:
   public:
-    ~Neutrinos_pg();
-    Neutrinos_pg(int s1, double Emin, double Emax);
+    Neutrinos_pg(size_t, double Emin, double Emax);
 
     void set_neutrinos(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                       gsl_spline *spline_Jp, double *en_perseg,
-                       double *lum_perseg, int nphot,
-                       std::string outputConfiguration, std::string flavor,
-                       int infosw, std::string source);
+                       gsl_spline *spline_Jp,
+                       const std::vector<double> &en_perseg,
+                       const std::vector<double> &lum_perseg, size_t nphot,
+                       const std::string &outputConfiguration,
+                       const std::string &flavor, int infosw,
+                       std::string_view source);
 };
 
 double Heta(double x, void *p);
@@ -47,9 +45,7 @@ double colliding_protons(gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp,
 double photons_jet(double eta, double Ep, gsl_spline *spline_ng,
                    gsl_interp_accel *acc_ng, double nu_min, double nu_max);
 void tables_photomeson(double &s, double &delta, double &Beta,
-                       std::string product, double xeta);
-double PhiFunc(double eta, double eta0, double x, std::string product);
+                       std::string_view product, double xeta);
+double PhiFunc(double eta, double eta0, double x, std::string_view product);
 
 }    // namespace kariba
-
-#endif

@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 
 #include <kariba/Radiation.hpp>
@@ -15,7 +16,9 @@ namespace karcst = kariba::constants;
 // information on the 2 velocity profiles below see Crumley et al. 2016
 void velprof_iso(gsl_spline *spline) {
     // Tabulated velocity for 1D quasi-isothermal Bernoulli eq.
-    static double gbx_vel_iso[54] = {
+    const size_t size = 54;
+
+    std::array<double, size> gbx_vel_iso = {
         1.0,         1.00001,     1.00005,     1.00023,     1.00101,
         1.00456,     1.02053,     1.09237,     1.41567,     2.87053,
         6.26251,     14.3691,     34.0825,     82.8831,     205.572,
@@ -28,7 +31,7 @@ void velprof_iso(gsl_spline *spline) {
         1.75523e+16, 5.29701e+16, 1.60321e+17, 4.86616e+17, 1.48111e+18,
         4.52032e+18, 1.38326e+19, 4.24394e+19, 1.0e+20};
 
-    static double gby_vel_iso[54] = {
+    std::array<double, size> gby_vel_iso = {
         0.485071, 1.05031, 1.05032, 1.05039, 1.05067, 1.05193, 1.05751, 1.08105,
         1.16389,  1.35278, 1.52406, 1.68077, 1.82495, 1.95888, 2.08429, 2.20255,
         2.3147,   2.42158, 2.52386, 2.62205, 2.71662, 2.80793, 2.89628, 2.98195,
@@ -37,12 +40,14 @@ void velprof_iso(gsl_spline *spline) {
         4.17160,  4.23089, 4.28933, 4.34696, 4.40381, 4.45992, 4.51530, 4.56999,
         4.62402,  4.67740, 4.73015, 4.78230, 4.83388, 4.87281};
 
-    gsl_spline_init(spline, gbx_vel_iso, gby_vel_iso, 54);
+    gsl_spline_init(spline, gbx_vel_iso.data(), gby_vel_iso.data(), size);
 }
 
 void velprof_ad(gsl_spline *spline) {
     // Tabluated velocity for 1D adiabatic Bernoulli eq.
-    static double gbx_vel_ad[54] = {
+    const size_t size = 54;
+
+    std::array<double, size> gbx_vel_ad = {
         1.0,         1.01667,     1.03362,     1.08617,     1.12268,
         1.16042,     1.23975,     1.30278,     1.43863,     1.56259,
         1.75429,     2.00234,     2.28546,     2.69630,     3.34274,
@@ -55,7 +60,7 @@ void velprof_ad(gsl_spline *spline) {
         9.83604e+06, 1.e7,        1.e8,        1.e9,        1.e10,
         1.e11,       1.e12,       1e13,        1.e14};
 
-    static double gby_vel_ad[54] = {
+    std::array<double, size> gby_vel_ad = {
         0.48507, 0.56599, 0.65850, 0.72925, 0.78367,  0.83265, 0.90340, 0.95238,
         1.03401, 1.09388, 1.17551, 1.27891, 1.360544, 1.45306, 1.55646, 1.6381,
         1.70884, 1.76871, 1.81769, 1.8666,  1.91565,  1.96462, 2.00816, 2.04626,
@@ -64,18 +69,18 @@ void velprof_ad(gsl_spline *spline) {
         2.39456, 2.39456, 2.39456, 2.39456, 2.39456,  2.39456, 2.39456, 2.39456,
         2.39456, 2.39456, 2.39456, 2.39456, 2.39456,  2.39456};
 
-    gsl_spline_init(spline, gbx_vel_ad, gby_vel_ad, 54);
+    gsl_spline_init(spline, gbx_vel_ad.data(), gby_vel_ad.data(), size);
 }
 
 // For information on this velocity profile see Lucchini et al. 2018
 void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
-    int size = 54;
-    double *gbx_vel_mag = new double[size];
-    double *gby_vel_mag = new double[size];
+    size_t size = 54;
+    std::vector<double> gbx_vel_mag(size, 0.0);
+    std::vector<double> gby_vel_mag(size, 0.0);
     double step;
 
     step = (std::log10(dyn.max) + 1. - std::log10(dyn.min)) / (size - 3.);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         gbx_vel_mag[i] = std::pow(10., std::log10(dyn.min) + i * step);
         if (gbx_vel_mag[i] < dyn.h0) {
             gby_vel_mag[i] = dyn.gam0;
@@ -91,10 +96,7 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
         gby_vel_mag[i] = std::sqrt(std::pow(gby_vel_mag[i], 2.) - 1.);
     }
 
-    gsl_spline_init(spline, gbx_vel_mag, gby_vel_mag, 54);
-
-    delete[] gbx_vel_mag;
-    delete[] gby_vel_mag;
+    gsl_spline_init(spline, gbx_vel_mag.data(), gby_vel_mag.data(), size);
 }
 
 // Equipartition functions: calculate bfield,lepton number density,proton number

@@ -1,8 +1,10 @@
 ---
 Language: Cpp
 IndentWidth: 4
+NamespaceIndentation: Inner
 BreakStringLiterals: true
 LineEnding: LF
 SpaceAfterCStyleCast: true
 SpacesBeforeTrailingComments: 4
-NamespaceIndentation: Inner
+InsertNewlineAtEOF: true
+InsertBraces: true

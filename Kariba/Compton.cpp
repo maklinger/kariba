@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_spline2d.h>
+
 #include "kariba/Compton.hpp"
 #include "kariba/Radiation.hpp"
 #include "kariba/constants.hpp"
@@ -65,15 +68,6 @@ static double esc_table_cyl[225] = {
 };
 
 Compton::~Compton() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-
-    delete[] seed_energ;
-    delete[] seed_urad;
-    delete[] iter_urad;
-
     gsl_spline2d_free(esc_p_sph);
     gsl_spline2d_free(esc_p_cyl);
     gsl_interp_accel_free(acc_Te);
@@ -86,18 +80,11 @@ Compton::~Compton() {
     gsl_interp_accel_free(acc_iter);
 }
 
-Compton::Compton(int s1, int s2) {
-    size = s1;
-    seed_size = s2;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    iter_urad = new double[size];
-    en_phot_obs = new double[2 * size];
-    num_phot_obs = new double[2 * size];
-
-    seed_energ = new double[seed_size];
-    seed_urad = new double[seed_size];
+Compton::Compton(size_t size, size_t seed_size)
+    : Radiation(size), seed_size(seed_size), seed_energ(seed_size, 0.0),
+      seed_urad(seed_size, 0.0), iter_urad(size, 0.0) {
+    en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
+    num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
     Niter = 20;
     ypar = 0;
@@ -118,31 +105,17 @@ Compton::Compton(int s1, int s2) {
 
     iter_ph = gsl_spline_alloc(gsl_interp_steffen, size);
     acc_iter = gsl_interp_accel_alloc();
-
-    for (int i = 0; i < size; i++) {
-        en_phot[i] = 0;
-        en_phot_obs[i] = 0;
-        en_phot_obs[i + size] = 0;
-        num_phot[i] = 0;
-        num_phot_obs[i] = 0;
-        num_phot_obs[i + size] = 0;
-        iter_urad[i] = 0;
-    }
-    for (int i = 0; i < seed_size; i++) {
-        seed_energ[i] = 0;
-        seed_urad[i] = 0;
-    }
 }
 
 // This function is the kernel of eq 2.48 in Blumenthal & Gould(1970),
 // represents the scattered photon spectrum for a given electron and includes
 // the Klein-Nishina cross section.
-double comfnc(double ein, void *p) {
-    struct comfnc_params *params = (struct comfnc_params *) p;
-    double game = (params->game);
-    double e1 = (params->e1);
-    gsl_spline *phodis = (params->phodis);
-    gsl_interp_accel *acc_phodis = (params->acc_phodis);
+double comfnc(double ein, void *pars) {
+    ComfncParams *params = static_cast<ComfncParams *>(pars);
+    double game = params->game;
+    double e1 = params->e1;
+    gsl_spline *phodis = params->phodis;
+    gsl_interp_accel *acc_phodis = params->acc_phodis;
 
     double einit, utst, biggam, q;
     double phonum;
@@ -170,8 +143,8 @@ double comfnc(double ein, void *p) {
 
 // This function is the integral of comfnc above over the total seed photon
 // distribution
-double comint(double gam, void *p) {
-    struct comint_params *params = (struct comint_params *) p;
+double comint(double gam, void *pars) {
+    ComintParams *params = static_cast<ComintParams *>(pars);
     double eph = (params->eph);
     double ephmin = (params->ephmin);
     double ephmax = (params->ephmax);
@@ -197,7 +170,7 @@ double comint(double gam, void *p) {
         gsl_integration_workspace *w2;
         w2 = gsl_integration_workspace_alloc(100);
         gsl_function F2;
-        struct comfnc_params F2params = {game, e1, phodis, acc_phodis};
+        auto F2params = ComfncParams{game, e1, phodis, acc_phodis};
         F2.function = &comfnc;
         F2.params = &F2params;
         gsl_integration_qag(&F2, blim, ulim, 1e0, 1e0, 100, 2, w2, &result,
@@ -219,10 +192,10 @@ double Compton::comintegral(int it, double blim, double ulim, double enphot,
     w1 = gsl_integration_workspace_alloc(100);
 
     gsl_function F1;
-    struct comint_params F1params = {enphot,    enphmin, enphmax, eldis,
-                                     acc_eldis, seed_ph, acc_seed};
-    struct comint_params F1params_it = {enphot,    enphmin, enphmax, eldis,
-                                        acc_eldis, iter_ph, acc_iter};
+    auto F1params = ComintParams{enphot,    enphmin, enphmax, eldis,
+                                 acc_eldis, seed_ph, acc_seed};
+    auto F1params_it = ComintParams{enphot,    enphmin, enphmax, eldis,
+                                    acc_eldis, iter_ph, acc_iter};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;
@@ -248,13 +221,14 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
     double dopfac_cj;
     double ephmin, ephmax;
 
-    ephmin = seed_energ[0];
-    ephmax = seed_energ[seed_size - 1];
+    ephmin = seed_energ.front();    //[0];
+    ephmax = seed_energ.back();     //[seed_size - 1];
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
+    size_t size = en_phot.size();
     for (int it = 0; it < Niter; it++) {
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             blim = log(std::max(gmin, en_phot[i] / constants::emerg));
             ulim = log(gmax);
             if (blim >= ulim) {
@@ -271,8 +245,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 en_phot_obs[i + size] = en_phot[i] * dopfac_cj;
                 num_phot_obs[i + size] = num_phot[i] * pow(dopfac_cj, dopnum);
             } else {
-                en_phot_obs[i + size] = 0;
-                num_phot_obs[i + size] = 0;
+                en_phot_obs[i + size] = 0.0;
+                num_phot_obs[i + size] = 0.0;
             }
             if (com == 0) {
                 iter_urad[i] = -50;
@@ -282,9 +256,9 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
                           (constants::pi * pow(r, 2.) * constants::cee));
             }
         }
-        ephmin = en_phot[0];
-        ephmax = en_phot[size - 1];
-        gsl_spline_init(iter_ph, en_phot, iter_urad, size);
+        ephmin = en_phot.front();    // [0];
+        ephmax = en_phot.back();     //[size - 1];
+        gsl_spline_init(iter_ph, en_phot.data(), iter_urad.data(), size);
     }
 }
 
@@ -294,8 +268,10 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
 // automatically added to the existing one. note: the second condition has a <=
 // sign to dodge numerical errors when the seed field energy density is
 // extremely low, which can result in negative values/nan for the seed_urad
-void Compton::cyclosyn_seed(const double *seed_arr, const double *seed_lum) {
-    for (int i = 0; i < seed_size; i++) {
+void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
+                            const std::vector<double> &seed_lum) {
+    // to do: asssert input and member sizes are the same
+    for (size_t i = 0; i < seed_size; i++) {
         seed_energ[i] = seed_arr[i];
         if (seed_urad[i] != 0) {
             seed_urad[i] =
@@ -312,19 +288,21 @@ void Compton::cyclosyn_seed(const double *seed_arr, const double *seed_lum) {
                                      seed_energ[i] * constants::pi * r * r));
         }
     }
-    gsl_spline_init(seed_ph, seed_energ, seed_urad, seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
 }
 
 // Method to include black body to seed field for IC;
 // Note: Urad and Tbb need to be passed in the co-moving frame, the function
 // does NOT account for beaming
-void Compton::bb_seed_k(const double *seed_arr, double Urad, double Tbb) {
+void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad,
+                        double Tbb) {
     double ulim, bbfield;
 
     ulim = 1e2 * Tbb * constants::kboltz;
-    seed_freq_array(seed_arr);
+    // seed_freq_array(seed_arr);
+    seed_energ = seed_arr;
 
-    for (int i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_size; i++) {
         if (seed_energ[i] < ulim) {
             bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
                       (constants::herg * pow(constants::cee, 2.) *
@@ -341,16 +319,18 @@ void Compton::bb_seed_k(const double *seed_arr, double Urad, double Tbb) {
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ, seed_urad, seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
 }
 
-void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
+void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad,
+                          double Tbb) {
     double ulim, bbfield;
 
     ulim = 1e2 * Tbb * constants::kboltz_kev2erg;
-    seed_freq_array(seed_arr);
+    // seed_freq_array(seed_arr);
+    seed_energ = seed_arr;
 
-    for (int i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_size; i++) {
         if (seed_energ[i] < ulim) {
             bbfield =
                 (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
@@ -369,22 +349,22 @@ void Compton::bb_seed_kev(const double *seed_arr, double Urad, double Tbb) {
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ, seed_urad, seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
 }
 
 // Calculates incident photon field for a Shakura-Sunyaev disk with aspect ratio
 // H, inner temperature Tin, inner radius Rin, at a distance z from the disk,
 // taking beaming into account
-double disk_integral(double alfa, void *p) {
-    struct disk_ic_params *params = (struct disk_ic_params *) p;
-    double gamma = (params->gamma);
-    double beta = (params->beta);
-    double tin = (params->tin);
-    double rin = (params->rin);
-    double rout = (params->rout);
-    double h = (params->h);
-    double z = (params->z);
-    double nu = (params->nu);
+double disk_integral(double alfa, void *pars) {
+    DiskIcParams *params = static_cast<DiskIcParams *>(pars);
+    double gamma = params->gamma;
+    double beta = params->beta;
+    double tin = params->tin;
+    double rin = params->rin;
+    double rout = params->rout;
+    double h = params->h;
+    double z = params->z;
+    double nu = params->nu;
 
     double delta = 1. / (gamma - beta * cos(alfa));
     double a, b, x, y, r, T_eff, nu_eff, fac, Urad;
@@ -406,8 +386,8 @@ double disk_integral(double alfa, void *p) {
     return Urad;
 }
 
-void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
-                           double rout, double h, double z) {
+void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin,
+                           double rin, double rout, double h, double z) {
     double ulim, blim, nulim, Gamma, result, error, diskfield;
 
     Gamma = 1. / pow((1. - pow(beta, 2.)), 1. / 2.);
@@ -419,16 +399,17 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
         ulim = atan(rout / (z - h * rout / 2.));
     }
     nulim = 1e1 * tin * constants::kboltz;
-    seed_freq_array(seed_arr);
+    // seed_freq_array(seed_arr);
+    seed_energ = seed_arr;
 
-    for (int i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_size; i++) {
         if (seed_energ[i] < nulim) {
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_function F;
-            struct disk_ic_params Fparams = {
-                Gamma, beta, tin, rin,
-                rout,  h,    z,   seed_energ[i] / constants::herg};
+            auto Fparams =
+                DiskIcParams{Gamma, beta, tin, rin,
+                             rout,  h,    z,   seed_energ[i] / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result,
@@ -447,7 +428,7 @@ void Compton::shsdisk_seed(const double *seed_arr, double tin, double rin,
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ, seed_urad, seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
 }
 
 // Method to estimate the number of scatterings the electrons go through;
@@ -531,9 +512,9 @@ void Compton::set_tau(double _tau) { tau = _tau; }
 
 // Method to set up the frequency array over desired range
 void Compton::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / (size - 1);
+    double nuinc = (log10(numax) - log10(numin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
     }
 }
@@ -543,8 +524,9 @@ void Compton::set_frequency(double numin, double numax) {
 void Compton::set_escape(double escape) { escape_corr = escape; }
 
 // Method to set up seed frequency array
-void Compton::seed_freq_array(const double *seed_arr) {
-    for (int i = 0; i < seed_size; i++) {
+void Compton::seed_freq_array(const std::vector<double> &seed_arr) {
+    // to do: asssert input and member sizes are the same
+    for (size_t i = 0; i < seed_size; i++) {
         seed_energ[i] = seed_arr[i];
     }
 }
@@ -552,18 +534,23 @@ void Compton::seed_freq_array(const double *seed_arr) {
 // This resets the energy density in case different photon fields want to be
 // calculated separately to see the contribution of each
 void Compton::reset() {
-    for (int i = 0; i < seed_size; i++) {
-        seed_urad[i] = 0;
-        seed_energ[i] = 0;
-    }
-    for (int i = 0; i < size; i++) {
-        num_phot[i] = 0;
-        num_phot_obs[i] = 0;
-    }
+    std::fill(seed_urad.begin(), seed_urad.end(), 0);
+    std::fill(seed_energ.begin(), seed_energ.end(), 0);
+    std::fill(num_phot.begin(), num_phot.end(), 0);
+    std::fill(num_phot_obs.begin(), num_phot_obs.end(), 0);
+
+    //    for (int i = 0; i < seed_size; i++) {
+    //        seed_urad[i] = 0;
+    //        seed_energ[i] = 0;
+    //    }
+    //    for (int i = 0; i < size; i++) {
+    //        num_phot[i] = 0;
+    //        num_phot_obs[i] = 0;
+    //    }
 }
 
 void Compton::urad_test() {
-    for (int i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_energ.size(); i++) {
         std::cout << seed_energ[i] / constants::herg << " " << seed_urad[i]
                   << " " << iter_urad[i] << std::endl;
     }

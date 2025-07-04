@@ -85,10 +85,10 @@ int main() {
                Electrons.get_pdens(), Electrons.get_gdens(),
                "Output/Singlezone_Particles.dat");
 
-    gsl_spline_init(spline_eldis, Electrons.get_gamma(), Electrons.get_gdens(),
-                    nel);
-    gsl_spline_init(spline_deriv, Electrons.get_gamma(),
-                    Electrons.get_gdens_diff(), nel);
+    gsl_spline_init(spline_eldis, Electrons.get_gamma().data(),
+                    Electrons.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, Electrons.get_gamma().data(),
+                    Electrons.get_gdens_diff().data(), nel);
 
     // Set up the cyclo-synchrotron emission, by specifying the size of the
     // arrays for frequency and flux. Then, specify the frequency range over
@@ -105,7 +105,7 @@ int main() {
     Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis, spline_deriv,
                            acc_deriv);
     plot_write(nfreq, Syncro.get_energy_obs(), Syncro.get_nphot_obs(),
-               "Output/Singlezone_Syn.dat", 1., 0.);
+               "Output/Singlezone_Syn.dat", 0.);
 
     // Set up the SSC emission, by specifying the size of both the output
     // arrays, and the seed photon arrays. Then, set in no particular order the
@@ -126,7 +126,7 @@ int main() {
     InvCompton.cyclosyn_seed(Syncro.get_energy(), Syncro.get_nphot());
     InvCompton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
     plot_write(nfreq, InvCompton.get_energy_obs(), InvCompton.get_nphot_obs(),
-               "Output/Singlezone_SSC.dat", 1., 0.);
+               "Output/Singlezone_SSC.dat", 0.);
 
     // Calculate physically relevant quantities like energy densities and
     // powers, and output to terminal.

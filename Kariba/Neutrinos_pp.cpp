@@ -1,3 +1,5 @@
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 
 #include "kariba/Neutrinos_pp.hpp"
@@ -6,37 +8,24 @@
 
 namespace kariba {
 
-Neutrinos_pp::~Neutrinos_pp() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-}
+Neutrinos_pp::Neutrinos_pp(size_t size, double Emin, double Emax)
+    : Radiation(size) {
 
-Neutrinos_pp::Neutrinos_pp(int s1, double Emin, double Emax) {
-
-    size = s1;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[2 * size];
-    num_phot_obs = new double[2 * size];
+    en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
+    num_phot_obs.resize(2 * num_phot_obs.size(), 0.0);
 
     double Einc = log10(Emax / Emin) / (size - 1);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         en_phot[i] = pow(10., log10(Emin) + i * Einc);
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + size] = en_phot[i];
-        num_phot[i] = 0;
-        num_phot_obs[i] = 0;
-        num_phot_obs[i + size] = 0;
     }
 }
 void Neutrinos_pp::set_neutrinos_pp(
     double pspec, double gammap_min, double gammap_max, double ntot_prot,
     double nwind, double plfrac, gsl_interp_accel *acc_Jp,
-    gsl_spline *spline_Jp, std::string outputConfiguration, std::string flavor,
-    int infosw, std::string source) {
+    gsl_spline *spline_Jp, const std::string &outputConfiguration,
+    const std::string &flavor, int infosw, std::string_view source) {
 
     std::ofstream NeutrinosppFile;    // for plotting
     if (infosw >= 2) {
@@ -97,7 +86,7 @@ void Neutrinos_pp::set_neutrinos_pp(
     }
     dy = log10(xmax / xmin) / (N - 1);
 
-    for (int j = 0; j < size; j++) {                  // for every single Ev
+    for (size_t j = 0; j < en_phot.size(); j++) {     // for every single Ev
         Ev = en_phot[j] * constants::erg * 1.e-12;    // in TeV
         if (Ev <= transition) {
             Epimin = Ev + constants::mpionTeV * constants::mpionTeV / (4. * Ev);
@@ -152,15 +141,16 @@ void Neutrinos_pp::set_neutrinos_pp(
                             << std::endl;
         }
     }    // End of for loop for all the neutrino energies.
-    if (infosw >= 2)
+    if (infosw >= 2) {
         NeutrinosppFile.close();
+    }
 }    // End of function that produces the neutrinos from pp
 
 //***********************************************************************************************************
 
 double prob_fve() {    // it is the same as of electrons
 
-    int N = 20;                     // The steps of integration.
+    size_t N = 20;                  // The steps of integration.
     double r = .573;                // r = 1-λ = m_μ^2/m_p^2 = 0.573.
     double xmin = 0., xmax = 1.;    // x = E_{particle}/E_p.
     double x, dx = (xmax - xmin) / (N - 1);
@@ -168,7 +158,7 @@ double prob_fve() {    // it is the same as of electrons
     double sum = 0.;
     double Bprob;
 
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
         x = xmin + i * dx;
         gn = 2. / (3. * (1. - r) * (1. - r)) *
              ((1. - x) *
@@ -192,7 +182,8 @@ double prob_fve() {    // it is the same as of electrons
     Bprob = 1. / sum;
     return Bprob;
 }
-double distr_pp(double lEv, double lEpi, std::string flavor) {
+
+double distr_pp(double lEv, double lEpi, std::string_view flavor) {
     double rmasses = .573;    // r = 1-λ = m_μ^2/m_p^2 = 0.573.The ratio of muon
                               // and proton energies
     double k = pow(10., (lEv - lEpi));    // x=Ev/Epion
@@ -253,7 +244,7 @@ double distr_pp(double lEv, double lEpi, std::string flavor) {
     return Fvespec;
 }
 
-double secondary_spectrum(double Ep, double y, std::string flavor) {
+double secondary_spectrum(double Ep, double y, std::string_view flavor) {
     double L = log(Ep);     // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
                             // for the cross section
     double Fvespec = 0.;    // The spectrum of secondary electrons from pion

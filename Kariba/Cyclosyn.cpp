@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <gsl/gsl_integration.h>
+
 #include "kariba/Cyclosyn.hpp"
 #include "kariba/Radiation.hpp"
 #include "kariba/constants.hpp"
@@ -24,23 +26,14 @@ static double var[47] = {
     -7.921e+0, -1.005e+1, -1.218e+1, -1.646e+1, -2.076e+1};
 
 Cyclosyn::~Cyclosyn() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-
     gsl_spline_free(syn_f), gsl_interp_accel_free(syn_acc);
 }
 
 // This constructor initializes the arrays and interpolations. In this case,
 // calculations are done in frequency space, not in photon energies.
-Cyclosyn::Cyclosyn(int s) {
-    size = s;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[2 * size];
-    num_phot_obs = new double[2 * size];
+Cyclosyn::Cyclosyn(size_t size) : Radiation(size) {
+    en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
+    num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
     counterjet = false;
 
@@ -48,22 +41,17 @@ Cyclosyn::Cyclosyn(int s) {
     syn_f = gsl_spline_alloc(gsl_interp_cspline, 47);
 
     gsl_spline_init(syn_f, arg, var, 47);
-
-    for (int i = 0; i < size; i++) {
-        en_phot[i] = 0;
-        num_phot[i] = 0;
-    }
 }
 
 // Single particle emissivity/absorption coefficient calculations
-double cyclosyn_emis(double gamma, void *p) {
-    struct cyclosyn_emis_params *params = (struct cyclosyn_emis_params *) p;
-    double nu = (params->nu);
-    double b = (params->b);
-    gsl_spline *syn = (params->syn);
-    gsl_interp_accel *acc_syn = (params->acc_syn);
-    gsl_spline *eldis = (params->eldis);
-    gsl_interp_accel *acc_eldis = (params->acc_eldis);
+double cyclosyn_emis(double gamma, void *pars) {
+    CyclosynEmisParams *params = static_cast<CyclosynEmisParams *>(pars);
+    double nu = params->nu;
+    double b = params->b;
+    gsl_spline *syn = params->syn;
+    gsl_interp_accel *acc_syn = params->acc_syn;
+    gsl_spline *eldis = params->eldis;
+    gsl_interp_accel *acc_eldis = params->acc_eldis;
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma;
     gamma = exp(gamma);
@@ -94,8 +82,8 @@ double cyclosyn_emis(double gamma, void *p) {
     return ngamma * gamma * emisfunc;
 }
 
-double cyclosyn_abs(double gamma, void *p) {
-    struct cyclosyn_abs_params *params = (struct cyclosyn_abs_params *) p;
+double cyclosyn_abs(double gamma, void *pars) {
+    CyclosynAbsParams *params = static_cast<CyclosynAbsParams *>(pars);
     double nu = (params->nu);
     double b = (params->b);
     gsl_spline *syn = (params->syn);
@@ -139,8 +127,8 @@ double Cyclosyn::emis_integral(double nu, double gmin, double gmax,
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct cyclosyn_emis_params F1params = {nu,      bfield, syn_f,
-                                            syn_acc, eldis,  acc_eldis};
+    auto F1params =
+        CyclosynEmisParams{nu, bfield, syn_f, syn_acc, eldis, acc_eldis};
     F1.function = &cyclosyn_emis;
     F1.params = &F1params;
     gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1,
@@ -157,8 +145,8 @@ double Cyclosyn::abs_integral(double nu, double gmin, double gmax,
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
-    struct cyclosyn_abs_params F1params = {nu,      bfield, syn_f,
-                                           syn_acc, derivs, acc_derivs};
+    auto F1params =
+        CyclosynAbsParams{nu, bfield, syn_f, syn_acc, derivs, acc_derivs};
     F1.function = &cyclosyn_abs;
     F1.params = &F1params;
     gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1,
@@ -181,7 +169,8 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
-    for (int k = 0; k < size; k++) {
+    size_t size = en_phot.size();
+    for (size_t k = 0; k < size; k++) {
         en_phot_obs[k] = en_phot[k] * dopfac;
         if (counterjet == true) {
             en_phot_obs[k + size] = en_phot[k] * dopfac_cj;
@@ -268,7 +257,7 @@ double Cyclosyn::nu_syn(double gamma) {
 double Cyclosyn::nu_syn() {
     double temp_lum = 0.;
     int temp = 0;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < num_phot.size(); i++) {
         if (num_phot[i] > temp_lum) {
             temp_lum = num_phot[i];
             temp = i;
@@ -279,9 +268,9 @@ double Cyclosyn::nu_syn() {
 
 // Method to set up the frequency array over desired range
 void Cyclosyn::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / (size - 1);
+    double nuinc = (log10(numax) - log10(numin)) / (en_phot.size() - 1);
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < en_phot.size(); i++) {
         en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
     }
 }
@@ -295,7 +284,7 @@ void Cyclosyn::set_mass(double mass) { mass_gr = mass; }
 void Cyclosyn::test() {
     std::cout << "Bfield: " << bfield << " r: " << r << " z: " << z
               << " v.angle: " << angle << " speed: " << beta
-              << " delta: " << dopfac << std::endl;
+              << " delta: " << dopfac << " particle mass: " << mass_gr << "\n";
 }
 
 }    // namespace kariba

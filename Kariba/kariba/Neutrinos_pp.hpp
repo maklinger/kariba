@@ -1,28 +1,25 @@
-#ifndef NEUTRINOS_PP_HPP
-#define NEUTRINOS_PP_HPP
+#pragma once
 
-#include <cstring>
-#include <fstream>
-#include <iomanip>
+#include <string>
 
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 
 class Neutrinos_pp : public Radiation {
     //	private:
   public:
-    ~Neutrinos_pp();
-    Neutrinos_pp(int s1, double Emin, double Emax);
+    Neutrinos_pp(size_t size, double Emin, double Emax);
 
     void set_neutrinos_pp(double p, double gammap_min, double gammap_max,
                           double ntot_prot, double nwind, double plfrac,
                           gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
-                          std::string outputConfiguration, std::string flavor,
-                          int infosw, std::string source);
+                          const std::string &outputConfiguration,
+                          const std::string &flavor, int infosw,
+                          std::string_view source);
 };
 
 double multiplicity(double pspec);    // in Electrons.cpp
@@ -34,11 +31,9 @@ double proton_dist(double gpmin, double Ep, double Epcode_max,
                    gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp);
 // in Gamma_rays.cpp
 
-double distr_pp(double lEv, double lEpi, std::string flavor);
-double secondary_spectrum(double Ep, double y, std::string flavor);
+double distr_pp(double lEv, double lEpi, std::string_view flavor);
+double secondary_spectrum(double Ep, double y, std::string_view flavor);
 
 double prob_fve();
 
 }    // namespace kariba
-
-#endif

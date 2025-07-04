@@ -1,7 +1,6 @@
-#ifndef KAPPA_HPP
-#define KAPPA_HPP
+#pragma once
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 
@@ -9,13 +8,13 @@ namespace kariba {
 // Particles class in Particles.hh
 
 class Kappa : public Particles {
-  private:
+  protected:
     double theta;
     double kappa, knorm;
     double pmin, pmax;
 
   public:
-    Kappa(int s);
+    Kappa(size_t size);
 
     void set_p(double ucom, double bfield, double betaeff, double r,
                double fsc);
@@ -36,6 +35,10 @@ class Kappa : public Particles {
     void test();
 };
 
-}    // namespace kariba
+class Kappa2 : public Kappa {
+    void set_p(double ucom, double bfield, double betaeff, double r,
+               double fsc);
+    void set_p(double max);
+};
 
-#endif
+}    // namespace kariba

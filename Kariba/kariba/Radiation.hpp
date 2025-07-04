@@ -1,38 +1,34 @@
-#ifndef RADIATION_HPP
-#define RADIATION_HPP
+#pragma once
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_interp2d.h>
-#include <gsl/gsl_sf_bessel.h>
-#include <gsl/gsl_spline.h>
-#include <gsl/gsl_spline2d.h>
 #include <string>
+#include <vector>
+
+#include <gsl/gsl_spline.h>
 
 namespace kariba {
 
 // Template class for photon/neutrino distributions
 
 // Structures used for GSL integration
-typedef struct cyclosyn_emis_params {
+struct CyclosynEmisParams {
     double nu;
     double b;
     gsl_spline *syn;
     gsl_interp_accel *acc_syn;
     gsl_spline *eldis;
     gsl_interp_accel *acc_eldis;
-} cyclosyn_emis_params;
+};
 
-typedef struct cyclosyn_abs_params {
+struct CyclosynAbsParams {
     double nu;
     double b;
     gsl_spline *syn;
     gsl_interp_accel *acc_syn;
     gsl_spline *derivs;
     gsl_interp_accel *acc_derivs;
-} cyclosyn_abs_params;
+};
 
-typedef struct comint_params {
+struct ComintParams {
     double eph;
     double ephmin;
     double ephmax;
@@ -40,22 +36,22 @@ typedef struct comint_params {
     gsl_interp_accel *acc_eldis;
     gsl_spline *phodis;
     gsl_interp_accel *acc_phodis;
-} comint_params;
+};
 
-typedef struct comfnc_params {
+struct ComfncParams {
     double game;
     double e1;
     gsl_spline *phodis;
     gsl_interp_accel *acc_phodis;
-} comfnc_params;
+};
 
-typedef struct disk_obs_params {
+struct DiskObsParams {
     double tin;
     double rin;
     double nu;
-} disk_obs_params;
+};
 
-typedef struct disk_ic_params {
+struct DiskIcParams {
     double gamma;
     double beta;
     double tin;
@@ -64,15 +60,16 @@ typedef struct disk_ic_params {
     double h;
     double z;
     double nu;
-} disk_ic_params;
+};
 
 class Radiation {
   protected:
-    int size;                // size of arrays
-    double *en_phot;         // array of photon energies
-    double *num_phot;        // array of number of photons in units of erg/s/Hz
-    double *en_phot_obs;     // same as above but in observer frame
-    double *num_phot_obs;    // same as above but in observer frame
+    size_t size;                    // size of arrays
+    std::vector<double> en_phot;    // array of photon energies
+    std::vector<double>
+        num_phot;    // array of number of photons in units of erg/s/Hz
+    std::vector<double> en_phot_obs;     // same as above but in observer frame
+    std::vector<double> num_phot_obs;    // same as above but in observer frame
 
     double r, z;             // Dimensions of emitting region
     double vol;              // Volume of emitting region
@@ -84,10 +81,12 @@ class Radiation {
     std::string geometry;    // string to track geometry of emitting region
 
   public:
-    double *get_energy() const { return en_phot; }
-    double *get_nphot() const { return num_phot; }
-    double *get_energy_obs() const { return en_phot_obs; }
-    double *get_nphot_obs() const { return num_phot_obs; }
+    Radiation(size_t size);
+
+    const std::vector<double> &get_energy() const { return en_phot; }
+    const std::vector<double> &get_nphot() const { return num_phot; }
+    const std::vector<double> &get_energy_obs() const { return en_phot_obs; }
+    const std::vector<double> &get_nphot_obs() const { return num_phot_obs; }
     int get_size() const { return size; }
     double get_volume() const { return vol; }
 
@@ -95,12 +94,10 @@ class Radiation {
 
     void set_beaming(double theta, double speed, double doppler);
     void set_inclination(double theta);
-    void set_geometry(std::string geom, double l1, double l2);
-    void set_geometry(std::string geom, double l1);
+    void set_geometry(const std::string &geom, double l1, double l2);
+    void set_geometry(const std::string &geom, double l1);
 
     void set_counterjet(bool flag);
     void test_arrays();
 };
 }    // namespace kariba
-
-#endif

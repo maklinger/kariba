@@ -1,7 +1,6 @@
-#ifndef CYCLOSYN_HPP
-#define CYCLOSYN_HPP
+#pragma once
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 
@@ -16,7 +15,7 @@ class Cyclosyn : public Radiation {
 
   public:
     ~Cyclosyn();
-    Cyclosyn(int s);
+    Cyclosyn(size_t size);
 
     friend double emis(double gamma, void *p);
     friend double abs(double gamma, void *p);
@@ -45,5 +44,3 @@ class Cyclosyn : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

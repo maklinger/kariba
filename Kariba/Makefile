@@ -5,10 +5,10 @@
 GSL = /opt/homebrew/Cellar/gsl/2.8
 
 CXX = g++-15
-CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -Ofast
+CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -O3 -fopenmp
 CPPFLAGS = -I${GSL}/include -I.
 LD = $(CXX)
-LDFLAGS = -fPIC -L${GSL}/lib
+LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
 LDLIBS = -lgsl
 AR = ar
 AR_OPTS = rcs

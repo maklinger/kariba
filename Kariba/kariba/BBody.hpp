@@ -1,7 +1,6 @@
-#ifndef BBODY_HPP
-#define BBODY_HPP
+#pragma once
 
-#include "kariba/Radiation.hpp"
+#include "Radiation.hpp"
 
 namespace kariba {
 
@@ -14,8 +13,7 @@ class BBody : public Radiation {
     double normbb;
 
   public:
-    ~BBody();
-    BBody();
+    BBody(size_t size = 40);
 
     void set_temp_kev(double T);
     void set_temp_k(double T);
@@ -34,5 +32,3 @@ class BBody : public Radiation {
 };
 
 }    // namespace kariba
-
-#endif

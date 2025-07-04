@@ -1,4 +1,8 @@
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+
+#include <gsl/gsl_integration.h>
 
 #include "kariba/Neutrinos_pg.hpp"
 #include "kariba/Radiation.hpp"
@@ -94,40 +98,26 @@ static const double Beta_antielectronTable[10] = {
 
 #endif
 
-Neutrinos_pg::~Neutrinos_pg() {
-    delete[] en_phot;
-    delete[] num_phot;
-    delete[] en_phot_obs;
-    delete[] num_phot_obs;
-}
+Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax)
+    : Radiation(lsize) {
 
-Neutrinos_pg::Neutrinos_pg(int s1, double Emin, double Emax) {
+    en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
+    num_phot_obs.resize(2 * num_phot_obs.size(), 0.0);
 
-    size = s1;
-
-    en_phot = new double[size];
-    num_phot = new double[size];
-    en_phot_obs = new double[2 * size];
-    num_phot_obs = new double[2 * size];
-
-    double Einc = log10(Emax / Emin) / (size - 1);
-    for (int i = 0; i < size; i++) {
+    double Einc = log10(Emax / Emin) / (lsize - 1);
+    for (size_t i = 0; i < lsize; i++) {
         en_phot[i] = pow(10., log10(Emin) + i * Einc);
         en_phot_obs[i] = en_phot[i];
-        en_phot_obs[i + size] = en_phot[i];
-        num_phot[i] = 0;
-        num_phot_obs[i] = 0;
-        num_phot_obs[i + size] = 0;
+        en_phot_obs[i + lsize] = en_phot[i];
     }
 }
 //************************************************************************************************************
-void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
-                                 gsl_interp_accel *acc_Jp,
-                                 gsl_spline *spline_Jp, double *en_perseg,
-                                 double *lum_perseg, int nphot,
-                                 std::string outputConfiguration,
-                                 std::string flavor, int infosw,
-                                 std::string source) {
+void Neutrinos_pg::set_neutrinos(
+    double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
+    gsl_spline *spline_Jp, const std::vector<double> &en_perseg,
+    const std::vector<double> &lum_perseg, size_t nphot,
+    const std::string &outputConfiguration, const std::string &flavor,
+    int infosw, std::string_view source) {
 
     std::ofstream PhotopionFile;    // for plotting
     if (infosw >= 2) {
@@ -145,7 +135,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
             PhotopionFile.open(filepath, std::ios::app);
         }
     }
-    int N = 10;
+    const size_t N = 10;
     double Epion = 139.6e6 / constants::erg;    // rest mass of pion in erg
     double eta, deta;    // eta parameter: η = 4εE_p/(m_p^2*c^4) and its step
     double eta_zero = 0.313;    // eq 16 from Kelner & Aharonian 08
@@ -157,32 +147,34 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         en_perseg[0] / constants::herg;    // the min freq of photon targets
     double nu_max = en_perseg[nphot - 1] /
                     constants::herg;    // the max freq of photon targets
-    double *freq =
-        new double[nphot];    // frequency of photons per segment in Hz
-    double *Uphot =
-        new double[nphot];    // diff energy density per segment in #/cm3/erg
+    std::vector<double> freq;    // frequency of photons per segment in Hz
+    std::vector<double>
+        Uphot;    // diff energy density per segment in #/cm3/erg
 
-    if (flavor.compare("electrons") == 0 || flavor.compare("antielectron") == 0)
+    if (flavor.compare("electrons") == 0 ||
+        flavor.compare("antielectron") == 0) {
         eta_min = 3.001;
-    if (flavor.compare("gamma_rays") == 0)
+    }
+    if (flavor.compare("gamma_rays") == 0) {
         Epion = 137.5e6 / constants::erg;
+    }
 
-    for (int k = 0; k < nphot; k++) {
-        freq[k] = en_perseg[k] / constants::herg;    // Hz from erg
-        Uphot[k] = lum_perseg[k] * (r / constants::cee /
-                                    (constants::herg * constants::herg *
-                                     freq[k] * vol));    // #/cm3/erg
+    for (size_t k = 0; k < nphot; k++) {
+        freq.push_back(en_perseg[k] / constants::herg);    // Hz from erg
+        Uphot.push_back(lum_perseg[k] * (r / constants::cee /
+                                         (constants::herg * constants::herg *
+                                          freq[k] * vol)));    // #/cm3/erg
     }
 
     // Interpolation for jet photon distribution
     gsl_interp_accel *acc_ng = gsl_interp_accel_alloc();
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_steffen, nphot);
-    gsl_spline_init(spline_ng, freq, Uphot, nphot);
+    gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
     deta = log10(eta_max / eta_min) / (N - 1);
 #pragma omp parallel for private(                                              \
         eta, Hfunction, dNdEv)    // possibly lost: 9,424 bytes in 31 blocks
-    for (int i = 0; i < size;
+    for (size_t i = 0; i < en_phot.size();
          i++) {    // for every neutrino of energy en_phot[i](erg)
         double sum;
         double Ev = en_phot[i];
@@ -193,11 +185,11 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
                 gsl_integration_workspace_alloc(100);
             double result1, error1;
             gsl_function F1;
-            for (int j = 0; j < N; j++) {    // eq 69 from KA08
+            for (size_t j = 0; j < N; j++) {    // eq 69 from KA08
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
-                Heta_params F1params = {eta,    eta_zero,  Ev,     gp_min,
-                                        gp_max, spline_Jp, acc_Jp, flavor,
-                                        acc_ng, spline_ng, nu_min, nu_max};
+                auto F1params = HetaParams{eta,    eta_zero,  Ev,     gp_min,
+                                           gp_max, spline_Jp, acc_Jp, flavor,
+                                           acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;
                 F1.params = &F1params;
                 double max = log10(Ev / (gp_min * constants::pmgm *
@@ -228,7 +220,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
 
     if ((infosw >= 2) && !(flavor.compare("electrons") == 0 ||
                            flavor.compare("positrons") == 0)) {
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < en_phot.size(); i++) {
             PhotopionFile << std::left << std::setw(15) << en_phot[i]
                           << std::setw(25)
                           << num_phot[i] / (constants::herg * en_phot[i] * vol)
@@ -238,29 +230,28 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max,
         }
     }
 
-    if (infosw >= 2)
+    if (infosw >= 2) {
         PhotopionFile.close();
+    }
     gsl_spline_free(spline_ng);
     gsl_interp_accel_free(acc_ng);
-    delete[] freq;
-    delete[] Uphot;
 }
-double Heta(double x, void *p) {
+double Heta(double x, void *pars) {
     // eq 70 from KA08 for pairs and writen as {0< x=Ee/Ep <1} Ee/Epmax <
     // x=Ee/Ep <Ee/Epmin
-    Heta_params *params = (Heta_params *) p;
-    double eta = (params->eta);
-    double eta_zero = (params->eta_zero);
-    double E = (params->E);
-    double gp_min = (params->gp_min);
-    double gp_max = (params->gp_max);
-    gsl_spline *spline_Jp = (params->spline_Jp);
-    gsl_interp_accel *acc_Jp = (params->acc_Jp);
-    std::string product = (params->product);
-    gsl_interp_accel *acc_ng = (params->acc_ng);
-    gsl_spline *spline_ng = (params->spline_ng);
-    double nu_min = (params->nu_min);
-    double nu_max = (params->nu_max);
+    HetaParams *params = static_cast<HetaParams *>(pars);
+    double eta = params->eta;
+    double eta_zero = params->eta_zero;
+    double E = params->E;
+    double gp_min = params->gp_min;
+    double gp_max = params->gp_max;
+    gsl_spline *spline_Jp = params->spline_Jp;
+    gsl_interp_accel *acc_Jp = params->acc_Jp;
+    std::string product = params->product;
+    gsl_interp_accel *acc_ng = params->acc_ng;
+    gsl_spline *spline_ng = params->spline_ng;
+    double nu_min = params->nu_min;
+    double nu_max = params->nu_max;
 
     double fp;         // number density of accelerated protons in #/cm3/erg
     double fph;        // number density of target photons in #/cm3/Hz
@@ -276,11 +267,12 @@ double Heta(double x, void *p) {
     //	double Tstar = 2.7;
     //	fph = photon_field(eta,Ep,Tstar);
     Phi = PhiFunc(eta, eta_zero, pow(10., x), product);
-    return fp * fph * Phi * log(10.) / Ep;
+    return fp * fph * Phi * log(10.) /
+           Ep;    // tod: replace log(10) with m_ln10
 }
 
 //************************************************************************************************************
-double PhiFunc(double eta, double eta0, double x, std::string product) {
+double PhiFunc(double eta, double eta0, double x, std::string_view product) {
     // eqs 27,28,29 etc for gamma rays with interpolation in the tables given by
     // KA08 and eqs 31,32,33,34,35,36,37,38,39,40,41 and tables for leptons
 
@@ -385,9 +377,9 @@ double PhiFunc(double eta, double eta0, double x, std::string product) {
 }
 // The tables from KA08 for photomeson that give s,δ and B
 void tables_photomeson(double &s, double &delta, double &Beta,
-                       std::string product, double xeta) {
+                       std::string_view product, double xeta) {
     // Gamma rays from neutral pion decay:
-    int sizeTable;
+    size_t sizeTable;
     if (product.compare("electrons") == 0 ||
         product.compare("antielectron") == 0) {
         sizeTable = 10;

@@ -1,7 +1,6 @@
-#ifndef THERMAL_HPP
-#define THERMAL_HPP
+#pragma once
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 
@@ -13,7 +12,7 @@ class Thermal : public Particles {
     double Temp, thnorm, theta;
 
   public:
-    Thermal(int s);
+    Thermal(size_t size);
 
     void set_p();
     void set_ndens();
@@ -26,5 +25,3 @@ class Thermal : public Particles {
 };
 
 }    // namespace kariba
-
-#endif

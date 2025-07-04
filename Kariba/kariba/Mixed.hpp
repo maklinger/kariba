@@ -1,7 +1,6 @@
-#ifndef MIXED_HPP
-#define MIXED_HPP
+#pragma once
 
-#include "kariba/Particles.hpp"
+#include "Particles.hpp"
 
 namespace kariba {
 
@@ -25,14 +24,14 @@ namespace kariba {
 // numerical value and use it elsewhere.
 
 class Mixed : public Particles {
-  private:
+  protected:
     double thnorm, theta, Temp;
     double pspec, plnorm;
     double pmin_th, pmax_th, pmin_pl, pmax_pl;
     double plfrac;
 
   public:
-    Mixed(int s);
+    Mixed(size_t size);
 
     void set_p(double ucom, double bfield, double betaeff, double r,
                double fsc);
@@ -66,6 +65,12 @@ class Mixed : public Particles {
     void test();
 };
 
-}    // namespace kariba
+class Mixed2 : public Mixed {
+  public:
+    Mixed2(int s);
+    void set_p(double ucom, double bfield, double betaeff, double r,
+               double fsc);
+    void set_p(double gmax);
+};
 
-#endif
+}    // namespace kariba
