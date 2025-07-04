@@ -16,9 +16,9 @@ Bknpower::Bknpower(size_t size) : Particles(size) {
     mass_kev = constants::emgm * constants::gr_to_kev;
 }
 
-// Methods to set momentum/energy arrays
-void Bknpower::set_p(double min, double brk, double ucom, double bfield,
-                     double betaeff, double r, double fsc) {
+//! Methods to set momentum/energy arrays
+void Bknpower::set_p(double min, double brk, double ucom, double bfield, double betaeff, double r,
+                     double fsc) {
     pmin = min;
     pbrk = brk;
     pmax = max_p(ucom, bfield, betaeff, r, fsc);
@@ -27,8 +27,7 @@ void Bknpower::set_p(double min, double brk, double ucom, double bfield,
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] =
-            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -41,31 +40,29 @@ void Bknpower::set_p(double min, double brk, double gmax) {
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] =
-            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
-// Method to set differential electron number density from known pspec,
-// normalization, and momentum array
+//! Method to set differential electron number density from known pspec,
+//! normalization, and momentum array
 void Bknpower::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
-        ndens[i] = norm * pow(p[i] / pbrk, -pspec1) /
-                   (1. + pow(p[i] / pbrk, -pspec1 + pspec2)) *
+        ndens[i] = norm * pow(p[i] / pbrk, -pspec1) / (1. + pow(p[i] / pbrk, -pspec1 + pspec2)) *
                    exp(-p[i] / pmax);
     }
     initialize_gdens();
     gdens_differentiate();
 }
 
-// methods to set the slopes, break and normalization
+//! methods to set the slopes, break and normalization
 void Bknpower::set_pspec1(double s1) { pspec1 = s1; }
 
 void Bknpower::set_pspec2(double s2) { pspec2 = s2; }
 
 void Bknpower::set_brk(double brk) { pbrk = brk; }
 
-// Methods to calculate the normalization of the function
+//! Methods to calculate the normalization of the function
 double norm_bkn_int(double x, void *pars) {
     BknParams *params = static_cast<BknParams *>(pars);
 
@@ -77,8 +74,7 @@ double norm_bkn_int(double x, void *pars) {
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    return pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) *
-           exp(-mom_int / max);
+    return pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) * exp(-mom_int / max);
 }
 
 void Bknpower::set_norm(double n) {
@@ -93,14 +89,13 @@ void Bknpower::set_norm(double n) {
     auto params = BknParams{pspec1, pspec2, pbrk, pmax, mass_gr};
     F1.function = &norm_bkn_int;
     F1.params = &params;
-    gsl_integration_qag(&F1, min, max, 0, 1e-7, 100, 1, w1, &norm_integral,
-                        &error);
+    gsl_integration_qag(&F1, min, max, 0, 1e-7, 100, 1, w1, &norm_integral, &error);
     gsl_integration_workspace_free(w1);
 
     norm = n / (norm_integral * mass_gr * constants::cee);
 }
 
-// Injection function to be integrated in cooling
+//! Injection function to be integrated in cooling
 double injection_bkn_int(double x, void *pars) {
     InjectionBknParams *params = static_cast<InjectionBknParams *>(pars);
     double s1 = params->s1;
@@ -112,18 +107,17 @@ double injection_bkn_int(double x, void *pars) {
 
     double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    return n * pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) *
-           exp(-mom_int / max);
+    return n * pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) * exp(-mom_int / max);
 }
 
-// Method to solve steady state continuity equation. NOTE: KN cross section not
-// included in IC cooling
-void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
-                                   double r, double betaeff) {
+//! Method to solve steady state continuity equation. NOTE: KN cross section not
+//! included in IC cooling
+void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double r,
+                                   double betaeff) {
     double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
     double pdot_ad = betaeff * constants::cee / r;
-    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
-                      (3. * mass_gr * pow(constants::cee, 2.));
+    double pdot_rad =
+        (4. * constants::sigtom * constants::cee * Urad) / (3. * mass_gr * pow(constants::cee, 2.));
     double tinj = r / (constants::cee);
 
     double integral, error;
@@ -136,18 +130,16 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
         if (i < p.size() - 1) {
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
-            gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1,
-                                w1, &integral, &error);
+            gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1, w1, &integral,
+                                &error);
             gsl_integration_workspace_free(w1);
 
             ndens[i] =
-                (integral / tinj) /
-                (pdot_ad * p[i] / (mass_gr * constants::cee) +
-                 pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
+                (integral / tinj) / (pdot_ad * p[i] / (mass_gr * constants::cee) +
+                                     pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[p.size() - 1] =
-                ndens[p.size() - 2] *
-                pow(p[p.size() - 1] / p[p.size() - 2], -pspec2 - 1);
+                ndens[p.size() - 2] * pow(p[p.size() - 1] / p[p.size() - 2], -pspec2 - 1);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -169,18 +161,16 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield,
     gdens_differentiate();
 }
 
-// Method to calculate maximum momentum of non thermal particles based on
-// acceleration and cooling timescales The estimate is identical to the old
-// agnjet but in momentum space; see Lucchini et al. 2019 for the math of the
-// old version
-double Bknpower::max_p(double ucom, double bfield, double betaeff, double r,
-                       double fsc) {
+//! Method to calculate maximum momentum of non thermal particles based on
+//! acceleration and cooling timescales The estimate is identical to the old
+//! agnjet but in momentum space; see Lucchini et al. 2019 for the math of the
+//! old version
+double Bknpower::max_p(double ucom, double bfield, double betaeff, double r, double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
     Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
     escom = betaeff * constants::cee / r;
     syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
-    accon = (3. * fsc * constants::charg * bfield) /
-            (4. * mass_gr * constants::cee);
+    accon = (3. * fsc * constants::charg * bfield) / (4. * mass_gr * constants::cee);
 
     b = escom / syncon;
     c = accon / syncon;
@@ -190,7 +180,7 @@ double Bknpower::max_p(double ucom, double bfield, double betaeff, double r,
     return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
-// simple method to check quantities.
+//! simple method to check quantities.
 void Bknpower::test() {
     std::cout << "Broken power-law distribution;" << std::endl;
     std::cout << "pspec1: " << pspec1 << std::endl;

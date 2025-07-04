@@ -4,9 +4,7 @@
 
 namespace kariba {
 
-// Class for thermal particles, inherited from the generic Particles class in
-// Particles.hpp note: ndens is number density per unit momentum
-
+//! Class for thermal particles. ndens is number density per unit momentum
 class Thermal : public Particles {
   private:
     double Temp, thnorm, theta;

@@ -4,17 +4,16 @@
 
 namespace kariba {
 
-// Class Shakura-Sunyeav disk, inherited from Radiation.hpp
-
+//! Class Shakura-Sunyeav disk, inherited from Radiation.hpp
 class ShSDisk : public Radiation {
   private:
-    double Tin;        // Disk temperature at R=Rin in Kev
-    double Mbh, Rg;    // Black hole mass in solar masses
-    double Ldisk;      // Disk luminosity in Eddington units
-    double Hratio;     // Disk aspect ratio; TODO test with constant hbb or with
-                       // hbb varying with disk size. Also test with just one
-                       // Comptonization zone, and with one up to hbb(Rin) and
-                       // another up to the end of the nozzle
+    double Tin;        //!< Disk temperature at R=Rin in Kev
+    double Mbh, Rg;    //!< Black hole mass in solar masses
+    double Ldisk;      //!< Disk luminosity in Eddington units
+    double Hratio;     //!< Disk aspect ratio; TODO test with constant hbb or with
+                       //!< hbb varying with disk size. Also test with just one
+                       //!< Comptonization zone, and with one up to hbb(Rin) and
+                       //!< another up to the end of the nozzle
 
   public:
     ShSDisk(size_t size = 50);
