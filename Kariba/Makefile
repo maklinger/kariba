@@ -1,14 +1,20 @@
-# Set the `GSL` variable to the base of your GSL installation
-# If this happens to be already on a default path, no harm is done
-# This option is mainly for semi-external installations, such as
-# through Homebrew on macOS
-GSL = /opt/homebrew/Cellar/gsl/2.8
+CONFIG = ../make.config
+include $(CONFIG)
 
-CXX = g++-15
+
+ifndef GSL
+	GSL_CPPFLAGS=
+	GSL_LDFLAGS=
+else
+	GSL_CPPFLAGS=-I$(GSL)/include
+	GSL_LDFLAGS=-L$(GSL)/lib
+endif
+
+
 CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -O3 -fopenmp
-CPPFLAGS = -I${GSL}/include -I.
+CPPFLAGS = $(GSL_CPPFLAGS)
 LD = $(CXX)
-LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
+LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
 LDLIBS = -lgsl
 AR = ar
 AR_OPTS = rcs

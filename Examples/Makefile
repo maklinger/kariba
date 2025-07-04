@@ -1,17 +1,25 @@
-# Set the `GSL` variable to the base of your GSL installation
-# If this happens to be already on a default path, no harm is done
-# This option is mainly for semi-external installations, such as
-# through Homebrew on macOS
-GSL = /opt/homebrew/Cellar/gsl/2.8
+CONFIG = ../make.config
+include $(CONFIG)
+
+KARIBA = ../Kariba
+
+
+ifndef GSL
+	GSL_CPPFLAGS=
+	GSL_LDFLAGS=
+else
+	GSL_CPPFLAGS=-I$(GSL)/include
+	GSL_LDFLAGS=-L$(GSL)/lib
+endif
+
 
 # Path to Kariba root
 KARIBA = ../Kariba
 
-CXX = g++-15
 CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
-CPPFLAGS = -I${GSL}/include -I${KARIBA}
+CPPFLAGS = $(GSL_CPPFLAGS) -I${KARIBA}
 LD = $(CXX)
-LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
+LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
 LDLIBS = -lgsl -lm
 RM = rm -f
 
