@@ -4,25 +4,24 @@
 
 namespace kariba {
 
-// Class for mixed particles, inherited from the generic Particles class in
-// Particles.hh the minimum momentum of the PL is always be assumed to be the
-// averge momentum of the thermal note: ndens is number density per unit
-// momentum
-
-// The reasons the integrands are friends is kind of magic. Basically, we need
-// pointers to the private members Temp/thnorm/theta/whatever to set the
-// parameters of the integrand functions in the GSL libraries. In C++ this is
-// not possible for non-static private member functions (because otherwise we
-// could access private members from the outside by using a pointer). To quote
-// the compiler error, C++ forbids taking the address of an unqualified or
-// parenthesized non-static member function to form a pointer to member
-// function. And we need a pointer member function void *p to set up the
-// integrands for GSL libraries. By using a friend function we can instead set
-// up a set of parameters whose value is that of a pointer which points at the
-// values stored in the private members; by doing this, we can not change the
-// private members' values (correctly so) but we can still access their
-// numerical value and use it elsewhere.
-
+//! Class for mixed particles, inherited from the generic Particles class in
+//! Particles.hh the minimum momentum of the PL is always be assumed to be the
+//! averge momentum of the thermal note: ndens is number density per unit
+//! momentum
+//!
+//! The reasons the integrands are friends is kind of magic. Basically, we need
+//! pointers to the private members Temp/thnorm/theta/whatever to set the
+//! parameters of the integrand functions in the GSL libraries. In C++ this is
+//! not possible for non-static private member functions (because otherwise we
+//! could access private members from the outside by using a pointer). To quote
+//! the compiler error, C++ forbids taking the address of an unqualified or
+//! parenthesized non-static member function to form a pointer to member
+//! function. And we need a pointer member function void *p to set up the
+//! integrands for GSL libraries. By using a friend function we can instead set
+//! up a set of parameters whose value is that of a pointer which points at the
+//! values stored in the private members; by doing this, we can not change the
+//! private members' values (correctly so) but we can still access their
+//! numerical value and use it elsewhere.
 class Mixed : public Particles {
   protected:
     double thnorm, theta, Temp;
@@ -33,8 +32,7 @@ class Mixed : public Particles {
   public:
     Mixed(size_t size);
 
-    void set_p(double ucom, double bfield, double betaeff, double r,
-               double fsc);
+    void set_p(double ucom, double bfield, double betaeff, double r, double fsc);
     void set_p(double gmax);
     void set_ndens();
     void set_temp_kev(double T);
@@ -43,10 +41,8 @@ class Mixed : public Particles {
     void set_plfrac(double Le, double r, double eldens);
     void set_pspec(double s1);
 
-    void cooling_steadystate(double ucom, double n0, double bfield, double r,
-                             double betaeff);
-    double max_p(double ucom, double bfield, double betaeff, double r,
-                 double fsc);
+    void cooling_steadystate(double ucom, double n0, double bfield, double r, double betaeff);
+    double max_p(double ucom, double bfield, double betaeff, double r, double fsc);
 
     friend double th_num_dens_int(double x, void *p);
     friend double av_th_p_int(double x, void *p);
@@ -68,8 +64,7 @@ class Mixed : public Particles {
 class Mixed2 : public Mixed {
   public:
     Mixed2(int s);
-    void set_p(double ucom, double bfield, double betaeff, double r,
-               double fsc);
+    void set_p(double ucom, double bfield, double betaeff, double r, double fsc);
     void set_p(double gmax);
 };
 

@@ -3,16 +3,14 @@
 #include <vector>
 
 namespace kariba {
-// Template class for particle distributions
-// This class contains members and methods that are used for thermal,
-// non-thermal and mixed distributions
 
-// Structures used for GSL integration
+//! Structure used for GSL integration
 struct PlParams {
     double s;
     double n;
 };
 
+//! Structure used for GSL integration
 struct BknParams {
     double s1;
     double s2;
@@ -21,17 +19,20 @@ struct BknParams {
     double m;
 };
 
+//! Structure used for GSL integration
 struct ThParams {
     double t;
     double n;
     double m;
 };
 
+//! Structure used for GSL integration
 struct KParams {
     double t;
     double k;
 };
 
+//! Structure used for GSL integration
 struct InjectionMixedParams {
     double s;
     double t;
@@ -43,6 +44,7 @@ struct InjectionMixedParams {
     double cutoff;
 };
 
+//! Structure used for GSL integration
 struct InjectionKappaParams {
     double t;
     double k;
@@ -50,6 +52,7 @@ struct InjectionKappaParams {
     double m;
 };
 
+//! Structure used for GSL integration
 struct InjectionPlParams {
     double s;
     double n;
@@ -57,6 +60,7 @@ struct InjectionPlParams {
     double max;
 };
 
+//! Structure used for GSL integration
 struct InjectionBknParams {
     double s1;
     double s2;
@@ -66,23 +70,22 @@ struct InjectionBknParams {
     double n;
 };
 
+//! Template class for particle distributions
+//! This class contains members and methods that are used for thermal,
+//! non-thermal and mixed distributions
 class Particles {
   protected:
     size_t size;
 
-    double mass_gr;    // particle mass in grams
-    double
-        mass_kev;    // same as above but in keV, using electrons as "reference"
+    double mass_gr;     //!< particle mass in grams
+    double mass_kev;    //!< same as above but in keV, using electrons as "reference"
 
-    std::vector<double> p;    // array of particle momenta
-    std::vector<double>
-        ndens;    // array of number density per unit volume, per unit momentum
-    std::vector<double>
-        gamma;    // array of particle kinetic energies for each momentum
-    std::vector<double>
-        gdens;    // array of number density per unit volume, per unit gamma
-    std::vector<double> gdens_diff;    // array with differential of number
-                                       // density for radiation calculation
+    std::vector<double> p;        //!< array of particle momenta
+    std::vector<double> ndens;    //!< array of number density per unit volume, per unit momentum
+    std::vector<double> gamma;    //!< array of particle kinetic energies for each momentum
+    std::vector<double> gdens;    //!< array of number density per unit volume, per unit gamma
+    std::vector<double> gdens_diff;    //!< array with differential of number
+                                       //!< density for radiation calculation
 
   public:
     Particles(size_t size);

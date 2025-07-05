@@ -4,8 +4,7 @@
 
 namespace kariba {
 
-// Class synchrotron photons, inherited from Radiation.hpp
-
+//! Class synchrotron photons, inherited from Radiation.hpp
 class Cyclosyn : public Radiation {
   private:
     double bfield;     // Magnetic field in emitting region
@@ -21,17 +20,15 @@ class Cyclosyn : public Radiation {
     friend double abs(double gamma, void *p);
     double emis_integral(double nu, double gmin, double gmax, gsl_spline *eldis,
                          gsl_interp_accel *acc_eldis);
-    double abs_integral(double nu, double gmin, double gmax,
-                        gsl_spline *eldis_diff,
+    double abs_integral(double nu, double gmin, double gmax, gsl_spline *eldis_diff,
                         gsl_interp_accel *acc_eldis_diff);
 
     // void specific_luminosity(int k,double gmin,double gmax,gsl_spline
     // *eldis,gsl_interp_accel
     //                          *acc_eldis,gsl_spline
     //                          *eldis_diff,gsl_interp_accel *acc_eldis_diff);
-    void cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
-                         gsl_interp_accel *acc_eldis, gsl_spline *eldis_diff,
-                         gsl_interp_accel *acc_eldis_diff);
+    void cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis,
+                         gsl_spline *eldis_diff, gsl_interp_accel *acc_eldis_diff);
 
     double nu_syn(double gamma);
     double nu_syn();

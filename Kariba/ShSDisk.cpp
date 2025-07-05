@@ -7,13 +7,13 @@
 
 namespace kariba {
 
-// Constructor for the disk. No input parameters because the sized of the arrays
-// is set automatically, and every other property needs to be handled by the
-// setters below
-ShSDisk::ShSDisk(size_t size) : Radiation(size) {}
+//! Constructor for the disk. No input parameters because the sized of the arrays
+//! is set automatically, and every other property needs to be handled by the
+//! setters below
+ShSDisk::ShSDisk(size_t size) : Radiation(size) {}    // size = 50 in the declaration
 
-// return SD spectrum over a given radius, frequency to be integrated over
-// radius
+//! return SD spectrum over a given radius, frequency to be integrated over
+//! radius
 double disk_int(double lr, void *pars) {
     DiskObsParams *params = static_cast<DiskObsParams *>(pars);
     double tin = params->tin;
@@ -26,11 +26,9 @@ double disk_int(double lr, void *pars) {
     fac = constants::herg * nu / (constants::kboltz * temp);
 
     if (fac < 1.e-3) {
-        bb = 2. * constants::herg * std::pow(nu, 3.) /
-             (pow(constants::cee, 2.) * fac);
+        bb = 2. * constants::herg * std::pow(nu, 3.) / (pow(constants::cee, 2.) * fac);
     } else {
-        bb = 2. * constants::herg * std::pow(nu, 3.) /
-             (pow(constants::cee, 2.) * (exp(fac) - 1.));
+        bb = 2. * constants::herg * std::pow(nu, 3.) / (pow(constants::cee, 2.) * (exp(fac) - 1.));
     }
 
     return 2. * constants::pi * std::pow(r, 2.) * bb;
@@ -46,8 +44,7 @@ void ShSDisk::disk_spectrum() {
         auto F1params = DiskObsParams{Tin, r, en_phot_obs[k] / constants::herg};
         F1.function = &disk_int;
         F1.params = &F1params;
-        gsl_integration_qag(&F1, log(r), log(z), 0, 1e-2, 100, 2, w1, &result,
-                            &error);
+        gsl_integration_qag(&F1, log(r), log(z), 0, 1e-2, 100, 2, w1, &result, &error);
         gsl_integration_workspace_free(w1);
 
         num_phot[k] = result;
@@ -55,50 +52,47 @@ void ShSDisk::disk_spectrum() {
     }
 }
 
-// this method removes a fraction f from the observed disk luminosity, assuming
-// that it was absorbed and reprocessed into some other unspecified radiative
-// mechanism
+//! this method removes a fraction f from the observed disk luminosity, assuming
+//! that it was absorbed and reprocessed into some other unspecified radiative
+//! mechanism
 void ShSDisk::cover_disk(double f) {
     for (size_t k = 0; k < num_phot_obs.size(); k++) {
         num_phot_obs[k] = num_phot_obs[k] * (1. - f);
     }
 }
 
-// Simple integration method to integrate num_phot_obs and get the total
-// luminosity of the disk
+//! Simple integration method to integrate num_phot_obs and get the total
+//! luminosity of the disk
 double ShSDisk::total_luminosity() {
     double temp = 0.;
     for (size_t i = 0; i < en_phot_obs.size() - 1; i++) {
-        temp = temp + (1. / 2.) *
-                          (en_phot_obs[i + 1] / constants::herg -
-                           en_phot_obs[i] / constants::herg) *
-                          (num_phot_obs[i + 1] / cos(angle) +
-                           num_phot_obs[i] / cos(angle));
+        temp =
+            temp + (1. / 2.) *
+                       (en_phot_obs[i + 1] / constants::herg - en_phot_obs[i] / constants::herg) *
+                       (num_phot_obs[i + 1] / cos(angle) + num_phot_obs[i] / cos(angle));
     }
     return temp;
 }
 
 void ShSDisk::set_mbh(double M) {
     Mbh = M;
-    Rg = constants::gconst * Mbh * constants::msun /
-         (constants::cee * constants::cee);
+    Rg = constants::gconst * Mbh * constants::msun / (constants::cee * constants::cee);
 }
 
-// note: for disk r is inner radius, z is the outer radius, both are input in cm
+//! Note: for disk r is inner radius, z is the outer radius, both are input in cm
 void ShSDisk::set_rin(double R) { r = R; }
 
 void ShSDisk::set_rout(double R) { z = R; }
 
-// NOTE: the constant factor to go between inner temperature Tin and disk
-// lunminosity Ldisk is 2 because the model uses the zero torque inner boundary
-// condition, Kubota et al. 1998, hence the factor 2 rather than 4pi when
-// converting between luminosity and temperature
+//! NOTE: the constant factor to go between inner temperature Tin and disk
+//! lunminosity Ldisk is 2 because the model uses the zero torque inner boundary
+//! condition, Kubota et al. 1998, hence the factor 2 rather than 4pi when
+//! converting between luminosity and temperature
 void ShSDisk::set_luminosity(double L) {
     double emin, emax, einc;
 
     Ldisk = L;
-    Tin = pow(Ldisk * 1.25e38 * Mbh / (2. * constants::sbconst * pow(r, 2.)),
-              0.25);
+    Tin = pow(Ldisk * 1.25e38 * Mbh / (2. * constants::sbconst * pow(r, 2.)), 0.25);
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
@@ -117,8 +111,7 @@ void ShSDisk::set_tin_kev(double T) {
 
     // note: 1 keV = constants::kboltz_kev2erg/constants::kboltz keV
     Tin = T * constants::kboltz_kev2erg / constants::kboltz;
-    Ldisk =
-        2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
+    Ldisk = 2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
@@ -136,8 +129,7 @@ void ShSDisk::set_tin_k(double T) {
     double emin, emax, einc;
 
     Tin = T;
-    Ldisk =
-        2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
+    Ldisk = 2. * constants::sbconst * pow(Tin, 4.) * pow(r, 2.) / (1.25e38 * Mbh);
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
@@ -152,11 +144,9 @@ void ShSDisk::set_tin_k(double T) {
 }
 
 void ShSDisk::test() {
-    std::cout << "Inner disk radius: " << r << " cm, " << r / Rg
-              << " rg; outer disk radius: " << z << " cm, " << z / Rg
-              << " rg; disk scale height: " << Hratio << std::endl;
-    std::cout << "Inner disk temperature: "
-              << Tin * constants::kboltz / constants::kboltz_kev2erg
+    std::cout << "Inner disk radius: " << r << " cm, " << r / Rg << " rg; outer disk radius: " << z
+              << " cm, " << z / Rg << " rg; disk scale height: " << Hratio << std::endl;
+    std::cout << "Inner disk temperature: " << Tin * constants::kboltz / constants::kboltz_kev2erg
               << " kev; emitted  disk luminosity in Eddington units: " << Ldisk
               << " and erg s^-1: " << total_luminosity() << std::endl;
 }

@@ -7,9 +7,7 @@
 
 namespace kariba {
 
-// Template class for photon/neutrino distributions
-
-// Structures used for GSL integration
+//! Structure used for GSL integration
 struct CyclosynEmisParams {
     double nu;
     double b;
@@ -19,6 +17,7 @@ struct CyclosynEmisParams {
     gsl_interp_accel *acc_eldis;
 };
 
+//! Structure used for GSL integration
 struct CyclosynAbsParams {
     double nu;
     double b;
@@ -28,6 +27,7 @@ struct CyclosynAbsParams {
     gsl_interp_accel *acc_derivs;
 };
 
+//! Structure used for GSL integration
 struct ComintParams {
     double eph;
     double ephmin;
@@ -38,6 +38,7 @@ struct ComintParams {
     gsl_interp_accel *acc_phodis;
 };
 
+//! Structure used for GSL integration
 struct ComfncParams {
     double game;
     double e1;
@@ -45,12 +46,14 @@ struct ComfncParams {
     gsl_interp_accel *acc_phodis;
 };
 
+//! Structure used for GSL integration
 struct DiskObsParams {
     double tin;
     double rin;
     double nu;
 };
 
+//! Structure used for GSL integration
 struct DiskIcParams {
     double gamma;
     double beta;
@@ -62,23 +65,22 @@ struct DiskIcParams {
     double nu;
 };
 
+//! Base class for photon/neutrino distributions
 class Radiation {
   protected:
-    size_t size;                    // size of arrays
-    std::vector<double> en_phot;    // array of photon energies
-    std::vector<double>
-        num_phot;    // array of number of photons in units of erg/s/Hz
-    std::vector<double> en_phot_obs;     // same as above but in observer frame
-    std::vector<double> num_phot_obs;    // same as above but in observer frame
+    size_t size;                         //!< M size of arrays
+    std::vector<double> en_phot;         //!< array of photon energies
+    std::vector<double> num_phot;        //!< array of number of photons in units of erg/s/Hz
+    std::vector<double> en_phot_obs;     //!< same as above but in observer frame
+    std::vector<double> num_phot_obs;    //!< same as above but in observer frame
 
-    double r, z;             // Dimensions of emitting region
-    double vol;              // Volume of emitting region
-    double beta;             // speed of the emitting region
-    double dopfac, angle;    // Viewing angle/Doppler factor of emitting region
-    double dopnum;           // Doppler boosting exponent, depends on geometry
-    bool counterjet;    // boolean switch if user wants to include counterjet
-    // emission
-    std::string geometry;    // string to track geometry of emitting region
+    double r, z;             //!< Dimensions of emitting region
+    double vol;              //!< Volume of emitting region
+    double beta;             //!< speed of the emitting region
+    double dopfac, angle;    //!< Viewing angle/Doppler factor of emitting region
+    double dopnum;           //!< Doppler boosting exponent, depends on geometry
+    bool counterjet;         //!< boolean switch if user wants to include counterjet emission
+    std::string geometry;    //!< string to track geometry of emitting region
 
   public:
     Radiation(size_t size);

@@ -7,7 +7,7 @@ namespace kariba {
 
 BBody::BBody(size_t size) : Radiation(size) {}
 
-// Methods to set BB quantities
+//! Methods to set BB quantities
 void BBody::set_temp_kev(double T) {
     double emin, emax, einc;
 
@@ -61,28 +61,24 @@ void BBody::set_lum(double L) {
     normbb = Lbb / (constants::sbconst * pow(Tbb, 4.));
 }
 
-// Method to set BB spectrum
+//! Method to set BB spectrum
 void BBody::bb_spectrum() {
     for (size_t i = 0; i < num_phot.size(); i++) {
-        num_phot[i] = normbb * 2. * constants::pi * constants::herg *
-                      pow(en_phot_obs[i] / constants::herg, 3.) /
-                      (pow(constants::cee, 2.) *
-                       (exp(en_phot_obs[i] / (Tbb * constants::kboltz)) - 1.));
+        num_phot[i] =
+            normbb * 2. * constants::pi * constants::herg *
+            pow(en_phot_obs[i] / constants::herg, 3.) /
+            (pow(constants::cee, 2.) * (exp(en_phot_obs[i] / (Tbb * constants::kboltz)) - 1.));
         num_phot_obs[i] = num_phot[i];
     }
 }
 
-// Methods to return BB temperature, luminosity, energy density at a given
-// distance d (or for a given radius d of the source)
-double BBody::temp_kev() const {
-    return Tbb * constants::kboltz / constants::kboltz_kev2erg;
-}
+//! Methods to return BB temperature, luminosity, energy density at a given
+//! distance d (or for a given radius d of the source)
+double BBody::temp_kev() const { return Tbb * constants::kboltz / constants::kboltz_kev2erg; }
 
 double BBody::temp_k() const { return Tbb; }
 
-double BBody::temp_hz() const {
-    return 2.82 * constants::kboltz * Tbb / constants::herg;
-}
+double BBody::temp_hz() const { return 2.82 * constants::kboltz * Tbb / constants::herg; }
 
 double BBody::lum() const { return Lbb; }
 
@@ -93,10 +89,9 @@ double BBody::Urad(double d) const {
 }
 
 void BBody::test() {
-    std::cout << "Black body temperature in K: " << temp_k()
-              << " in keV: " << temp_kev() << std::endl;
-    std::cout << "Black body bolometric luminosity in erg s^-1 " << Lbb
+    std::cout << "Black body temperature in K: " << temp_k() << " in keV: " << temp_kev()
               << std::endl;
+    std::cout << "Black body bolometric luminosity in erg s^-1 " << Lbb << std::endl;
 }
 
 }    // namespace kariba

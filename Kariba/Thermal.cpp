@@ -8,7 +8,7 @@
 
 namespace kariba {
 
-// Class constructor to initialize object
+//! Class constructor to initialize object
 Thermal::Thermal(size_t size) : Particles(size) {
     thnorm = 1.;
 
@@ -16,11 +16,10 @@ Thermal::Thermal(size_t size) : Particles(size) {
     mass_kev = constants::emgm * constants::gr_to_kev;
 }
 
-// Method to initialize momentum array a with default interval
-void Thermal::set_p() {    //
-    double emin =
-        (1. / 100.) * Temp;      // minimum energy in kev, 1/100 lower than peak
-    double emax = 20. * Temp;    // maximum energy in kev, 20 higher than peak
+//! Method to initialize momentum array a with default interval
+void Thermal::set_p() {                  //
+    double emin = (1. / 100.) * Temp;    // minimum energy in kev, 1/100 lower than peak
+    double emax = 20. * Temp;            // maximum energy in kev, 20 higher than peak
     double gmin, gmax, pmin, pmax, pinc;
 
     gmin = emin / mass_kev + 1.;
@@ -32,13 +31,12 @@ void Thermal::set_p() {    //
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin) + i * pinc);
-        gamma[i] =
-            pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
-// Method to set differential electron number density from known temperature,
-// normalization, and momentum array
+//! Method to set differential electron number density from known temperature,
+//! normalization, and momentum array
 void Thermal::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
         ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta);
@@ -47,19 +45,18 @@ void Thermal::set_ndens() {
     gdens_differentiate();
 }
 
-// methods to set the temperature and normalization. NOTE: temperature must be
-// in ergs, no factor kb
+//! methods to set the temperature and normalization. NOTE: temperature must be
+//! in ergs, no factor kb
 void Thermal::set_temp_kev(double T) {
     Temp = T;
-    theta = (Temp * constants::kboltz_kev2erg) /
-            (mass_gr * constants::cee * constants::cee);
+    theta = (Temp * constants::kboltz_kev2erg) / (mass_gr * constants::cee * constants::cee);
 }
 
 void Thermal::set_norm(double n) {
     thnorm = n / (pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
 }
 
-// Evaluate Bessel function as in old agnjet
+//! Evaluate Bessel function as in old agnjet
 double Thermal::K2(double x) {
     double res;
 
@@ -72,11 +69,11 @@ double Thermal::K2(double x) {
     return res;
 }
 
-// simple method to check quantities.
+//! simple method to check quantities.
 void Thermal::test() {
     std::cout << "Thermal distribution;\n";
-    std::cout << "Temperature: " << Temp << " erg, "
-              << Temp / constants::kboltz_kev2erg << " kev\n";
+    std::cout << "Temperature: " << Temp << " erg, " << Temp / constants::kboltz_kev2erg
+              << " kev\n";
     ;
     std::cout << "Array size: " << p.size() << "\n";
     std::cout << "Normalization: " << thnorm << "\n";
