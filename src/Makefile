@@ -11,7 +11,6 @@ else
 endif
 
 
-CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -O3 -fopenmp
 CPPFLAGS = $(GSL_CPPFLAGS)
 LD = $(CXX)
 LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
