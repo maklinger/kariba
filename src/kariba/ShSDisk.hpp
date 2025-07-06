@@ -19,8 +19,11 @@ class ShSDisk : public Radiation {
     ShSDisk(size_t size = 50);
 
     double hdisk() const { return Hratio; };
+
     double tin() const { return Tin; };
+
     double rin() const { return r; };
+
     double lum() const { return Ldisk; };
 
     void disk_spectrum();

@@ -281,6 +281,7 @@ double Powerlaw::sigma_pp(double Ep) {    // cross section of pp in mb (that's
                            : 1.e-80;
     return sinel;
 }
+
 double Powerlaw::set_normprot(double nprot) {
     double Epmin = mass_gr * constants::cee * constants::cee * gamma[0];
     double Epmax = sqrt((pmax * constants::cee) * (pmax * constants::cee) +
@@ -366,6 +367,7 @@ void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, do
         protdens = 1.e-100;
     }
 }
+
 void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
     /* If mass-loading, I use the specific enthalpy to work the normalisation */
     if (isEfficient) {

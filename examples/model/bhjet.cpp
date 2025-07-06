@@ -16,8 +16,7 @@
 
 #include "bhjet.hpp"
 
-namespace karcst =
-    kariba::constants;    // alias the kariba::constants namespace
+namespace karcst = kariba::constants;    // alias the kariba::constants namespace
 
 void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
              std::vector<double> &photeng, std::vector<double> &photspec) {
@@ -29,72 +28,58 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
     size_t nz = 100;    // total number of zones
     size_t nel = 70;
-    size_t syn_res = 10;    // number of bins per decade in synch frequency;
-    size_t com_res = 6;     // number of bins per decade in compton frequency;
+    size_t syn_res = 10;          // number of bins per decade in synch frequency;
+    size_t com_res = 6;           // number of bins per decade in compton frequency;
     size_t nsyn = 0, ncom = 0;    // number of bins in synch/compton frequency;
-    int npsw =
-        1;    // switch to define number of protons calculations in agnjet
-              // 0: no protons
-              // 1: Up = Ue+Ub
-              // 2: ne = np
-              // NOTE pair only jet not implemented self-consistently yet!
+    int npsw = 1;                 // switch to define number of protons calculations in agnjet
+                                  // 0: no protons
+                                  // 1: Up = Ue+Ub
+                                  // 2: ne = np
+                                  // NOTE pair only jet not implemented self-consistently yet!
 
-    double Mbh = 0.0;       // black hole mass in solar masses
-    double Eddlum = 0.0;    // black hole Eddington luminosity
-    double Rg = 0.0;        // black hole  gravitational radius in cm
-    double theta = 0.0;     // viewing angle
-    double dist = 0.0;      // distance in kpc
-    double redsh = 0.0;     // source redshift
-    double jetrat = 0.0;    // injected power in Eddington units
-    double zmin = 0.0;      // jet launching point
-    double r_0 = 0.0;       // initial jet radius in rg
-    double z_acc = 0.0;     // end of bulk magnetic acceleration region in rg
-    double z_diss =
-        0.0;    // dissipation/nonthermal particle injection region in rg
-    double z_max = 0.0;    // distance from bh up to which calculation continues
-    double t_e = 0.0;      // temperature in kev, converted to erg
-    double f_nth =
-        0.0;    // percentage of nonthermal particles at the dissipation region
-    double f_pl = 0.0;      // parameter to change plfrac over distance
-    double pspec = 0.0;     // slope of nonthermal distribution
-    double f_heat = 0.0;    // shock heating paramter
-    double f_beta =
-        0.0;    // effective expansion velocity used to set adiabatic cooling
+    double Mbh = 0.0;        // black hole mass in solar masses
+    double Eddlum = 0.0;     // black hole Eddington luminosity
+    double Rg = 0.0;         // black hole  gravitational radius in cm
+    double theta = 0.0;      // viewing angle
+    double dist = 0.0;       // distance in kpc
+    double redsh = 0.0;      // source redshift
+    double jetrat = 0.0;     // injected power in Eddington units
+    double zmin = 0.0;       // jet launching point
+    double r_0 = 0.0;        // initial jet radius in rg
+    double z_acc = 0.0;      // end of bulk magnetic acceleration region in rg
+    double z_diss = 0.0;     // dissipation/nonthermal particle injection region in rg
+    double z_max = 0.0;      // distance from bh up to which calculation continues
+    double t_e = 0.0;        // temperature in kev, converted to erg
+    double f_nth = 0.0;      // percentage of nonthermal particles at the dissipation region
+    double f_pl = 0.0;       // parameter to change plfrac over distance
+    double pspec = 0.0;      // slope of nonthermal distribution
+    double f_heat = 0.0;     // shock heating paramter
+    double f_beta = 0.0;     // effective expansion velocity used to set adiabatic cooling
     double f_sc = 0.0;       // particle acceleration timescale parameter
     double p_beta = 0.0;     // plasma beta in the jet base
     double sig_acc = 0.0;    // final sigma when using magnetic acceleration
     double l_disk = 0.0;     // disk luminosity in Eddington units
     double r_in = 0.0;       // disk inner radius in rg
     double r_out = 0.0;      // disk outer radius in rg
-    double compar1 =
-        0.0;    // external inverse Compton parameters; different meanings
+    double compar1 = 0.0;    // external inverse Compton parameters; different meanings
     double compar2 = 0.0;    // depending on the value of compsw
     double compar3 = 0.0;
-    double compsw =
-        0.0;    // switch to activate different external Compton fields
-    double velsw = 0.0;    // velocity profile parameter
-    int infosw = 0.0;      // switch to print info
-    int EBLsw = 0.0;       // switch to activate EBL attenuation
+    double compsw = 0.0;    // switch to activate different external Compton fields
+    double velsw = 0.0;     // velocity profile parameter
+    int infosw = 0.0;       // switch to print info
+    int EBLsw = 0.0;        // switch to activate EBL attenuation
 
-    double z = 0.0;    // distance along the jet axis
-    double tshift =
-        0.0;    // temperature shift from initial value due to ad. cooling
-    double Urad =
-        0.0;    // estimate of total radiation energy density in each zone
-    double
-        Ubb1 = 0.0,
-        Ubb2 =
-            0.0;    // estimate of comoving energy density of external photons
-    double
-        gmin = 0.0,
-        gmax =
-            0.0;    // minimum/maximum Lorentz factors over which to integrate
+    double z = 0.0;         // distance along the jet axis
+    double tshift = 0.0;    // temperature shift from initial value due to ad. cooling
+    double Urad = 0.0;      // estimate of total radiation energy density in each zone
+    double Ubb1 = 0.0,
+           Ubb2 = 0.0;    // estimate of comoving energy density of external photons
+    double gmin = 0.0,
+           gmax = 0.0;    // minimum/maximum Lorentz factors over which to integrate
     double syn_min = 0.0,
-           syn_max =
-               0.0;    // interval for synchrotron calculation in each zone
+           syn_max = 0.0;    // interval for synchrotron calculation in each zone
     double com_min = 0.0,
-           com_max =
-               0.0;    // interval for inverse Compton calculation in each zone
+           com_max = 0.0;    // interval for inverse Compton calculation in each zone
 
     // std::vector<double> syn_en;
     //  sychrotron energy array for jet+counterjet summed
@@ -107,8 +92,8 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     std::vector<double> tot_en(ne, 0.0);    // energy arrray for sum of all
                                             // zones and/or components
     std::vector<double> tot_syn_pre(ne,
-                                    0.0);    // specific synchrotron luminosity
-                                             // arrays for all zones
+                                    0.0);         // specific synchrotron luminosity
+                                                  // arrays for all zones
     std::vector<double> tot_syn_post(ne, 0.0);    // pre/post particle
                                                   // acceleration
     std::vector<double> tot_com_pre(ne, 0.0);
@@ -117,8 +102,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     std::vector<double> tot_lum(ne, 0.0);    // specific luminosity array for
                                              // sum of all components
 
-    std::ofstream
-        Numdensfile;    // ofstream plot file for particle distribution
+    std::ofstream Numdensfile;    // ofstream plot file for particle distribution
     std::ofstream Presyn, Postsyn,
         Syn_zones;    // ofstream plot files for synchrotron emission
     std::ofstream Precom, Postcom,
@@ -130,9 +114,9 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     grid_pars grid;            // structure with grid parameters
     jet_dynpars jet_dyn;       // structure with jet dynamical parameters
     jet_enpars nozzle_ener;    // structure with jet energetic parameters
-    zone_pars zone;      // strucutre with parameters of each individual zone
-    com_pars agn_com;    // structure with parameters for inverse Compton fields
-                         // in AGN
+    zone_pars zone;            // strucutre with parameters of each individual zone
+    com_pars agn_com;          // structure with parameters for inverse Compton fields
+                               // in AGN
 
     // External photon object declarations
     kariba::ShSDisk Disk;
@@ -190,8 +174,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
     // initialize total energy/luminosity arrays
     for (size_t i = 0; i < ne; i++) {
-        tot_en[i] =
-            (ear[i] + (ear[i + 1] - ear[i]) / 2.) * karcst::herg / karcst::hkev;
+        tot_en[i] = (ear[i] + (ear[i + 1] - ear[i]) / 2.) * karcst::herg / karcst::hkev;
         tot_syn_pre[i] = 1.;
         tot_syn_post[i] = 1.;
         tot_com_pre[i] = 1.;
@@ -231,8 +214,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         Disk.set_inclination(theta);
         Disk.disk_spectrum();
         if (compsw != 2 && l_disk > 0) {
-            sum_ext(50, ne, Disk.get_energy_obs(), Disk.get_nphot_obs(), tot_en,
-                    tot_lum);
+            sum_ext(50, ne, Disk.get_energy_obs(), Disk.get_nphot_obs(), tot_en, tot_lum);
         }
         if (infosw >= 3) {
             Disk.test();
@@ -249,8 +231,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         BlackBody.set_lum(compar2);
         Ubb1 = compar3;
         BlackBody.bb_spectrum();
-        sum_ext(40, ne, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(),
-                tot_en, tot_lum);
+        sum_ext(40, ne, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(), tot_en, tot_lum);
     } else if (compsw == 2 && r_in < r_out) {
         agn_photons_init(Disk.total_luminosity(), compar1, compar2, agn_com);
 
@@ -264,16 +245,14 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
         Disk.cover_disk(compar1 + compar2);
         if (infosw >= 3) {
-            std::cout << "BLR radius in Rg: " << agn_com.rblr / Rg
-                      << " and in cm: " << agn_com.rblr << "\n";
-            std::cout << "DT radius in Rg: " << agn_com.rdt / Rg
-                      << " and in cm: " << agn_com.rdt << "\n";
+            std::cout << "BLR radius in Rg: " << agn_com.rblr / Rg << " and in cm: " << agn_com.rblr
+                      << "\n";
+            std::cout << "DT radius in Rg: " << agn_com.rdt / Rg << " and in cm: " << agn_com.rdt
+                      << "\n";
         }
-        sum_ext(40, ne, Torus.get_energy_obs(), Torus.get_nphot_obs(), tot_en,
-                tot_lum);
+        sum_ext(40, ne, Torus.get_energy_obs(), Torus.get_nphot_obs(), tot_en, tot_lum);
         if (l_disk > 0) {
-            sum_ext(50, ne, Disk.get_energy_obs(), Disk.get_nphot_obs(), tot_en,
-                    tot_lum);
+            sum_ext(50, ne, Disk.get_energy_obs(), Disk.get_nphot_obs(), tot_en, tot_lum);
         }
     }
 
@@ -297,13 +276,10 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     jet_dyn.h0 = 2. * r_0 + zmin;
     jet_dyn.r0 = r_0;
     jet_dyn.acc = z_acc;
-    jet_dyn.beta0 =
-        sqrt(4. / 3. * (4. / 3. - 1.) /
-             (4. / 3. +
-              1.));    // set initial jet speed for relativistic fluid, g=4/3
-    jet_dyn.gam0 =
-        1. / sqrt(1. - (pow(jet_dyn.beta0,
-                            2.)));    // set corresponding lorentz factor
+    jet_dyn.beta0 = sqrt(4. / 3. * (4. / 3. - 1.) /
+                         (4. / 3. + 1.));    // set initial jet speed for relativistic fluid, g=4/3
+    jet_dyn.gam0 = 1. / sqrt(1. - (pow(jet_dyn.beta0,
+                                       2.)));    // set corresponding lorentz factor
     jet_dyn.gamf = velsw;
     jet_dyn.Rg = Rg;
 
@@ -334,10 +310,8 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
                   << "plasma beta!\n";
     } else if (velsw > 1 && dummy_elec.av_gamma() * nozzle_ener.eta >= 3e2) {
         std::cout << "Pair content or temperature too high for  for bljet!\n";
-        std::cout << "Pair content: " << nozzle_ener.eta
-                  << " pairs per proton\n";
-        std::cout << "Average lepton Lorenz factor: " << dummy_elec.av_gamma()
-                  << "\n";
+        std::cout << "Pair content: " << nozzle_ener.eta << " pairs per proton\n";
+        std::cout << "Average lepton Lorenz factor: " << dummy_elec.av_gamma() << "\n";
         std::cout << "Check the value of Te and/or plasma beta!\n";
     }
 
@@ -345,12 +319,10 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         std::cout << "Jet base parameters: \n";
         std::cout << "Pair content (ne/np): " << nozzle_ener.eta << "\n";
         std::cout << "Initial magnetization: " << nozzle_ener.sig0 << "\n";
-        std::cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma()
-                  << "\n";
+        std::cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma() << "\n";
         std::cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << "\n";
         std::cout << "Jet nozzle optical depth: "
-                  << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom
-                  << "\n\n";
+                  << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom << "\n\n";
     }
 
     // STEP 5: TOTAL JET CALCULATIONS, LOOPING OVER EACH SEGMENT OF THE JET
@@ -358,25 +330,19 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         // calculate dynamics/energetics in each zone
         jetgrid(i, grid, jet_dyn, zone.r, zone.delz, z);
         if (velsw == 0) {
-            adjetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed,
-                      acc_speed);
+            adjetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed, acc_speed);
         } else if (velsw == 1) {
-            isojetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed,
-                       acc_speed);
+            isojetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed, acc_speed);
         } else {
-            bljetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed,
-                      acc_speed);
+            bljetpars(z, jet_dyn, nozzle_ener, tshift, zone, spline_speed, acc_speed);
         }
-        zone.delta =
-            1. / (zone.gamma *
-                  (1. - zone.beta * std::cos(theta * karcst::pi / 180.)));
+        zone.delta = 1. / (zone.gamma * (1. - zone.beta * std::cos(theta * karcst::pi / 180.)));
 
         // This is to avoid crashes due to low (sub 1 kev) particle temperatures
         if (z < z_diss) {
             zone.eltemp = std::max(tshift * t_e, 1.);
         } else {
-            zone.eltemp = std::max(
-                tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+            zone.eltemp = std::max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
         }
 
         // This is to evolve the fraction of non thermal particles along the
@@ -397,8 +363,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
             double delta_disk, theta_disk;
             theta_disk = karcst::pi - std::atan(r_in / z);
             delta_disk = 1. / (zone.gamma - zone.beta * std::cos(theta_disk));
-            Urad = pow(delta_disk, 2.) * l_disk * Eddlum /
-                   (4. * karcst::pi * Rdisk * karcst::cee);
+            Urad = pow(delta_disk, 2.) * l_disk * Eddlum / (4. * karcst::pi * Rdisk * karcst::cee);
         } else {
             Urad = 0.;
         }
@@ -423,22 +388,20 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             zone.avgammasq = pow(th_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, th_lep.get_gamma().data(),
-                            th_lep.get_gdens().data(), nel);
-            gsl_spline_init(spline_deriv, th_lep.get_gamma().data(),
-                            th_lep.get_gdens_diff().data(), nel);
+            gsl_spline_init(spline_eldis, th_lep.get_gamma().data(), th_lep.get_gdens().data(),
+                            nel);
+            gsl_spline_init(spline_deriv, th_lep.get_gamma().data(), th_lep.get_gdens_diff().data(),
+                            nel);
 
             if (infosw >= 2) {
-                plot_write(nel, th_lep.get_p(), th_lep.get_gamma(),
-                           th_lep.get_pdens(), th_lep.get_gdens(),
-                           "Output/Numdens.dat");
+                plot_write(nel, th_lep.get_p(), th_lep.get_gamma(), th_lep.get_pdens(),
+                           th_lep.get_gdens(), "Output/Numdens.dat");
             }
         } else if (zone.nth_frac < 0.5) {
             if (IsShock == false) {
                 t_e = f_heat * t_e;
                 IsShock = true;
-                zone.eltemp = std::max(
-                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
             }
             kariba::Mixed acc_lep(nel);
             acc_lep.set_temp_kev(zone.eltemp);
@@ -455,8 +418,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             acc_lep.set_norm(zone.lepdens);
             acc_lep.set_ndens();
-            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r,
-                                        f_beta);
+            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r, f_beta);
             // Note: this assumes ssc cooling is negligible
 
             gmin = acc_lep.get_gamma()[0];
@@ -464,21 +426,19 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
-                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(), acc_lep.get_gdens().data(),
+                            nel);
             gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
                             acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
-                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
-                           acc_lep.get_pdens(), acc_lep.get_gdens(),
-                           "Output/Numdens.dat");
+                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                           acc_lep.get_gdens(), "Output/Numdens.dat");
             }
         } else if (zone.nth_frac < 1.) {
             if (IsShock == false) {
                 t_e = f_heat * t_e;
-                zone.eltemp = std::max(
-                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
                 IsShock = true;
             }
             kariba::Thermal dummy_elec(nel);
@@ -493,16 +453,14 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
             acc_lep.set_pspec2(pspec);
 
             if (f_sc < 10.) {
-                acc_lep.set_p(0.1 * pbrk, pbrk, Urad, zone.bfield, f_beta,
-                              zone.r, f_sc);
+                acc_lep.set_p(0.1 * pbrk, pbrk, Urad, zone.bfield, f_beta, zone.r, f_sc);
             } else {
                 acc_lep.set_p(0.1 * pbrk, pbrk, f_sc);
             }
 
             acc_lep.set_norm(zone.lepdens);
             acc_lep.set_ndens();
-            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r,
-                                        f_beta);
+            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r, f_beta);
             // Note: this assumes ssc cooling is negligible
 
             gmin = acc_lep.get_gamma()[0];
@@ -510,21 +468,19 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
-                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(), acc_lep.get_gdens().data(),
+                            nel);
             gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
                             acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
-                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
-                           acc_lep.get_pdens(), acc_lep.get_gdens(),
-                           "Output/Numdens.dat");
+                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                           acc_lep.get_gdens(), "Output/Numdens.dat");
             }
         } else if (zone.nth_frac == 1.) {
             if (IsShock == false) {
                 t_e = f_heat * t_e;
-                zone.eltemp = std::max(
-                    tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
+                zone.eltemp = std::max(tshift * t_e * pow(log10(z_diss) / log10(z), f_pl), 1.);
                 IsShock = true;
             }
             kariba::Thermal dummy_elec(nel);
@@ -545,8 +501,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             acc_lep.set_norm(zone.lepdens);
             acc_lep.set_ndens();
-            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r,
-                                        f_beta);
+            acc_lep.cooling_steadystate(Urad, zone.lepdens, zone.bfield, zone.r, f_beta);
             // Note: this assumes ssc cooling is negligible
 
             gmin = acc_lep.get_gamma()[0];
@@ -554,42 +509,35 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             zone.avgammasq = pow(acc_lep.av_gamma(), 2.);
 
-            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(),
-                            acc_lep.get_gdens().data(), nel);
+            gsl_spline_init(spline_eldis, acc_lep.get_gamma().data(), acc_lep.get_gdens().data(),
+                            nel);
             gsl_spline_init(spline_deriv, acc_lep.get_gamma().data(),
                             acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
-                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(),
-                           acc_lep.get_pdens(), acc_lep.get_gdens(),
-                           "Output/Numdens.dat");
+                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                           acc_lep.get_gdens(), "Output/Numdens.dat");
             }
         }
         // Note: the energy density below assumes only cold protons
         if (infosw >= 5) {
             double Up, Ue, Ub;
             Ue = sqrt(zone.avgammasq) * zone.lepdens * karcst::emerg;
-            Up = (zone.lepdens / nozzle_ener.eta) * karcst::pmgm *
-                 pow(karcst::cee, 2.);
+            Up = (zone.lepdens / nozzle_ener.eta) * karcst::pmgm * pow(karcst::cee, 2.);
             Ub = pow(zone.bfield, 2.) / (8. * karcst::pi);
             std::cout << "\n"
-                      << "Jetpars; Bfield: " << zone.bfield
-                      << ", Lepton ndens: " << zone.lepdens
-                      << ", speed: " << zone.gamma << ", delta: " << zone.delta
+                      << "Jetpars; Bfield: " << zone.bfield << ", Lepton ndens: " << zone.lepdens
+                      << ", speed: " << zone.gamma << ", delta: " << zone.delta << "\n";
+            std::cout << "tshift: " << tshift << ", Temperature in keV: " << zone.eltemp << "\n";
+            std::cout << "Grid; R: " << zone.r / Rg << ", delz: " << zone.delz / Rg
+                      << ", z: " << z / Rg << ", z+delz: " << (zone.delz + z) / Rg << "\n";
+            std::cout << "Equipartition check; Sigma: " << 2. * Ub / Up << " Ue/Ub: " << Ue / Ub
                       << "\n";
-            std::cout << "tshift: " << tshift
-                      << ", Temperature in keV: " << zone.eltemp << "\n";
-            std::cout << "Grid; R: " << zone.r / Rg
-                      << ", delz: " << zone.delz / Rg << ", z: " << z / Rg
-                      << ", z+delz: " << (zone.delz + z) / Rg << "\n";
-            std::cout << "Equipartition check; Sigma: " << 2. * Ub / Up
-                      << " Ue/Ub: " << Ue / Ub << "\n";
 
             std::ofstream file;
             file.open("Output/Profiles.dat", std::ios::app);
-            file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " "
-                 << zone.lepdens << " " << zone.gamma << " " << zone.eltemp
-                 << " \n";
+            file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " " << zone.lepdens << " "
+                 << zone.gamma << " " << zone.eltemp << " \n";
             file.close();
         }
         // calculate emission of each zone
@@ -600,10 +548,9 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         syn_min = 0.1 * pow(gmin, 2.) * karcst::charg * zone.bfield /
                   (2. * karcst::pi * karcst::emgm * karcst::cee);
         if (r_in < r_out) {
-            syn_max =
-                std::max(50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
-                             (2. * karcst::pi * karcst::emgm * karcst::cee),
-                         20. * Disk.tin() * karcst::kboltz / karcst::herg);
+            syn_max = std::max(50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
+                                   (2. * karcst::pi * karcst::emgm * karcst::cee),
+                               20. * Disk.tin() * karcst::kboltz / karcst::herg);
         } else {
             syn_max = 50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
                       (2. * karcst::pi * karcst::emgm * karcst::cee);
@@ -637,10 +584,8 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         Syncro.set_beaming(theta, zone.beta, zone.delta);
         Syncro.set_geometry("cylinder", zone.r, zone.delz);
         Syncro.set_counterjet(true);
-        Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis,
-                               spline_deriv, acc_deriv);
-        sum_counterjet(nsyn, Syncro.get_energy_obs(), Syncro.get_nphot_obs(),
-                       syn_en, syn_lum);
+        Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis, spline_deriv, acc_deriv);
+        sum_counterjet(nsyn, Syncro.get_energy_obs(), Syncro.get_nphot_obs(), syn_en, syn_lum);
         if (infosw >= 4) {
             Syncro.test();
         }
@@ -671,27 +616,23 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
             // Disk photons are included only if the disk is present
             if (r_in < r_out) {
-                InvCompton.shsdisk_seed(Syncro.get_energy(), Disk.tin(), r_in,
-                                        r_out, Disk.hdisk(),
+                InvCompton.shsdisk_seed(Syncro.get_energy(), Disk.tin(), r_in, r_out, Disk.hdisk(),
                                         z + zone.delz / 2.);
             }
             // Black body photons included only if compsw==1
             if (compsw == 1) {
-                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb1,
-                                     zone.delta * BlackBody.temp_k());
+                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb1, zone.delta * BlackBody.temp_k());
             }
             // AGN photon fields photons are considered only if disk is present
             // and compsw==2
             if (compsw == 2 && r_in < r_out) {
-                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb1,
-                                     zone.delta * BLR.temp_k());
-                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb2,
-                                     zone.delta * Torus.temp_k());
+                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb1, zone.delta * BLR.temp_k());
+                InvCompton.bb_seed_k(Syncro.get_energy(), Ubb2, zone.delta * Torus.temp_k());
             }
             // Calculate the spectrum with whichever fields have been invoked
             InvCompton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis);
-            sum_counterjet(ncom, InvCompton.get_energy_obs(),
-                           InvCompton.get_nphot_obs(), com_en, com_lum);
+            sum_counterjet(ncom, InvCompton.get_energy_obs(), InvCompton.get_nphot_obs(), com_en,
+                           com_lum);
             if (infosw >= 4) {
                 InvCompton.test();
             }
@@ -707,18 +648,16 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
             std::cout << "Out of the Comptonization region\n";
         }
         if (infosw >= 2) {
-            plot_write(nsyn, syn_en, syn_lum, "Output/Cyclosyn_zones.dat", dist,
-                       redsh);
-            plot_write(ncom, com_en, com_lum, "Output/Compton_zones.dat", dist,
-                       redsh);
+            plot_write(nsyn, syn_en, syn_lum, "Output/Cyclosyn_zones.dat", dist, redsh);
+            plot_write(ncom, com_en, com_lum, "Output/Compton_zones.dat", dist, redsh);
         }
     }
 
     // FINAL STEP: SUM JET COMPONENTS TO TOTAL OUTPUT, WRITE/CLOSE PLOT FILES,
     // FREE MEMORY
     for (size_t k = 0; k < ne; k++) {
-        tot_lum[k] = (tot_lum[k] + tot_syn_pre[k] + tot_syn_post[k] +
-                      tot_com_pre[k] + tot_com_post[k]);
+        tot_lum[k] =
+            (tot_lum[k] + tot_syn_pre[k] + tot_syn_post[k] + tot_com_pre[k] + tot_com_post[k]);
         photeng[k] = log10(tot_en[k] / karcst::herg);
     }
 
@@ -727,9 +666,8 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         kariba::ebl_atten_gil(ne, tot_en, tot_lum,
                               redsh);    // correction for total
                                          // luminosity
-        kariba::ebl_atten_gil(
-            ne, tot_en, tot_com_post,
-            redsh);    // correction for post Compton luminosity
+        kariba::ebl_atten_gil(ne, tot_en, tot_com_post,
+                              redsh);    // correction for post Compton luminosity
     }
     output_spectrum(ne, tot_en, tot_lum, photspec, redsh, dist);
 
@@ -739,56 +677,45 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
         plot_write(ne, tot_en, tot_syn_post, "Output/Postsyn.dat", dist, redsh);
         plot_write(ne, tot_en, tot_com_pre, "Output/Precom.dat", dist, redsh);
         plot_write(ne, tot_en, tot_com_post, "Output/Postcom.dat", dist, redsh);
-        plot_write(50, Disk.get_energy_obs(), Disk.get_nphot_obs(),
-                   "Output/Disk.dat", dist, redsh);
+        plot_write(50, Disk.get_energy_obs(), Disk.get_nphot_obs(), "Output/Disk.dat", dist, redsh);
         if (compsw == 2) {
-            plot_write(40, Torus.get_energy_obs(), Torus.get_nphot_obs(),
-                       "Output/BB.dat", dist, redsh);
+            plot_write(40, Torus.get_energy_obs(), Torus.get_nphot_obs(), "Output/BB.dat", dist,
+                       redsh);
         } else {
-            plot_write(40, BlackBody.get_energy_obs(),
-                       BlackBody.get_nphot_obs(), "Output/BB.dat", dist, redsh);
+            plot_write(40, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(), "Output/BB.dat",
+                       dist, redsh);
         }
         plot_write(ne, tot_en, tot_lum, "Output/Total.dat", dist, redsh);
     }
     if (infosw >= 3) {
-        double disk_lum, IC_lum, Xray_lum, Radio_lum, Xray_index, Radio_index,
-            compactness;
-        disk_lum = integrate_lum(50, 0.3 * 2.41e17, 5. * 2.41e17,
-                                 Disk.get_energy_obs(), Disk.get_nphot_obs());
-        IC_lum = integrate_lum(ne, 0.3 * 2.41e17, 300. * 2.41e17, tot_en,
-                               tot_com_pre);
-        Xray_lum =
-            integrate_lum(ne, 1. * 2.41e17, 10. * 2.41e17, tot_en, tot_lum);
+        double disk_lum, IC_lum, Xray_lum, Radio_lum, Xray_index, Radio_index, compactness;
+        disk_lum = integrate_lum(50, 0.3 * 2.41e17, 5. * 2.41e17, Disk.get_energy_obs(),
+                                 Disk.get_nphot_obs());
+        IC_lum = integrate_lum(ne, 0.3 * 2.41e17, 300. * 2.41e17, tot_en, tot_com_pre);
+        Xray_lum = integrate_lum(ne, 1. * 2.41e17, 10. * 2.41e17, tot_en, tot_lum);
         Radio_lum = integrate_lum(ne, 4e9, 6e9, tot_en, tot_lum);
-        Xray_index =
-            photon_index(ne, 10. * 2.41e17, 100. * 2.41e17, tot_en, tot_lum);
+        Xray_index = photon_index(ne, 10. * 2.41e17, 100. * 2.41e17, tot_en, tot_lum);
         Radio_index = 1. + photon_index(ne, 1e10, 1e11, tot_en, tot_lum);
-        compactness = integrate_lum(ne, 0.1 * 2.41e17, 300. * 2.41e17, tot_en,
-                                    tot_com_pre) *
+        compactness = integrate_lum(ne, 0.1 * 2.41e17, 300. * 2.41e17, tot_en, tot_com_pre) *
                       karcst::sigtom / (r_0 * karcst::emerg * karcst::cee);
         std::cout << "Observed 0.3-5 keV disk luminosity: " << disk_lum << "\n";
-        std::cout << "Observed 0.3-300 keV Inverse Compton luminosity: "
-                  << IC_lum << "\n";
+        std::cout << "Observed 0.3-300 keV Inverse Compton luminosity: " << IC_lum << "\n";
         std::cout << "Observed 1-10 keV total luminosity: " << Xray_lum << "\n";
         std::cout << "Observed 4-6 GHz luminosity: " << Radio_lum << "\n";
-        std::cout << "X-ray 10-100 keV photon index estimate: " << Xray_index
-                  << "\n";
-        std::cout << "Radio 10-100 GHz spectral index estimate: " << Radio_index
-                  << "\n";
+        std::cout << "X-ray 10-100 keV photon index estimate: " << Xray_index << "\n";
+        std::cout << "Radio 10-100 GHz spectral index estimate: " << Radio_index << "\n";
         std::cout << "Jet base compactness: " << compactness << "\n\n";
         std::ofstream file;
         file.open("Output/Spectral_properties.dat", std::ios::app);
-        file << disk_lum << " " << IC_lum << " " << Xray_lum << " " << Radio_lum
-             << " " << Xray_index << " " << Radio_index << " " << compactness
-             << "\n";
+        file << disk_lum << " " << IC_lum << " " << Xray_lum << " " << Radio_lum << " "
+             << Xray_index << " " << Radio_index << " " << compactness << "\n";
         file.close();
         if (compactness >= 10. * (param[9] / 511.) * exp(511. / param[9])) {
             std::cout << "Possible pair production in the jet base!" << "\n";
             std::cout << "Lower limit on allowed compactness: "
                       << 10. * (param[9] / 511.) * exp(511. / param[9]) << "\n";
-            std::cout
-                << "Note: this is for a slab, a cylinder allows higher l by a "
-                   "factor of ~10\n";
+            std::cout << "Note: this is for a slab, a cylinder allows higher l by a "
+                         "factor of ~10\n";
         }
     }
 

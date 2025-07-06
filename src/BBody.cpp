@@ -5,7 +5,7 @@
 
 namespace kariba {
 
-BBody::BBody(size_t size) : Radiation(size) {}
+BBody::BBody(size_t size) : Radiation(size) {}    // default of size = 40 in definition
 
 //! Methods to set BB quantities
 void BBody::set_temp_kev(double T) {

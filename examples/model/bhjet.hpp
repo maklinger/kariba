@@ -54,8 +54,8 @@ typedef struct jet_enpars {
 
 // Structure including distance grid calculations
 typedef struct grid_pars {
-    int nz;     // total number of zones
-    int cut;    // zone counter after which grid switched to logarithmic spacing
+    int nz;         // total number of zones
+    int cut;        // zone counter after which grid switched to logarithmic spacing
     double zcut;    // distance at which grid switched to log spacing
 } grid_pars;
 
@@ -90,37 +90,31 @@ void jetmain(std::vector<double> &ear, int ne, std::vector<double> &param,
              std::vector<double> &photeng, std::vector<double> &photspec);
 
 void param_write(const std::vector<double> &par, const std::string &path);
-void plot_write(size_t size, const std::vector<double> &en,
-                const std::vector<double> &lum, const std::string &path,
-                double dist, double redshift);
+void plot_write(size_t size, const std::vector<double> &en, const std::vector<double> &lum,
+                const std::string &path, double dist, double redshift);
 // void plot_write(size_t size, const std::vector<double> &en, const
 // std::vector<double> &lum, 		const std::string& path, double dist, double
-//redshift);
-void plot_write(size_t size, const std::vector<double> &p,
-                const std::vector<double> &g, const std::vector<double> &pdens,
-                const std::vector<double> &gdens, const std::string &path);
+// redshift);
+void plot_write(size_t size, const std::vector<double> &p, const std::vector<double> &g,
+                const std::vector<double> &pdens, const std::vector<double> &gdens,
+                const std::string &path);
 
-bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Ucom,
-                   double velsw, zone_pars &zone);
+bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Ucom, double velsw,
+                   zone_pars &zone);
 
 void sum_counterjet(size_t size, const std::vector<double> &input_en,
-                    const std::vector<double> &input_lum,
-                    std::vector<double> &en, std::vector<double> &lum);
-void output_spectrum(size_t size, std::vector<double> &en,
-                     std::vector<double> &lum, std::vector<double> &spec,
-                     double redsh, double dist);
+                    const std::vector<double> &input_lum, std::vector<double> &en,
+                    std::vector<double> &lum);
+void output_spectrum(size_t size, std::vector<double> &en, std::vector<double> &lum,
+                     std::vector<double> &spec, double redsh, double dist);
 void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
-               std::vector<double> &input_lum, std::vector<double> &en,
-               std::vector<double> &lum);
-void sum_ext(size_t size_in, size_t size_out,
-             const std::vector<double> &input_en,
+               std::vector<double> &input_lum, std::vector<double> &en, std::vector<double> &lum);
+void sum_ext(size_t size_in, size_t size_out, const std::vector<double> &input_en,
              const std::vector<double> &input_lum, std::vector<double> &en,
              std::vector<double> &lum);
-double integrate_lum(size_t size, double numin, double numax,
-                     const std::vector<double> &input_en,
+double integrate_lum(size_t size, double numin, double numax, const std::vector<double> &input_en,
                      const std::vector<double> &input_lum);
-double photon_index(size_t size, double numin, double numax,
-                    const std::vector<double> &input_en,
+double photon_index(size_t size, double numin, double numax, const std::vector<double> &input_en,
                     const std::vector<double> &input_lum);
 
 void velprof_ad(gsl_spline *spline);
@@ -130,25 +124,21 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline);
 void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en);
 void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en);
 
-void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz,
-             double &z);
-void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
-                zone_pars &zone, gsl_spline *spline, gsl_interp_accel *acc);
-void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
-               zone_pars &zone, gsl_spline *spline, gsl_interp_accel *acc);
-void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t,
-               zone_pars &zone, gsl_spline *spline, gsl_interp_accel *acc);
-void b_profile(double g, double n, jet_dynpars &dyn, jet_enpars &en,
-               double &field);
+void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z);
+void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
+                gsl_spline *spline, gsl_interp_accel *acc);
+void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
+               gsl_spline *spline, gsl_interp_accel *acc);
+void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
+               gsl_spline *spline, gsl_interp_accel *acc);
+void b_profile(double g, double n, jet_dynpars &dyn, jet_enpars &en, double &field);
 
 void agn_photons_init(double lum, double f1, double f2, com_pars &agn_com);
-void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone,
-                       double &udt_zone, com_pars &agn_com);
+void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone, double &udt_zone,
+                       com_pars &agn_com);
 
 void clean_file(std::string path, int check);
-void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
-               std::vector<double> &phot, std::vector<double> &photar, int ne,
-               int newne);
+void jetinterp(std::vector<double> &ear, std::vector<double> &energ, std::vector<double> &phot,
+               std::vector<double> &photar, int ne, int newne);
 
-void ebl_atten_gil(int size, std::vector<double> &en, std::vector<double> &lum,
-                   double redsh);
+void ebl_atten_gil(int size, std::vector<double> &en, std::vector<double> &lum, double redsh);

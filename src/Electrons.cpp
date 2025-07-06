@@ -19,6 +19,7 @@ double multiplicity(double pspec) {
     }
     return ntilde;
 }
+
 double prob() {
 
     int N = 20, i;                  //!< The steps of integration.
@@ -53,6 +54,7 @@ double prob() {
 
     return Bprob;
 }
+
 double elec_dist_pp(double zen, double w) {
 
     double rmasses = .573;       //!< r = 1-λ = m_μ^2/m_p^2 = 0.573.The ratio of muon
@@ -82,6 +84,7 @@ double elec_dist_pp(double zen, double w) {
 
     return fe;
 }
+
 double elec_spec_pp(double Ep, double y) {
 
     double L = log(Ep);    //!< L = ln(Ep/1TeV) as definied in Kelner et al. 2006
@@ -107,6 +110,7 @@ double elec_spec_pp(double Ep, double y) {
              (-y * log(10.)) * (-y * log(10.)) * (-y * log(10.));
     return Fespec;
 }
+
 //***********************************************************************************************************
 
 double production_rate(double ge, double x) {    // from Coppi & Blandford 1990

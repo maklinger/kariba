@@ -83,7 +83,6 @@ static const double delta_antielectronTable[10] = {2.63, 2.98, 2.31, 2.11, 2.03,
 static const double Beta_antielectronTable[10] = {6.61e-19, 9.74e-18, 1.34e-16, 2.91e-16, 3.81e-16,
                                                   4.48e-16, 4.83e-16, 5.13e-16, 1.75e-15, 5.48e-15};
 
-
 Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax) : Radiation(lsize) {
 
     en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
@@ -96,6 +95,7 @@ Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax) : Radiation(l
         en_phot_obs[i + lsize] = en_phot[i];
     }
 }
+
 //************************************************************************************************************
 void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
                                  gsl_spline *spline_Jp, const std::vector<double> &en_perseg,
@@ -202,6 +202,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
     gsl_spline_free(spline_ng);
     gsl_interp_accel_free(acc_ng);
 }
+
 double Heta(double x, void *pars) {
     // eq 70 from KA08 for pairs and writen as {0< x=Ee/Ep <1} Ee/Epmax <
     // x=Ee/Ep <Ee/Epmin
@@ -334,6 +335,7 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
 
     return Phi;
 }
+
 // The tables from KA08 for photomeson that give s,δ and B
 void tables_photomeson(double &s, double &delta, double &Beta, std::string_view product,
                        double xeta) {

@@ -140,6 +140,7 @@ void Grays::set_grays_pp(double p, double gammap_min, double gammap_max, double 
     }    // end of loop for photon energies
 }    // End of function that produces the gamma-rays produced by neutral pion
      // decay from pp interactions
+
 //************************************************************************************************************
 
 // The following are common with electrons/neutrinos:
@@ -157,6 +158,7 @@ double set_ntilde(double p) {
     }
     return ntilde;
 }
+
 double target_protons(double ntot_prot, double ntargets, double plfrac) {
     double pp_targets;
     // if ((1.-plfrac)*ntot_prot>=ntargets || (ntargets>(1.-plfrac)*ntot_prot &&
@@ -170,6 +172,7 @@ double target_protons(double ntot_prot, double ntargets, double plfrac) {
     }
     return pp_targets;
 }
+
 double sigma_pp(double Ep) {    // cross section of pp in mb (that's why I
                                 // multiply with 1.e-27 at Phie)
 
@@ -185,6 +188,7 @@ double sigma_pp(double Ep) {    // cross section of pp in mb (that's why I
     }
     return sinel;
 }
+
 double proton_dist(double gpmin, double Ep, double Epcode_max, gsl_spline *spline_Jp,
                    gsl_interp_accel *acc_Jp) {
     double fp, gp;
@@ -196,6 +200,7 @@ double proton_dist(double gpmin, double Ep, double Epcode_max, gsl_spline *splin
     }
     return fp / constants::mprotTeV;    // the distribution of protons in #/cm3/TeV
 }
+
 double gspec_pp(double Ep, double y) {
 
     double L = log(Ep);    // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
@@ -220,6 +225,7 @@ double gspec_pp(double Ep, double y) {
 
     return Fg;
 }
+
 //************************************************************************************************************
 void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<double> &lum_perseg,
                  size_t ntarg, const std::vector<double> &targ_en,
@@ -376,6 +382,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     // delete[] freq;
     // delete[] Uphot;
 }
+
 double Hetag(double x, void *pars) {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
     HetagParams *params = static_cast<HetagParams *>(pars);
@@ -423,6 +430,7 @@ double colliding_protons(gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp, double
     }
     return Jp / (constants::pmgm * constants::cee * constants::cee);    // in #/erg/cm3
 }
+
 double photons_jet(double eta, double Ep, gsl_spline *spline_ng, gsl_interp_accel *acc_ng,
                    double nu_min, double nu_max) {
     // dif number density of photons inside the jet (from other physical
@@ -437,6 +445,7 @@ double photons_jet(double eta, double Ep, gsl_spline *spline_ng, gsl_interp_acce
         return 1.e-100;
     }
 }
+
 double PhiFunc_gamma(double eta, double eta0, double x) {
     // eqs 27,28,29 etc for gamma rays with interpolation in the tables given by
     // KA08 and eqs 31,32,33,34,35,36,37,38,39,40,41 and tables for leptons
@@ -467,6 +476,7 @@ double PhiFunc_gamma(double eta, double eta0, double x) {
     }
     return Phi;
 }
+
 //! The tables from KA08 for photomeson that give s,δ and B
 void tables_photomeson_gamma(double &s, double &delta, double &Beta, double xeta) {
     // Gamma rays from neutral pion decay:

@@ -63,6 +63,7 @@ class Compton : public Radiation {
     void seed_freq_array(const std::vector<double> &seed_energ);
 
     double get_tau() const { return tau; };
+
     double get_ypar() const { return ypar; };
 
     void reset();

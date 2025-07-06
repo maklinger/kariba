@@ -20,6 +20,7 @@ Neutrinos_pp::Neutrinos_pp(size_t size, double Emin, double Emax) : Radiation(si
         en_phot_obs[i + size] = en_phot[i];
     }
 }
+
 void Neutrinos_pp::set_neutrinos_pp(double pspec, double gammap_min, double gammap_max,
                                     double ntot_prot, double nwind, double plfrac,
                                     gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
