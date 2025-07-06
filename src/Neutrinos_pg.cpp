@@ -10,8 +10,6 @@
 
 namespace kariba {
 
-#ifndef PHOTOMESON_TABLES
-#define PHOTOMESON_TABLES
 //----------------------- electrons -----------------------//
 static const double etaeTable[10] = {3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 30.0, 100.0};
 static const double seTable[10] = {0.658, 0.348, 0.286, 0.256, 0.258,
@@ -85,7 +83,6 @@ static const double delta_antielectronTable[10] = {2.63, 2.98, 2.31, 2.11, 2.03,
 static const double Beta_antielectronTable[10] = {6.61e-19, 9.74e-18, 1.34e-16, 2.91e-16, 3.81e-16,
                                                   4.48e-16, 4.83e-16, 5.13e-16, 1.75e-15, 5.48e-15};
 
-#endif
 
 Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax) : Radiation(lsize) {
 
