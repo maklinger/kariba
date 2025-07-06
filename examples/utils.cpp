@@ -1,7 +1,7 @@
 #include <kariba/Radiation.hpp>
 #include <kariba/constants.hpp>
 
-#include "kariba_examples.hpp"
+#include "examples.hpp"
 
 namespace karcst = kariba::constants;
 
@@ -17,10 +17,8 @@ void read_params(const std::string &path, std::vector<double> &pars) {
     }
     while (getline(inFile, line)) {
         // Remove whitespace from the beginning of the line
-        line.erase(line.begin(),
-                   std::find_if(line.begin(), line.end(), [](unsigned char c) {
-                       return !std::isspace(c);
-                   }));
+        line.erase(line.begin(), std::find_if(line.begin(), line.end(),
+                                              [](unsigned char c) { return !std::isspace(c); }));
         if (line[0] == '#') {
             continue;
         } else {
@@ -35,9 +33,8 @@ void read_params(const std::string &path, std::vector<double> &pars) {
 // file on the provided path. Note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, const std::vector<double> &en,
-                const std::vector<double> &lum, const std::string &path,
-                double redsh) {
+void plot_write(int size, const std::vector<double> &en, const std::vector<double> &lum,
+                const std::string &path, double redsh) {
     std::ofstream file;
     file.open(path, std::ios::app);
 
@@ -48,15 +45,14 @@ void plot_write(int size, const std::vector<double> &en,
     file.close();
 }
 
-void plot_write(int size, const std::vector<double> &p,
-                const std::vector<double> &g, const std::vector<double> &pdens,
-                const std::vector<double> &gdens, const std::string &path) {
+void plot_write(int size, const std::vector<double> &p, const std::vector<double> &g,
+                const std::vector<double> &pdens, const std::vector<double> &gdens,
+                const std::string &path) {
 
     std::ofstream file;
     file.open(path, std::ios::app);
     for (int k = 0; k < size; k++) {
-        file << p[k] << " " << g[k] << " " << pdens[k] << " " << gdens[k]
-             << "\n";
+        file << p[k] << " " << g[k] << " " << pdens[k] << " " << gdens[k] << "\n";
     }
 
     file.close();
@@ -69,8 +65,7 @@ void plot_write(int size, const std::vector<double> &p,
 // arryas in input is that the input arrays are directly accessed from the
 // ShSDisk class, which are const
 void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
-               std::vector<double> &input_lum, std::vector<double> &en,
-               std::vector<double> &lum) {
+               std::vector<double> &input_lum, std::vector<double> &en, std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
     gsl_spline *input_spline = gsl_spline_alloc(gsl_interp_akima, size_in);
     gsl_spline_init(input_spline, input_en.data(), input_lum.data(), size_in);
@@ -83,8 +78,7 @@ void sum_zones(size_t size_in, size_t size_out, std::vector<double> &input_en,
     gsl_spline_free(input_spline), gsl_interp_accel_free(acc);
 }
 
-void sum_ext(size_t size_in, size_t size_out,
-             const std::vector<double> &input_en,
+void sum_ext(size_t size_in, size_t size_out, const std::vector<double> &input_en,
              const std::vector<double> &input_lum, std::vector<double> &en,
              std::vector<double> &lum) {
     gsl_interp_accel *acc = gsl_interp_accel_alloc();
@@ -104,16 +98,13 @@ void sum_ext(size_t size_in, size_t size_out,
 // erg/s/Hz for the luminosity array to be integrated, Hz for the integration
 // bounds; size is the dimension of the input arrays Note: this uses a VERY
 // rough method and wide bins, so thread carefully
-double integrate_lum(int size, double numin, double numax,
-                     const std::vector<double> &input_en,
+double integrate_lum(int size, double numin, double numax, const std::vector<double> &input_en,
                      const std::vector<double> &input_lum) {
     double temp = 0.;
     for (int i = 0; i < size - 1; i++) {
-        if (input_en[i] / karcst::herg > numin &&
-            input_en[i + 1] / karcst::herg < numax) {
+        if (input_en[i] / karcst::herg > numin && input_en[i + 1] / karcst::herg < numax) {
             temp = temp + (1. / 2.) *
-                              (input_en[i + 1] / karcst::herg -
-                               input_en[i] / karcst::herg) *
+                              (input_en[i + 1] / karcst::herg - input_en[i] / karcst::herg) *
                               (input_lum[i + 1] + input_lum[i]);
         }
     }
@@ -123,8 +114,7 @@ double integrate_lum(int size, double numin, double numax,
 // Overly simplified estimate of the photon index between numin and numax of a
 // given array; input is the same as integrate_lum. Note that this assumes
 // input_lum is a power-law in shape
-double photon_index(int size, double numin, double numax,
-                    const std::vector<double> &input_en,
+double photon_index(int size, double numin, double numax, const std::vector<double> &input_en,
                     const std::vector<double> &input_lum) {
     int counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
@@ -137,8 +127,7 @@ double photon_index(int size, double numin, double numax,
         }
     }
     delta_y = log10(input_lum[counter_2]) - log10(input_lum[counter_1]);
-    delta_x = log10(input_en[counter_2] / karcst::herg) -
-              log10(input_en[counter_1] / karcst::herg);
+    delta_x = log10(input_en[counter_2] / karcst::herg) - log10(input_en[counter_1] / karcst::herg);
     gamma = delta_y / delta_x - 1.;
     return gamma;
 }
@@ -157,8 +146,8 @@ void clean_file(const std::string &path, bool check) {
     if (check == true) {
         file << std::left << std::setw(20) << "#nu [Hz] " << "Flux [mJy]\n";
     } else {
-        file << std::left << std::setw(20) << "#p [g cm s-1] " << std::setw(20)
-             << "g [] " << std::setw(20) << " n(p) [# cm^-3 p^-1] "
+        file << std::left << std::setw(20) << "#p [g cm s-1] " << std::setw(20) << "g [] "
+             << std::setw(20) << " n(p) [# cm^-3 p^-1] "
              << " n(g) [# cm^-3 g^-1]\n";
     }
 

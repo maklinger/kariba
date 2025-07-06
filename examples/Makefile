@@ -1,7 +1,8 @@
 CONFIG = ../make.config
 include $(CONFIG)
 
-KARIBA = ../Kariba
+# Path to Kariba root
+KARIBA = ../src
 
 
 ifndef GSL
@@ -13,10 +14,6 @@ else
 endif
 
 
-# Path to Kariba root
-KARIBA = ../Kariba
-
-CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
 CPPFLAGS = $(GSL_CPPFLAGS) -I${KARIBA}
 LD = $(CXX)
 LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
@@ -27,12 +24,12 @@ RM = rm -f
 SOURCES = utils.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
 
-TARGET_CORONA = kariba_corona_examples
-TARGET_PARTICLES = kariba_particles_examples
-TARGET_SINGLEZONE = kariba_singlezone_examples
-OBJECT_CORONA = kariba_corona_examples.o
-OBJECT_PARTICLES = kariba_particles_examples.o
-OBJECT_SINGLEZONE = kariba_singlezone_examples.o
+TARGET_CORONA = corona
+TARGET_PARTICLES = particles
+TARGET_SINGLEZONE = singlezone
+OBJECT_CORONA = corona.o
+OBJECT_PARTICLES = particles.o
+OBJECT_SINGLEZONE = singlezone.o
 
 LIBKARIBA = ${KARIBA}/libkariba.a
 

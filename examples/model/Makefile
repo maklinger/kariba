@@ -1,8 +1,8 @@
-CONFIG = ../make.config
+CONFIG = ../../make.config
 include $(CONFIG)
 
 # Path to Kariba root
-KARIBA = ../Kariba
+KARIBA = ../../src
 
 ifndef GSL
 	GSL_CPPFLAGS=
@@ -13,7 +13,6 @@ else
 endif
 
 
-CXXFLAGS = -std=c++17 -Wall -Wextra -fopenmp -fPIC -Ofast
 CPPFLAGS = $(GSL_CPPFLAGS) -I${KARIBA}
 LD = $(CXX)
 LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)

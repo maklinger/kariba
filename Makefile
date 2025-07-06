@@ -4,44 +4,41 @@ include $(CONFIG)
 $(info $(GSL))
 
 
-#include Kariba/Makefile
+.PHONY: all lib examples model tests clean distclean
 
 
-.PHONY: all kariba examples bhjet tests clean distclean
+all: lib tests examples model
 
+lib:
+	$(MAKE) -C src
 
-all: kariba tests examples bhjet
+examples: lib
+	$(MAKE) -C examples
 
-kariba:
-	$(MAKE) -C Kariba
+model: lib
+	$(MAKE) -C examples/model
 
-examples: kariba
-	$(MAKE) -C Examples
-
-bhjet: kariba
-	$(MAKE) -C BHJet
-
-tests: kariba
+tests: lib
 	$(MAKE) -C tests
 
 clean:
-	$(MAKE) -C Kariba clean
-	$(MAKE) -C Examples clean
-	$(MAKE) -C BHJet clean
+	$(MAKE) -C src clean
+	$(MAKE) -C examples clean
+	$(MAKE) -C examples/model clean
 	$(MAKE) -C tests clean
 
 distclean:
-	$(MAKE) -C Kariba distclean
-	$(MAKE) -C Examples distclean
-	$(MAKE) -C BHJet distclean
+	$(MAKE) -C src distclean
+	$(MAKE) -C examples distclean
+	$(MAKE) -C examples/model distclean
 	$(MAKE) -C tests distclean
 
 help:
 	@echo Possible targets
 	@echo
-	@echo "'make kariba': build the library"
+	@echo "'make lib': build the library"
 	@echo "'make examples': build the examples"
-	@echo "'make bhjet': build the BHJet model"
+	@echo "'make model': build the BHJet example model"
 	@echo "'make all': build all of the three above. This is the default for just running 'make'"
 	@echo
 	@echo "'make clean': remove the intermediate (object) files for each target"

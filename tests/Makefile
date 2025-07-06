@@ -1,7 +1,8 @@
 CONFIG = ../make.config
 include $(CONFIG)
 
-KARIBA = ../Kariba
+# Path to Kariba root
+KARIBA = ../src
 
 
 ifndef GSL
@@ -13,15 +14,11 @@ else
 endif
 
 
-# Path to Kariba root
-KARIBA = ../Kariba
 
-CXX = g++-15
-CXXFLAGS = -std=c++17 -Wall -Wextra -fPIC -O3
 CPPFLAGS = -I${GSL}/include -I${KARIBA} -I.
 LD = $(CXX)
 LDFLAGS = -fPIC -L${GSL}/lib -fopenmp
-LDLIBS = -lgsl -lm $(LIBKARIBA)
+LDLIBS = -lgsl -lm
 RM = rm -f
 
 # Kariba library
@@ -47,7 +44,7 @@ OBJECTS = $(MAIN_OBJ) $(PARTICLE_OBJ) $(RADIATION_OBJ) $(DISTRIBUTIONS_OBJ) $(PO
 all: main
 
 main: $(OBJECTS)
-	$(LD) $(LDFLAGS) $(LDLIBS) -o $(TEST_MAIN) $(OBJECTS)
+	$(LD) $(LDFLAGS) $(LDLIBS) -o $(TEST_MAIN) $(OBJECTS) $(LIBKARIBA)
 
 
 %.o: %.cpp doctest.h
