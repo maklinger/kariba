@@ -4,7 +4,7 @@
 #include <kariba/Thermal.hpp>
 #include <kariba/constants.hpp>
 
-#include "kariba_examples.hpp"
+#include "examples.hpp"
 
 namespace karcst = kariba::constants;
 
@@ -64,11 +64,11 @@ int main() {
     lowfrac.set_pspec(s);
     lowfrac.set_norm(1.);
     lowfrac.set_ndens();
-    plot_write(nel, lowfrac.get_p(), lowfrac.get_gamma(), lowfrac.get_pdens(),
-               lowfrac.get_gdens(), "Output/lowfrac.dat");
+    plot_write(nel, lowfrac.get_p(), lowfrac.get_gamma(), lowfrac.get_pdens(), lowfrac.get_gdens(),
+               "Output/lowfrac.dat");
     lowfrac.cooling_steadystate(0., 1., bfield, R, beta_exp);
-    plot_write(nel, lowfrac.get_p(), lowfrac.get_gamma(), lowfrac.get_pdens(),
-               lowfrac.get_gdens(), "Output/lowfrac_cool.dat");
+    plot_write(nel, lowfrac.get_p(), lowfrac.get_gamma(), lowfrac.get_pdens(), lowfrac.get_gdens(),
+               "Output/lowfrac_cool.dat");
 
     highfrac.set_temp_kev(Te);
     highfrac.set_p(gmax);
@@ -76,13 +76,11 @@ int main() {
     highfrac.set_pspec(s);
     highfrac.set_norm(1.);
     highfrac.set_ndens();
-    plot_write(nel, highfrac.get_p(), highfrac.get_gamma(),
-               highfrac.get_pdens(), highfrac.get_gdens(),
-               "Output/highfrac.dat");
+    plot_write(nel, highfrac.get_p(), highfrac.get_gamma(), highfrac.get_pdens(),
+               highfrac.get_gdens(), "Output/highfrac.dat");
     highfrac.cooling_steadystate(0., 1., bfield, R, beta_exp);
-    plot_write(nel, highfrac.get_p(), highfrac.get_gamma(),
-               highfrac.get_pdens(), highfrac.get_gdens(),
-               "Output/highfrac_cool.dat");
+    plot_write(nel, highfrac.get_p(), highfrac.get_gamma(), highfrac.get_pdens(),
+               highfrac.get_gdens(), "Output/highfrac_cool.dat");
 
     // The kappa distribution is identical to the mixed distribution, except a)
     // you don't need to specify the non-thermal fraction and b) by definition
@@ -92,11 +90,11 @@ int main() {
     kdist.set_kappa(s + 1.);
     kdist.set_norm(1.);
     kdist.set_ndens();
-    plot_write(nel, kdist.get_p(), kdist.get_gamma(), kdist.get_pdens(),
-               kdist.get_gdens(), "Output/kdist.dat");
+    plot_write(nel, kdist.get_p(), kdist.get_gamma(), kdist.get_pdens(), kdist.get_gdens(),
+               "Output/kdist.dat");
     kdist.cooling_steadystate(0., 1., bfield, R, beta_exp);
-    plot_write(nel, kdist.get_p(), kdist.get_gamma(), kdist.get_pdens(),
-               kdist.get_gdens(), "Output/kdist_cool.dat");
+    plot_write(nel, kdist.get_p(), kdist.get_gamma(), kdist.get_pdens(), kdist.get_gdens(),
+               "Output/kdist_cool.dat");
 
     // For the broken power-law distribution, first instatiate a dummy thermal
     // distribution. For the thermal distribution, before calculating the
@@ -122,11 +120,11 @@ int main() {
     bkndist.set_p(0.1 * pbrk, pbrk, gmax);
     bkndist.set_norm(1.);
     bkndist.set_ndens();
-    plot_write(nel, bkndist.get_p(), bkndist.get_gamma(), bkndist.get_pdens(),
-               bkndist.get_gdens(), "Output/bkndist.dat");
+    plot_write(nel, bkndist.get_p(), bkndist.get_gamma(), bkndist.get_pdens(), bkndist.get_gdens(),
+               "Output/bkndist.dat");
     bkndist.cooling_steadystate(0., 1., bfield, R, beta_exp);
-    plot_write(nel, bkndist.get_p(), bkndist.get_gamma(), bkndist.get_pdens(),
-               bkndist.get_gdens(), "Output/bkndist_cool.dat");
+    plot_write(nel, bkndist.get_p(), bkndist.get_gamma(), bkndist.get_pdens(), bkndist.get_gdens(),
+               "Output/bkndist_cool.dat");
 
     // system("python3 Particles.py");
 

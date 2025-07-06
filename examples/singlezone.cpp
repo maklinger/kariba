@@ -3,7 +3,7 @@
 #include <kariba/Powerlaw.hpp>
 #include <kariba/constants.hpp>
 
-#include "kariba_examples.hpp"
+#include "examples.hpp"
 
 namespace karcst = kariba::constants;
 
@@ -18,11 +18,11 @@ int main() {
     int nfreq = 200;    // array size for frequency arrays
 
     double B, R,
-        n;    // plasma quantities of emitting region: bfield, radius, number
-              // density
-    double gmin, gmax, p;    // details of particle distribution:
-                             // minimum/maximum gamma factor, powerlaw slope
-    double pmin;             // minimum momentum corresponding to gmin
+        n;                        // plasma quantities of emitting region: bfield, radius, number
+                                  // density
+    double gmin, gmax, p;         // details of particle distribution:
+                                  // minimum/maximum gamma factor, powerlaw slope
+    double pmin;                  // minimum momentum corresponding to gmin
     double delta, gamma, beta;    // plasma speed/beaming factor
     double theta;                 // jet viewing angle
     double Pj;                    // total power carried in the jet
@@ -55,15 +55,13 @@ int main() {
     R = 626. * Rg;
     n = 9.5e-3;
     gmin = 4.1e3;
-    pmin =
-        std::pow(std::pow(gmin, 2.) - 1., 1. / 2.) * karcst::emgm * karcst::cee;
+    pmin = std::pow(std::pow(gmin, 2.) - 1., 1. / 2.) * karcst::emgm * karcst::cee;
     gmax = 6.4e7;
     p = 3.03;
     delta = 3.3;
     gamma = 3.;
     beta = 0.942809;
-    theta = std::acos((delta * gamma - 1.) / (beta * delta * gamma)) * 180. /
-            karcst::pi;
+    theta = std::acos((delta * gamma - 1.) / (beta * delta * gamma)) * 180. / karcst::pi;
 
     nus_min = 1.e8;
     nus_max = 1.e21;
@@ -81,14 +79,12 @@ int main() {
     Electrons.set_pspec(p);
     Electrons.set_norm(n);
     Electrons.set_ndens();
-    plot_write(nel, Electrons.get_p(), Electrons.get_gamma(),
-               Electrons.get_pdens(), Electrons.get_gdens(),
-               "Output/Singlezone_Particles.dat");
+    plot_write(nel, Electrons.get_p(), Electrons.get_gamma(), Electrons.get_pdens(),
+               Electrons.get_gdens(), "Output/Singlezone_Particles.dat");
 
-    gsl_spline_init(spline_eldis, Electrons.get_gamma().data(),
-                    Electrons.get_gdens().data(), nel);
-    gsl_spline_init(spline_deriv, Electrons.get_gamma().data(),
-                    Electrons.get_gdens_diff().data(), nel);
+    gsl_spline_init(spline_eldis, Electrons.get_gamma().data(), Electrons.get_gdens().data(), nel);
+    gsl_spline_init(spline_deriv, Electrons.get_gamma().data(), Electrons.get_gdens_diff().data(),
+                    nel);
 
     // Set up the cyclo-synchrotron emission, by specifying the size of the
     // arrays for frequency and flux. Then, specify the frequency range over
@@ -102,10 +98,9 @@ int main() {
     Syncro.set_bfield(B);
     Syncro.set_beaming(theta, beta, delta);
     Syncro.set_geometry("sphere", R);
-    Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis, spline_deriv,
-                           acc_deriv);
-    plot_write(nfreq, Syncro.get_energy_obs(), Syncro.get_nphot_obs(),
-               "Output/Singlezone_Syn.dat", 0.);
+    Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis, spline_deriv, acc_deriv);
+    plot_write(nfreq, Syncro.get_energy_obs(), Syncro.get_nphot_obs(), "Output/Singlezone_Syn.dat",
+               0.);
 
     // Set up the SSC emission, by specifying the size of both the output
     // arrays, and the seed photon arrays. Then, set in no particular order the
@@ -140,14 +135,12 @@ int main() {
     Pj = Pe + Pb + Pp;
 
     std::cout << "Physical quantities:\n";
-    std::cout << "Average electron Lorenz factor: " << Electrons.av_gamma()
-              << "\n";
+    std::cout << "Average electron Lorenz factor: " << Electrons.av_gamma() << "\n";
     std::cout << "Equipartition Ue/UB: " << equip << "\n";
     std::cout << "Electron power: " << Pe << "\n";
     std::cout << "Magnetic power: " << Pb << "\n";
     std::cout << "Proton power: " << Pp << "\n";
-    std::cout << "Total power: " << Pj << " erg s^-1, " << Pj / Eddlum
-              << " Eddington\n";
+    std::cout << "Total power: " << Pj << " erg s^-1, " << Pj / Eddlum << " Eddington\n";
 
     // system("python3 Singlezone.py");
 

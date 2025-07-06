@@ -21,24 +21,20 @@
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_spline.h>
 
-void plot_write(int size, const std::vector<double> &en,
-                const std::vector<double> &lum, const std::string &path,
-                double redshift);
-void plot_write(int size, const std::vector<double> &p,
-                const std::vector<double> &g, const std::vector<double> &pdens,
-                const std::vector<double> &gdens, const std::string &path);
+void plot_write(int size, const std::vector<double> &en, const std::vector<double> &lum,
+                const std::string &path, double redshift);
+void plot_write(int size, const std::vector<double> &p, const std::vector<double> &g,
+                const std::vector<double> &pdens, const std::vector<double> &gdens,
+                const std::string &path);
 
 void sum_zones(int size_in, int size_out, std::vector<double> &input_en,
-               std::vector<double> &input_lum, std::vector<double> &en,
-               std::vector<double> &lum);
+               std::vector<double> &input_lum, std::vector<double> &en, std::vector<double> &lum);
 void sum_ext(int size_in, int size_out, const std::vector<double> &input_en,
              const std::vector<double> &input_lum, std::vector<double> &en,
              std::vector<double> &lum);
-double integrate_lum(int size, double numin, double numax,
-                     const std::vector<double> &input_en,
+double integrate_lum(int size, double numin, double numax, const std::vector<double> &input_en,
                      const std::vector<double> &input_lum);
-double photon_index(int size, double numin, double numax,
-                    const std::vector<double> &input_en,
+double photon_index(int size, double numin, double numax, const std::vector<double> &input_en,
                     const std::vector<double> &input_lum);
 
 void clean_file(const std::string &path, bool check);
