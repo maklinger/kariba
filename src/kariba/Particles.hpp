@@ -89,7 +89,6 @@ class Particles {
 
   public:
     Particles(size_t size);
-    ~Particles();
 
     void set_mass(double m);
     void initialize_gdens();

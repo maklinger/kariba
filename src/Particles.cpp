@@ -9,8 +9,6 @@
 
 namespace kariba {
 
-//! Class destructor to de-allocate arrays
-Particles::~Particles() {}
 
 Particles::Particles(size_t size)
     : size(size), p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0), gdens(size, 0.0),
