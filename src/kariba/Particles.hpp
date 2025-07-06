@@ -105,14 +105,6 @@ class Particles {
 
     const std::vector<double> &get_gdens_diff() const { return gdens_diff; }
 
-    // std::vector<double>& get_p() { return p; }
-    // std::vector<double>& get_pdens() { return ndens; }
-    // std::vector<double>& get_gamma() { return gamma; }
-    // std::vector<double>& get_gdens() { return gdens; }
-    // std::vector<double>& get_gdens_diff() { return gdens_diff; }
-
-    // double beta(int i);  // todo: not implemented!
-
     double count_particles();
     double count_particles_energy();
     double av_p();

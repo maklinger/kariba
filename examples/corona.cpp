@@ -275,8 +275,6 @@ int main() {
     plot_write(nfreq, IC_Tau019Te900.get_energy_obs(), IC_Tau019Te900.get_nphot_obs(),
                "Output/IC_Tau019Te900.dat", 0.);
 
-    // system("python3 Coronae.py");
-
     gsl_spline_free(spline_eldis), gsl_interp_accel_free(acc_eldis);
     gsl_spline_free(spline_deriv), gsl_interp_accel_free(acc_deriv);
 

@@ -82,23 +82,6 @@ void plot_write(size_t size, const std::vector<double> &en, const std::vector<do
     file.close();
 }
 
-/*
-void plot_write(int size, const std::vector<double> &en,
-                const std::vector<double> &lum, std::string path, double dist,
-                double redsh) {
-    std::ofstream file;
-    file.open(path.c_str(), std::ios::app);
-
-    for (int k = 0; k < size; k++) {
-        file << en[k] / (karcst::herg * (1. + redsh)) << " "
-             << lum[k] * (1. + redsh) /
-                    (4. * karcst::pi * std::pow(dist, 2.) * karcst::mjy)
-             << std::endl;
-    }
-
-    file.close();
-}
-*/
 // Same as above but for particle distributions
 void plot_write(size_t size, const std::vector<double> &p, const std::vector<double> &g,
                 const std::vector<double> &pdens, const std::vector<double> &gdens,

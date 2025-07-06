@@ -45,11 +45,6 @@ void Neutrinos_pp::set_neutrinos_pp(double pspec, double gammap_min, double gamm
     double pp_targets = target_protons(ntot_prot, nwind, plfrac);
     double Epcode_max = gammap_max * constants::pmgm * constants::cee * constants::cee *
                         constants::erg * 1.e-12;    // The proton energy in TeV
-    // std::cout<<"*****************************"<<std::endl;
-    // // std::cout<<"Epmax : "<<gammap_max*pmgm*cee*cee*erg<<" eV"<<std::endl;
-    // std::cout<<"Epmax : "<<Epcode_max<<" TeV"<<std::endl;
-    // // std::cout<<"Evmax : "<<en_phot[size-1]*erg*1e-12<<" ΤeV"<<std::endl;
-    // std::cout<<"*****************************"<<std::endl;
 
     int N = 60;    // Steps of the secondary particle (e.g., pion) energy
     double xmin = 1.e-3,
@@ -121,7 +116,7 @@ void Neutrinos_pp::set_neutrinos_pp(double pspec, double gammap_min, double gamm
             Phiv = 1.e-100;
         }
         num_phot[j] = Phiv * constants::herg * vol * Ev;    // erg/s/Hz per segment
-        en_phot_obs[j] = en_phot[j] * dopfac;               //*dopfac;
+        en_phot_obs[j] = en_phot[j] * dopfac;               // *dopfac;
         num_phot_obs[j] =
             num_phot[j] * pow(dopfac,
                               dopnum);    // dopfac*dopfac;			//L'_v' -> L_v
@@ -217,9 +212,9 @@ double distr_pp(double lEv, double lEpi, std::string_view flavor) {
               (7. * rmasses * rmasses - 4. * rmasses * rmasses * rmasses + 7. * k * rmasses -
                4. * k * rmasses * rmasses - 2. * k * k - 4. * k * k * rmasses);
 
-        /* The function f_v is given by equation 36 from Kelner et al. 2006 and
-           is: f_e(x) = g_v*H(x-r) + (h_v1(x) + h_v2(x))*H(r-x), with H(y) the
-           Heaviside function.*/
+        // The function f_v is given by equation 36 from Kelner et al. 2006 and
+        // is: f_e(x) = g_v*H(x-r) + (h_v1(x) + h_v2(x))*H(r-x), with H(y) the
+        // Heaviside function.
         if (k >= rmasses) {    // H(x-r) = 1 and H(r-x) = 0.
             fve = gn;
         } else {    // H(x-r) = 0 and H(r-x) = 1.
@@ -276,14 +271,14 @@ double secondary_spectrum(double Ep, double y, std::string_view flavor) {
         }
         Fvespec = Fv1 + Fv2;
     } else if (flavor.compare("electron") == 0) {
-        double Betae, be, yke; /* The sub-functions that describe the function F_ve(x,E_p)
-                                  that implies the number of elec neutrinos in the interval
-                                  (x,x+dx) per collision. In particular, eqs. 63-65 from
-                                  Kelner et al. 2006:*/
+        double Betae, be, yke;    // The sub-functions that describe the function F_ve(x,E_p)
+                                  // that implies the number of elec neutrinos in the interval
+                                  // (x,x+dx) per collision. In particular, eqs. 63-65 from
+                                  // Kelner et al. 2006.
 
-        /* The sub-functions that describe the function F_e(x,E_p) that implies
-         the number of electrons in the interval (x,x+dx) per collision. In
-         particular, eq. 63 from Kelner et al. 2006:*/
+        // The sub-functions that describe the function F_e(x,E_p) that implies
+        // the number of electrons in the interval (x,x+dx) per collision. In
+        // particular, eq. 63 from Kelner et al. 2006:
         Betae = 1. / (69.5 + 2.65 * L + .3 * L * L);
         be = 1.0 / pow((.201 + .062 * L + .00041 * L * L),
                        .25);    // Eq. 64 from K06.

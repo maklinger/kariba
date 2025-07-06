@@ -236,7 +236,6 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
 
     double logx;
 
-    // std::cout<<"\n\n";
     for (size_t i = 0; i < ntarg; i++) {    // lx = log10(hv/mec2) of target photons with energy hv
         lx[i] = log10(targ_en[i] / constants::emerg);
         if (targ_lum[i] == 0.) {
@@ -244,9 +243,7 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
         } else {
             lL[i] = log10(targ_lum[i]);
         }
-        // std::cout<<"("<<lx[i]<<","<<lL[i]<<") ";
     }
-    // std::cout<<"\n";
 
     // We interpolate over the targets
     gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
@@ -280,9 +277,7 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
         } else {
             lL[i] = log10(targ_lum[i]);
         }
-        // std::cout<<"("<<lx[i]<<","<<lL[i]<<") ";
     }
-    // std::cout<<"\n";
 
     // We interpolate over the targets
     gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
@@ -316,9 +311,6 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     double eta_min = 1.10;      // min η
     double nu_min = en_perseg[0] / constants::herg;            // the min freq of photon targets
     double nu_max = en_perseg[nphot - 1] / constants::herg;    // the max freq of photon targets
-    // double *freq	= new double[nphot];		//frequency of photons
-    // per segment in Hz double *Uphot	= new double[nphot];		//diff
-    // energy density per segment in #/cm3/erg
     double freq[nphot];     // frequency of photons per segment in Hz
     double Uphot[nphot];    // diff energy density per segment in #/cm3/erg
 
@@ -379,8 +371,6 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
 
     gsl_spline_free(spline_ng);
     gsl_interp_accel_free(acc_ng);
-    // delete[] freq;
-    // delete[] Uphot;
 }
 
 double Hetag(double x, void *pars) {

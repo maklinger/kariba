@@ -81,14 +81,6 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     double com_min = 0.0,
            com_max = 0.0;    // interval for inverse Compton calculation in each zone
 
-    // std::vector<double> syn_en;
-    //  sychrotron energy array for jet+counterjet summed
-    // std::vector<double> syn_lum;
-    //  synchrotron luminosity array for jet+counterjet summed
-    // std::vector<double> com_en =
-    //  compton energy array for jet+counterjet summed
-    // std::vector<double> com_lum =
-    //  compton luminosity array for jet+counterjet summed
     std::vector<double> tot_en(ne, 0.0);    // energy arrray for sum of all
                                             // zones and/or components
     std::vector<double> tot_syn_pre(ne,

@@ -142,8 +142,6 @@ int main() {
     std::cout << "Proton power: " << Pp << "\n";
     std::cout << "Total power: " << Pj << " erg s^-1, " << Pj / Eddlum << " Eddington\n";
 
-    // system("python3 Singlezone.py");
-
     gsl_spline_free(spline_eldis), gsl_interp_accel_free(acc_eldis);
 
     return 0;

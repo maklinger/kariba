@@ -52,8 +52,6 @@ int main([[maybe_unused]] int argc, char *argv[]) {
     double end = omp_get_wtime();
     std::cout << "Total running time: " << end - start << " seconds\n";
 
-    // system("python3 Plot_separate.py");
-
     return EXIT_SUCCESS;
 }    // ----------  end of function main  ----------
 

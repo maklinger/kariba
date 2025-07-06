@@ -297,7 +297,7 @@ double Powerlaw::set_normprot(double nprot) {
 //! normalization and γ array
 void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield, double plfrac,
                          double Uradjet) {
-    /* if plfrac_p>0, namely a frac of thermal of protons accelerate*/
+    // if plfrac_p>0, namely a frac of thermal of protons accelerate
     // plnormprot is in #/cm3/erg/sec and gdens is in #/cm3/gamma_p
     if (isEfficient) {
         double plnormprot = set_normprot(protdens) * plfrac * constants::cee / r;
@@ -334,9 +334,9 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
 // if (Lumsw == 1)
 void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, double pspec,
                                double &protdens) {
-    /*Sets the normalization of the accelerated protons assuming that a fraction
-    --ep--  of the jet power goes into the proton acceleration, unless Emax<Emin
-    so set to zero */
+    // Sets the normalization of the accelerated protons assuming that a fraction
+    // --ep--  of the jet power goes into the proton acceleration, unless Emax<Emin
+    // so set to zero
     if (isEfficient) {
         double G_jet = 1. / sqrt(1. - beta * beta);    // bulk Lorentz factor
         double plnormprot;                             // in #/cm3
@@ -369,7 +369,7 @@ void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, do
 }
 
 void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
-    /* If mass-loading, I use the specific enthalpy to work the normalisation */
+    // If mass-loading, I use the specific enthalpy to work the normalisation
     if (isEfficient) {
         double gpmax =
             sqrt(pmax * pmax / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
@@ -511,7 +511,7 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, dou
 void Powerlaw::set_pg_electrons(const std::vector<double> &energy,
                                 const std::vector<double> &density, double f_beta, double r,
                                 double vol, double B) {
-    /* the density is in erg/s/Hz (because it's a Radiation object)*/
+    // the density is in erg/s/Hz (because it's a Radiation object)
     double tcool;    // cooling time to account for synchrotron losses
     for (size_t i = 0; i < gamma.size(); i++) {
         gamma[i] = energy[i] / constants::emerg;
@@ -582,7 +582,8 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_nu
             tgg_ee[i] = r / (constants::cee * .652 * (x * x - 1.) / pow(x, 3) * log(x));
         }
 
-        tcharg = pow(constants::cee / r + /*1./tgICS +*/ 1. / tgg_ee[i], -1);
+        // tcharg = pow(constants::cee / r + 1. / tgICS + 1. / tgg_ee[i], -1);
+        tcharg = pow(constants::cee / r + 1. / tgg_ee[i], -1);
         Ngamma[i] *= tcharg / tgg_ee[i];    // photons taken into account for γγ->ee
         logNgamma[i] = log10(Ngamma[i]);
     }
@@ -629,14 +630,6 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_nu
 
     // we free the space occupied for interpolation
     gsl_spline_free(spline_lNg), gsl_interp_accel_free(acc_lNg);
-
-    // we delete the arrays created in this function
-    //  delete[] logx;
-    //  delete[] logNgamma,	delete[] Ngamma;
-    //  delete[] tgg_ee;	//delete[] tgg_ee2;
-
-    //	ggannihilationFile.close();
-    //	attenuatedFile.close();
 }
 
 //! simple method to check quantities.
