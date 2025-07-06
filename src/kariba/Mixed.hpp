@@ -61,11 +61,4 @@ class Mixed : public Particles {
     void test();
 };
 
-class Mixed2 : public Mixed {
-  public:
-    Mixed2(int s);
-    void set_p(double ucom, double bfield, double betaeff, double r, double fsc);
-    void set_p(double gmax);
-};
-
 }    // namespace kariba

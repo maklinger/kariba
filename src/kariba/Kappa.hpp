@@ -31,9 +31,4 @@ class Kappa : public Particles {
     void test();
 };
 
-class Kappa2 : public Kappa {
-    void set_p(double ucom, double bfield, double betaeff, double r, double fsc);
-    void set_p(double max);
-};
-
 }    // namespace kariba
