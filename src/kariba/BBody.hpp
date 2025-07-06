@@ -6,7 +6,7 @@ namespace kariba {
 
 //! Class black body photons, inherited from Radiation.hh
 class BBody : public Radiation {
-  private:
+  protected:
     double Tbb;
     double Lbb;
     double normbb;

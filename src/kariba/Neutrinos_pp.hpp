@@ -10,7 +10,6 @@
 namespace kariba {
 
 class Neutrinos_pp : public Radiation {
-    //	private:
   public:
     Neutrinos_pp(size_t size, double Emin, double Emax);
 

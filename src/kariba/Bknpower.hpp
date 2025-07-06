@@ -7,7 +7,7 @@ namespace kariba {
 //! Class for non-thermal particles, inherited from the generic Particles class
 //! in Particles.hpp note: ndens is number density per unit momentum
 class Bknpower : public Particles {
-  private:
+  protected:
     double pspec1, pspec2, norm;
     double pmin, pbrk, pmax;
 

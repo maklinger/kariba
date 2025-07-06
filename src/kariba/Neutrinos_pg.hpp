@@ -26,7 +26,6 @@ struct HetaParams {
 };
 
 class Neutrinos_pg : public Radiation {
-    //	private:
   public:
     Neutrinos_pg(size_t, double Emin, double Emax);
 

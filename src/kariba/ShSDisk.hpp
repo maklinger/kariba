@@ -6,7 +6,7 @@ namespace kariba {
 
 //! Class Shakura-Sunyeav disk, inherited from Radiation.hpp
 class ShSDisk : public Radiation {
-  private:
+  protected:
     double Tin;        //!< Disk temperature at R=Rin in Kev
     double Mbh, Rg;    //!< Black hole mass in solar masses
     double Ldisk;      //!< Disk luminosity in Eddington units

@@ -8,7 +8,7 @@ namespace kariba {
 
 //! Class inverse Compton, inherited from Radiation.hpp
 class Compton : public Radiation {
-  private:
+  protected:
     size_t seed_size;    //!< size of seed photon field
     int Niter;           //!< number of IC iterations
     double tau, ypar;    //!< optical depth/comtpon Y of emitting region

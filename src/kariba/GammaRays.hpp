@@ -26,7 +26,6 @@ struct HetagParams {
 };
 
 class Grays : public Radiation {
-    //	private:
   public:
     Grays(size_t size, double numin, double numax);
 
