@@ -44,7 +44,7 @@ OBJECTS = $(MAIN_OBJ) $(PARTICLE_OBJ) $(RADIATION_OBJ) $(DISTRIBUTIONS_OBJ) $(PO
 all: main
 
 main: $(OBJECTS)
-	$(LD) $(LDFLAGS) $(LDLIBS) -o $(TEST_MAIN) $(OBJECTS) $(LIBKARIBA)
+	$(LD) $(LDFLAGS) -o $(TEST_MAIN) $(OBJECTS) $(LIBKARIBA) $(LDLIBS)
 
 
 %.o: %.cpp doctest.h
