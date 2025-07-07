@@ -231,8 +231,8 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
                  size_t ntarg, const std::vector<double> &targ_en,
                  const std::vector<double> &targ_lum) {
 
-    double lx[ntarg];    // log10 of targ_en[]/emerg
-    double lL[ntarg];    // log10 of Luminosity of targets in erg/s/Hz
+    std::vector<double> lx(ntarg, 0.0);    // log10 of targ_en[]/emerg
+    std::vector<double> lL(ntarg, 0.0);    // log10 of Luminosity of targets in erg/s/Hz
 
     double logx;
 
@@ -248,7 +248,7 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
     // We interpolate over the targets
     gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
     gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
-    gsl_spline_init(spline_targ, lx, lL, ntarg);
+    gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
         logx = log10(en_perseg[i] / constants::emerg);
@@ -311,8 +311,8 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     double eta_min = 1.10;      // min η
     double nu_min = en_perseg[0] / constants::herg;            // the min freq of photon targets
     double nu_max = en_perseg[nphot - 1] / constants::herg;    // the max freq of photon targets
-    double freq[nphot];     // frequency of photons per segment in Hz
-    double Uphot[nphot];    // diff energy density per segment in #/cm3/erg
+    std::vector<double> freq(nphot, 0.0);     // frequency of photons per segment in Hz
+    std::vector<double> Uphot(nphot, 0.0);    // diff energy density per segment in #/cm3/erg
 
     double dopfac_cj;
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
@@ -327,7 +327,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     // Interpolation for jet photon distribution
     gsl_interp_accel *acc_ng = gsl_interp_accel_alloc();
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
-    gsl_spline_init(spline_ng, freq, Uphot, nphot);
+    gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
     deta = log10(eta_max / eta_min) / static_cast<double>(N - 1);
     size_t size = en_phot.size();
