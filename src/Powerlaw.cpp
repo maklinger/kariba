@@ -25,10 +25,10 @@ void Powerlaw::set_p(double min, double ucom, double bfield, double betaeff, dou
     pmin = min;
     pmax = max_p(ucom, bfield, betaeff, r, fsc);
 
-    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + i * pinc);
+        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
         gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
@@ -37,10 +37,10 @@ void Powerlaw::set_p(double min, double gmax) {
     pmin = min;
     pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + i * pinc);
+        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
         gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
@@ -162,13 +162,14 @@ void Powerlaw::set_energy(double gpmin, double fsc, double f_beta, double bfield
     } else {
         isEfficient = true;
         gpmax = fsc;
-        logdgp = log10(2. * gpmax / gpmin) /
-                 (gamma.size() - 1);    // so as to extend a bit further from γ_p,max
+        logdgp =
+            log10(2. * gpmax / gpmin) /
+            static_cast<double>(gamma.size() - 1);    // so as to extend a bit further from γ_p,max
         check_secondary_charged_syn(bfield, gpmax);
     }
 
     for (size_t i = 0; i < gamma.size(); i++) {
-        gamma[i] = pow(10., (log10(gpmin) + i * logdgp));
+        gamma[i] = pow(10., (log10(gpmin) + static_cast<double>(i) * logdgp));
         p[i] = sqrt(gamma[i] * gamma[i] - 1.) * mass_gr * constants::cee;
     }
     pmin = p[0];
@@ -215,18 +216,20 @@ void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta, doubl
     gpmax = Epmax / (constants::pmgm * constants::cee * constants::cee) + 1.;
     if (Epmax > constants::pmgm * constants::cee * constants::cee) {
         isEfficient = true;
-        logdgp = log10(2. * gpmax / gpmin) /
-                 (gamma.size() - 1);    // so as to extend a bit further from γ_p,max
+        logdgp =
+            log10(2. * gpmax / gpmin) /
+            static_cast<double>(gamma.size() - 1);    // so as to extend a bit further from γ_p,max
     } else {
         isEfficient = false;
-        logdgp = log10(10.) / (gamma.size() - 1);    // make an array between 1 and 10 GeV
+        logdgp = log10(10.) /
+                 static_cast<double>(gamma.size() - 1);    // make an array between 1 and 10 GeV
     }
     if (infosw >= 2) {
         std::string filepath =
             outputConfiguration + "/Output/Particles/timescales_" + source + ".dat";
         timescalesFile.open(filepath, std::ios::app);
         for (size_t i = 0; i < gamma.size(); i++) {
-            gp = pow(10., (log10(gpmin) + i * logdgp));
+            gp = pow(10., (log10(gpmin) + static_cast<double>(i) * logdgp));
             betap = sqrt(gp * gp - 1.) / gp;
             tescape = r / (constants::cee * betap * f_beta);
 
@@ -454,7 +457,8 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, dou
 
     // Loop for every electron energy
     for (size_t j = 0; j < gamma.size(); j++) {
-        gamma[j] = pow(10., log10(gmin) + j * log10(gmax / gmin) / (gamma.size() - 1));
+        gamma[j] = pow(10., log10(gmin) + static_cast<double>(j) * log10(gmax / gmin) /
+                                              static_cast<double>(gamma.size() - 1));
         Ee = gamma[j] * constants::emerg * constants::erg * 1.e-12;    // in TeV
         if (Ee < transition) {
             Epimin = Ee + constants::mpionTeV * constants::mpionTeV / (4. * Ee);
@@ -462,7 +466,8 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, dou
             dw = (log10(Epimax / Epimin)) / (N - 1);
             sum = 0.;
             for (size_t i = 0; i < N; i++) {
-                lEpi = log10(Epimin) + i * dw;    // The exponent of the pion energy.
+                lEpi = log10(Epimin) +
+                       static_cast<double>(i) * dw;    // The exponent of the pion energy.
                 Ep = constants::mprotTeV +
                      pow(10., lEpi) / constants::Kpi;    // The mass of the proton in TeV.
                 sinel = sigma_pp(Ep);
@@ -481,7 +486,7 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, dou
         } else if ((Ee >= transition) && (Ee <= Epcode_max)) {
             sum = 0.;
             for (size_t i = 0; i < N; i++) {    // The loop over all pion energies.
-                y = ymin + i * dy;
+                y = ymin + static_cast<double>(i) * dy;
                 Ep = pow(10., (log10(Ee) - y));    // Proton enrergy in TeV.
                 if (Ep <= Epcode_max) {
                     sinel = sigma_pp(Ep);
@@ -594,7 +599,8 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_nu
     gsl_spline_init(spline_lNg, logx.data(), logNgamma.data(), phot_number);
 
     for (size_t i = 0; i < gamma.size(); i++) {
-        gamma[i] = pow(10., log10(gmin) + i * log10(gmax / gmin) / (gamma.size() - 1));
+        gamma[i] = pow(10., log10(gmin) + static_cast<double>(i) * log10(gmax / gmin) /
+                                              static_cast<double>(gamma.size() - 1));
         Eg = log10(2. * gamma[i]);    // 2γ from MK95
 
         if (Eg >= logx[1] && Eg <= logx[phot_number - 1]) {

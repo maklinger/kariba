@@ -466,10 +466,10 @@ void Compton::set_tau(double _tau) { tau = _tau; }
 
 //! Method to set up the frequency array over desired range
 void Compton::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / (en_phot.size() - 1);
+    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
+        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
     }
 }
 

@@ -18,10 +18,8 @@ TEST_CASE("Radiation base class functionality") {
 
         SUBCASE("Basic disk parameters") {
             double mbh = 10.0;    // 10 solar masses
-            double rin =
-                10.0 * karcst::gconst * mbh * karcst::msun / karcst::cee_cee;
-            double rout =
-                1e4 * karcst::gconst * mbh * karcst::msun / karcst::cee_cee;
+            double rin = 10.0 * karcst::gconst * mbh * karcst::msun / karcst::cee_cee;
+            double rout = 1e4 * karcst::gconst * mbh * karcst::msun / karcst::cee_cee;
             double ldisk = 1e-4;    // Eddington units
 
             disk.set_mbh(mbh);
@@ -56,7 +54,7 @@ TEST_CASE("Radiation base class functionality") {
             const std::vector<double> &nphot = disk.get_nphot_obs();
 
             bool has_positive_flux = false;
-            for (int i = 0; i < disk.get_size(); i++) {
+            for (size_t i = 0; i < disk.get_size(); i++) {
                 CHECK(energy[i] > 0.0);
                 if (nphot[i] > 0.0) {
                     has_positive_flux = true;
@@ -67,10 +65,8 @@ TEST_CASE("Radiation base class functionality") {
 
         SUBCASE("Disk geometry and beaming") {
             disk.set_mbh(10.0);
-            disk.set_rin(10.0 * karcst::gconst * 10.0 * karcst::msun /
-                         karcst::cee_cee);
-            disk.set_rout(1e4 * karcst::gconst * 10.0 * karcst::msun /
-                          karcst::cee_cee);
+            disk.set_rin(10.0 * karcst::gconst * 10.0 * karcst::msun / karcst::cee_cee);
+            disk.set_rout(1e4 * karcst::gconst * 10.0 * karcst::msun / karcst::cee_cee);
             disk.set_luminosity(1e-4);
 
             // Test different inclination angles
@@ -105,7 +101,7 @@ TEST_CASE("Radiation base class functionality") {
             // Check that all energies are positive and increasing
             bool increasing = true;
             bool has_positive_flux = false;
-            for (int i = 0; i < bbody.get_size(); i++) {
+            for (size_t i = 0; i < bbody.get_size(); i++) {
                 CHECK(energy[i] > 0.0);
                 if (i > 0 && energy[i] <= energy[i - 1]) {
                     increasing = false;
@@ -143,8 +139,8 @@ TEST_CASE("Synchrotron radiation") {
         gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
         gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma().data(),
-                        electrons.get_gdens().data(), 100);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        100);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
                         electrons.get_gdens_diff().data(), 100);
 
@@ -160,8 +156,7 @@ TEST_CASE("Synchrotron radiation") {
             double gmin = electrons.get_gamma()[0];
             double gmax_actual = electrons.get_gamma()[99];
 
-            CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin, gmax_actual,
-                                                 spline_eldis, acc_eldis,
+            CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis,
                                                  spline_deriv, acc_deriv));
 
             CHECK(!syncro.get_energy().empty());
@@ -170,7 +165,7 @@ TEST_CASE("Synchrotron radiation") {
             // Check for positive flux somewhere
             const std::vector<double> &nphot = syncro.get_nphot();
             bool has_flux = false;
-            for (int i = 0; i < syncro.get_size(); i++) {
+            for (size_t i = 0; i < syncro.get_size(); i++) {
                 if (nphot[i] > 0.0) {
                     has_flux = true;
                 }
@@ -193,8 +188,7 @@ TEST_CASE("Synchrotron radiation") {
             double gmin = electrons.get_gamma()[0];
             double gmax_actual = electrons.get_gamma()[99];
 
-            CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin, gmax_actual,
-                                                 spline_eldis, acc_eldis,
+            CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis,
                                                  spline_deriv, acc_deriv));
         }
 
@@ -233,8 +227,8 @@ TEST_CASE("Inverse Compton scattering") {
         gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
         gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma().data(),
-                        electrons.get_gdens().data(), 100);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        100);
 
         SUBCASE("Basic Compton scattering") {
             double radius = 1e15;    // cm
@@ -245,14 +239,13 @@ TEST_CASE("Inverse Compton scattering") {
             compton.set_tau(1e-3, temp_kev);
 
             // Use disk as seed photon field
-            compton.shsdisk_seed(disk.get_energy(), disk.tin(), disk.rin(),
-                                 disk.rin() * 100, disk.hdisk(), 0.0);
+            compton.shsdisk_seed(disk.get_energy(), disk.tin(), disk.rin(), disk.rin() * 100,
+                                 disk.hdisk(), 0.0);
 
             double gmin = electrons.get_gamma()[0];
             double gmax = electrons.get_gamma()[99];
 
-            CHECK_NOTHROW(
-                compton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis));
+            CHECK_NOTHROW(compton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis));
 
             CHECK(!compton.get_energy().empty());
             CHECK(!compton.get_nphot().empty());
@@ -265,14 +258,13 @@ TEST_CASE("Inverse Compton scattering") {
             compton.set_tau(0.1, temp_kev);    // Higher optical depth
             compton.set_niter(5);              // Multiple scatterings
 
-            compton.shsdisk_seed(disk.get_energy(), disk.tin(), disk.rin(),
-                                 disk.rin() * 100, disk.hdisk(), 0.0);
+            compton.shsdisk_seed(disk.get_energy(), disk.tin(), disk.rin(), disk.rin() * 100,
+                                 disk.hdisk(), 0.0);
 
             double gmin = electrons.get_gamma()[0];
             double gmax = electrons.get_gamma()[99];
 
-            CHECK_NOTHROW(
-                compton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis));
+            CHECK_NOTHROW(compton.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis));
         }
 
         // Cleanup
@@ -306,16 +298,15 @@ TEST_CASE("Inverse Compton scattering") {
         gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
         gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma().data(),
-                        electrons.get_gdens().data(), 100);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        100);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
                         electrons.get_gdens_diff().data(), 100);
 
         double gmin = electrons.get_gamma()[0];
         double gmax_actual = electrons.get_gamma()[99];
 
-        syncro.cycsyn_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis,
-                               spline_deriv, acc_deriv);
+        syncro.cycsyn_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis, spline_deriv, acc_deriv);
 
         // Now set up SSC using synchrotron photons as seed
         ssc.set_frequency(1e20, 1e28);
@@ -325,8 +316,7 @@ TEST_CASE("Inverse Compton scattering") {
 
         ssc.cyclosyn_seed(syncro.get_energy(), syncro.get_nphot());
 
-        CHECK_NOTHROW(
-            ssc.compton_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis));
+        CHECK_NOTHROW(ssc.compton_spectrum(gmin, gmax_actual, spline_eldis, acc_eldis));
 
         // Cleanup
         gsl_spline_free(spline_eldis);
@@ -351,8 +341,8 @@ TEST_CASE("Radiation consistency checks") {
         CHECK(total_lum > 0.0);
 
         // Stefan-Boltzmann check (approximately)
-        double expected_lum = 4.0 * karcst::pi * pow(1e10, 2.0) *
-                              karcst::sbconst * pow(5000.0, 4.0);
+        double expected_lum =
+            4.0 * karcst::pi * pow(1e10, 2.0) * karcst::sbconst * pow(5000.0, 4.0);
 
         // Should be within reasonable range (integration limits matter)
         CHECK(total_lum / expected_lum > 0.01);

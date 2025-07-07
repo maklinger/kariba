@@ -54,8 +54,8 @@ typedef struct jet_enpars {
 
 // Structure including distance grid calculations
 typedef struct grid_pars {
-    int nz;         // total number of zones
-    int cut;        // zone counter after which grid switched to logarithmic spacing
+    size_t nz;      // total number of zones
+    size_t cut;     // zone counter after which grid switched to logarithmic spacing
     double zcut;    // distance at which grid switched to log spacing
 } grid_pars;
 
@@ -99,7 +99,7 @@ void plot_write(size_t size, const std::vector<double> &p, const std::vector<dou
                 const std::vector<double> &pdens, const std::vector<double> &gdens,
                 const std::string &path);
 
-bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Ucom, double velsw,
+bool Compton_check(bool IsShock, size_t i, double Mbh, double Nj, double Ucom, double velsw,
                    zone_pars &zone);
 
 void sum_counterjet(size_t size, const std::vector<double> &input_en,
@@ -124,7 +124,7 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline);
 void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en);
 void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en);
 
-void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z);
+void jetgrid(size_t i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z);
 void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
                 gsl_spline *spline, gsl_interp_accel *acc);
 void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
@@ -139,6 +139,6 @@ void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone, double &udt
 
 void clean_file(std::string path, int check);
 void jetinterp(std::vector<double> &ear, std::vector<double> &energ, std::vector<double> &phot,
-               std::vector<double> &photar, int ne, int newne);
+               std::vector<double> &photar, size_t ne, size_t newne);
 
 void ebl_atten_gil(int size, std::vector<double> &en, std::vector<double> &lum, double redsh);

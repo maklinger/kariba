@@ -96,10 +96,10 @@ void ShSDisk::set_luminosity(double L) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot_obs[i] = pow(10., log10(emin) + i * einc);
+        en_phot_obs[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;
         num_phot_obs[i] = 0.;
@@ -115,10 +115,10 @@ void ShSDisk::set_tin_kev(double T) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot_obs[i] = pow(10., log10(emin) + i * einc);
+        en_phot_obs[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;
         num_phot_obs[i] = 0.;
@@ -133,10 +133,10 @@ void ShSDisk::set_tin_k(double T) {
     Hratio = std::max(0.1, Ldisk);
     emin = 0.0001 * constants::kboltz * Tin;
     emax = 30. * constants::kboltz * Tin;
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot_obs[i] = pow(10., log10(emin) + i * einc);
+        en_phot_obs[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot[i] = en_phot_obs[i];
         num_phot[i] = 0.;
         num_phot_obs[i] = 0.;

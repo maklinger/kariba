@@ -16,10 +16,10 @@ void BBody::set_temp_kev(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + i * einc);
+        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }
@@ -32,10 +32,10 @@ void BBody::set_temp_k(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + i * einc);
+        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }
@@ -48,10 +48,10 @@ void BBody::set_temp_hz(double nu) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / (en_phot.size() - 1);
+    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + i * einc);
+        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }

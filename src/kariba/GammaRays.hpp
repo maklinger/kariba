@@ -38,7 +38,7 @@ class Grays : public Radiation {
                       gsl_spline *spline_Jp);
 
     void set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp,
-                      std::vector<double> &nu_per_seg, std::vector<double> &ng_per_seg, int ne);
+                      std::vector<double> &nu_per_seg, std::vector<double> &ng_per_seg, size_t ne);
 };
 
 //! Adds up in the lum_perseg the target photon luminosity (in erg/sec/Hz)

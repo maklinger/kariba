@@ -10,7 +10,7 @@ namespace karcst = kariba::constants;
 TEST_CASE("Bknpower tests") {
     SUBCASE("Simple Bknpower usage") {
 
-        int nel = 50;
+        size_t nel = 50;
         double gmax = 1e3;
         double s = 2.0;
         double pbreak = 8.65822e-17;
@@ -30,7 +30,6 @@ TEST_CASE("Bknpower tests") {
         CHECK(bknpower.count_particles() > 0.0);
 
         // Test cooling
-        CHECK_NOTHROW(
-            bknpower.cooling_steadystate(0.0, 1.0, bfield, R, beta_exp));
+        CHECK_NOTHROW(bknpower.cooling_steadystate(0.0, 1.0, bfield, R, beta_exp));
     }
 }

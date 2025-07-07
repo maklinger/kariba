@@ -14,8 +14,8 @@ namespace karcst = kariba::constants;
 
 int main() {
 
-    int nel = 100;      // array size for particle distributions
-    int nfreq = 100;    // array size for frequency arrays
+    size_t nel = 100;      // array size for particle distributions
+    size_t nfreq = 100;    // array size for frequency arrays
 
     // Input parameters:
     double Mbh;

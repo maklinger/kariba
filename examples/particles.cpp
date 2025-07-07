@@ -13,7 +13,7 @@ namespace karcst = kariba::constants;
 
 int main() {
 
-    int nel = 200;    // array size for particle distributions
+    size_t nel = 200;    // array size for particle distributions
 
     // Set the radius of the emitting regions in cm, the electron temperature,
     // the maximum Lorenz factor, magnetic field in the emitting region,

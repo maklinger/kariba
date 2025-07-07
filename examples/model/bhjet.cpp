@@ -156,8 +156,8 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     compar3 = param[23];
     compsw = param[24];
     velsw = param[25];
-    infosw = param[26];
-    EBLsw = param[27];
+    infosw = static_cast<int>(param[26]);
+    EBLsw = static_cast<int>(param[27]);
     zmin = 2. * Rg;
 
     if (infosw >= 1) {
@@ -547,7 +547,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
             syn_max = 50. * pow(gmax, 2.) * karcst::charg * zone.bfield /
                       (2. * karcst::pi * karcst::emgm * karcst::cee);
         }
-        nsyn = (size_t) (int(log10(syn_max) - log10(syn_min)) * syn_res);
+        nsyn = (size_t) (log10(syn_max) - log10(syn_min)) * syn_res;
         std::vector<double> syn_en(nsyn, 0.0);
         std::vector<double> syn_lum(nsyn, 0.0);
         kariba::Cyclosyn Syncro(nsyn);
@@ -555,7 +555,7 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
 
         com_min = 0.1 * Syncro.nu_syn();
         com_max = ear[ne - 1] / karcst::hkev;
-        ncom = (size_t) (int(log10(com_max) - log10(com_min)) * com_res);
+        ncom = (size_t) (log10(com_max) - log10(com_min)) * com_res;
         std::vector<double> com_en(ncom, 0.0);
         std::vector<double> com_lum(ncom, 0.0);
         kariba::Compton InvCompton(ncom, nsyn);
