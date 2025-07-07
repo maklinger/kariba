@@ -126,7 +126,5 @@ int main() {
     plot_write(nel, bkndist.get_p(), bkndist.get_gamma(), bkndist.get_pdens(), bkndist.get_gdens(),
                "Output/bkndist_cool.dat");
 
-    // system("python3 Particles.py");
-
     return 0;
 }

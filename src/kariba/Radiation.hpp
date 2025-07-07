@@ -86,10 +86,15 @@ class Radiation {
     Radiation(size_t size);
 
     const std::vector<double> &get_energy() const { return en_phot; }
+
     const std::vector<double> &get_nphot() const { return num_phot; }
+
     const std::vector<double> &get_energy_obs() const { return en_phot_obs; }
+
     const std::vector<double> &get_nphot_obs() const { return num_phot_obs; }
+
     int get_size() const { return size; }
+
     double get_volume() const { return vol; }
 
     double integrated_luminosity(double numin, double numax);

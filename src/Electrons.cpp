@@ -19,15 +19,16 @@ double multiplicity(double pspec) {
     }
     return ntilde;
 }
+
 double prob() {
 
-    int N = 20, i;                  //!< The steps of integration.
-    double r = .573;                //!< r = 1-λ = m_μ^2/m_p^2 = 0.573.
-    double xmin = 0., xmax = 1.;    //!< x = E_{particle}/E_p.
+    int N = 20, i;                  // The steps of integration.
+    double r = .573;                // r = 1-λ = m_μ^2/m_p^2 = 0.573.
+    double xmin = 0., xmax = 1.;    // x = E_{particle}/E_p.
     double x, dx = (xmax - xmin) / (N - 1);
-    double gn, hn1, hn2, fe; /*!< The energy distribution/probability f_e of electrons as a
-                                function of gn, hn1, hn2 (equations 36-39 from Kelner et al.
-                                2006).	*/
+    double gn, hn1, hn2, fe;    // The energy distribution/probability f_e of electrons as a
+                                // function of gn, hn1, hn2 (equations 36-39 from Kelner et al.
+                                // 2006).
     double sum = 0.;
     double Bprob;
 
@@ -53,13 +54,14 @@ double prob() {
 
     return Bprob;
 }
+
 double elec_dist_pp(double zen, double w) {
 
-    double rmasses = .573;       //!< r = 1-λ = m_μ^2/m_p^2 = 0.573.The ratio of muon
-                                 //!< and proton energies.
-    double yk;                   //!< x = E_e / E_pion  from Kelner et al. 2006.
-    double gn, hn1, hn2, fe;     /*!< The energy distribution/probability f_e of electrons as a
-                                    function of gn, hn1, hn2 (eqs. 36-39 from  Kelner et al. 2006):*/
+    double rmasses = .573;       // r = 1-λ = m_μ^2/m_p^2 = 0.573.The ratio of muon
+                                 // and proton energies.
+    double yk;                   // x = E_e / E_pion  from Kelner et al. 2006.
+    double gn, hn1, hn2, fe;     // The energy distribution/probability f_e of electrons as a
+                                 // function of gn, hn1, hn2 (eqs. 36-39 from  Kelner et al. 2006).
     yk = pow(10., (zen - w));    // x = E_e/E_pion from Kelner.
     gn = (3. - 2. * rmasses) / (9. * (1. - rmasses) * (1. - rmasses)) *
          (9. * yk * yk - 6. * log(yk) - 4. * yk * yk * yk -
@@ -71,9 +73,9 @@ double elec_dist_pp(double zen, double w) {
           (9. * (rmasses + yk) -
            4. * (rmasses * rmasses + rmasses * yk + yk * yk));    // Eq 39 from K06.
 
-    /* The function f_e is given by equation 36 from Kelner et al. 2006 and is:
-       f_e(x) = g_v*H(x-r) + (h_v1(x) + h_v2(x))*H(r-x), with H(y) the Heaviside
-       function.*/
+    // The function f_e is given by equation 36 from Kelner et al. 2006 and is:
+    // f_e(x) = g_v*H(x-r) + (h_v1(x) + h_v2(x))*H(r-x), with H(y) the Heaviside
+    // function.
     if (yk >= rmasses) {    // H(x-r) = 1 and H(r-x) = 0.
         fe = gn;
     } else {    // H(x-r) = 0 and H(r-x) = 1.
@@ -82,19 +84,20 @@ double elec_dist_pp(double zen, double w) {
 
     return fe;
 }
+
 double elec_spec_pp(double Ep, double y) {
 
-    double L = log(Ep);    //!< L = ln(Ep/1TeV) as definied in Kelner et al. 2006
-                           //!< for the cross section
-    double Betae, be, yke; /*!< The sub-functions that describe the function F_e(x,E_p) that
-                              implies the number of electrons in the interval (x,x+dx) per
-                              collision. In particular, eqs. 63-65 from Kelner et al. 2006:*/
-    double Fespec;         /*!< The spectrum of secondary electrons from pion decay.
-                              Equation 62 from Kelner et al. 2006*/
+    double L = log(Ep);       // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
+                              // for the cross section
+    double Betae, be, yke;    // The sub-functions that describe the function F_e(x,E_p) that
+                              // implies the number of electrons in the interval (x,x+dx) per
+                              // collision. In particular, eqs. 63-65 from Kelner et al. 2006:
+    double Fespec;            // The spectrum of secondary electrons from pion decay.
+                              // Equation 62 from Kelner et al. 2006
 
-    /* The sub-functions that describe the function F_e(x,E_p) that implies the
-     number of electrons in the interval (x,x+dx) per collision. In particular,
-     eq. 63 from Kelner et al. 2006:*/
+    // The sub-functions that describe the function F_e(x,E_p) that implies the
+    // number of electrons in the interval (x,x+dx) per collision. In particular,
+    // eq. 63 from Kelner et al. 2006.
     Betae = 1. / (69.5 + 2.65 * L + .3 * L * L);
     be = 1.0 / pow((.201 + .062 * L + .00041 * L * L), .25);    // Eq. 64 from K06.
 
@@ -107,6 +110,7 @@ double elec_spec_pp(double Ep, double y) {
              (-y * log(10.)) * (-y * log(10.)) * (-y * log(10.));
     return Fespec;
 }
+
 //***********************************************************************************************************
 
 double production_rate(double ge, double x) {    // from Coppi & Blandford 1990

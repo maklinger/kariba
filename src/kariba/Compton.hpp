@@ -8,20 +8,17 @@ namespace kariba {
 
 //! Class inverse Compton, inherited from Radiation.hpp
 class Compton : public Radiation {
-  private:
-    size_t seed_size;    //!< size of seed photon field
-    int Niter;           //!< number of IC iterations
-    double tau, ypar;    //!< optical depth/comtpon Y of emitting region
-    double rphot;        //!< photospheric radius when tau > 1, used to renormalize
-    //!< volume
-    double escape_corr;    //!< escape term, used to renormalize our spectra to
-    //!< CompPS
+  protected:
+    size_t seed_size;      //!< size of seed photon field
+    int Niter;             //!< number of IC iterations
+    double tau, ypar;      //!< optical depth/comtpon Y of emitting region
+    double rphot;          //!< photospheric radius when tau > 1, used to renormalize volume
+    double escape_corr;    //!< escape term, used to renormalize our spectra to CompPS
 
     std::vector<double> seed_energ;    //!< array of seed frequencies in Hz
-    std::vector<double> seed_urad;     //!< array of seed photon number density in
-    //!< log10(#/erg/cm^3)
-    std::vector<double> iter_urad;    //!< array of iterated photon number density in
-    //!< log10(#/erg/cm^3)
+    std::vector<double> seed_urad;     //!< array of seed photon number density in log10(#/erg/cm^3)
+    std::vector<double>
+        iter_urad;    //!< array of iterated photon number density in log10(#/erg/cm^3)
 
     gsl_spline *seed_ph;           //!< interpolation of photon field array seed_urad
     gsl_interp_accel *acc_seed;    //!< accelerator for above spline
@@ -46,7 +43,6 @@ class Compton : public Radiation {
     double comintegral(int it, double blim, double ulim, double nu, double numin, double numax,
                        gsl_spline *eldis, gsl_interp_accel *acc_eldis);
     void compton_spectrum(double gmin, double gmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis);
-    // double compton_spectrum_parallel();//WIP
 
     void cyclosyn_seed(const std::vector<double> &seed_arr, const std::vector<double> &seed_lum);
     void bb_seed_k(const std::vector<double> &seed_arr, double Urad, double Tbb);
@@ -63,6 +59,7 @@ class Compton : public Radiation {
     void seed_freq_array(const std::vector<double> &seed_energ);
 
     double get_tau() const { return tau; };
+
     double get_ypar() const { return ypar; };
 
     void reset();

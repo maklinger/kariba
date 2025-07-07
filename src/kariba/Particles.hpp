@@ -89,7 +89,6 @@ class Particles {
 
   public:
     Particles(size_t size);
-    ~Particles();
 
     void set_mass(double m);
     void initialize_gdens();
@@ -97,17 +96,14 @@ class Particles {
     void gdens_differentiate();
 
     const std::vector<double> &get_p() const { return p; }
-    const std::vector<double> &get_pdens() const { return ndens; }
-    const std::vector<double> &get_gamma() const { return gamma; }
-    const std::vector<double> &get_gdens() const { return gdens; }
-    const std::vector<double> &get_gdens_diff() const { return gdens_diff; }
-    // std::vector<double>& get_p() { return p; }
-    // std::vector<double>& get_pdens() { return ndens; }
-    // std::vector<double>& get_gamma() { return gamma; }
-    // std::vector<double>& get_gdens() { return gdens; }
-    // std::vector<double>& get_gdens_diff() { return gdens_diff; }
 
-    // double beta(int i);  // todo: not implemented!
+    const std::vector<double> &get_pdens() const { return ndens; }
+
+    const std::vector<double> &get_gamma() const { return gamma; }
+
+    const std::vector<double> &get_gdens() const { return gdens; }
+
+    const std::vector<double> &get_gdens_diff() const { return gdens_diff; }
 
     double count_particles();
     double count_particles_energy();

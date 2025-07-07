@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <fenv.h>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -12,16 +13,20 @@
 #include <string>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 void read_params(const std::string &path, std::vector<double> &pars);
 
 extern void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
-                      std::vector<double> &phot, std::vector<double> &photar,
-                      size_t ne, size_t newne);
-extern void jetmain(std::vector<double> &ear, size_t ne,
-                    std::vector<double> &param, std::vector<double> &photeng,
-                    std::vector<double> &photspec);
+                      std::vector<double> &phot, std::vector<double> &photar, size_t ne,
+                      size_t newne);
+extern void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
+                    std::vector<double> &photeng, std::vector<double> &photspec);
 
-int main() {
+int main([[maybe_unused]] int argc, char *argv[]) {
+    // set input path file relative to executable
+    fs::path input_path = argv[0];
+    input_path.replace_filename("Input/ip.dat");
 
     double start = omp_get_wtime();
 
@@ -40,14 +45,12 @@ int main() {
         ebins[i] = pow(10, (emin + i * einc));
     }
 
-    read_params("Input/ip.dat", param);
+    read_params(input_path, param);
 
     jetmain(ebins, ne - 1, param, spec, dumarr);
 
     double end = omp_get_wtime();
     std::cout << "Total running time: " << end - start << " seconds\n";
-
-    // system("python3 Plot_separate.py");
 
     return EXIT_SUCCESS;
 }    // ----------  end of function main  ----------
@@ -64,15 +67,13 @@ void read_params(const std::string &path, std::vector<double> &pars) {
     std::string line;
     int line_nb = 0;
     if (!inFile) {
-        std::cerr << "Can't open input file\n";
+        std::cerr << "Can't open input file: " << path << "\n";
         exit(1);
     }
     while (getline(inFile, line)) {
         // Remove whitespace from the beginning of the line
-        line.erase(line.begin(),
-                   std::find_if(line.begin(), line.end(), [](unsigned char c) {
-                       return !std::isspace(c);
-                   }));
+        line.erase(line.begin(), std::find_if(line.begin(), line.end(),
+                                              [](unsigned char c) { return !std::isspace(c); }));
         if (line[0] == '#') {
             continue;
         } else {

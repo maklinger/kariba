@@ -19,7 +19,9 @@ jobs:
 
        - name: Build Doxygen Documentation
          working-directory: ./docs
-         run: doxygen Doxyfile
+         run: |
+           doxygen Doxyfile
+           touch ./html/.nojekyll  # Prevent Jekyll processing of special files & dirs
 
        - name: Deploy to GitHub Pages
          uses: peaceiris/actions-gh-pages@v4

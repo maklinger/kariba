@@ -6,7 +6,7 @@ namespace kariba {
 
 //! Class for thermal particles. ndens is number density per unit momentum
 class Thermal : public Particles {
-  private:
+  protected:
     double Temp, thnorm, theta;
 
   public:
