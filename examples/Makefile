@@ -14,9 +14,10 @@ else
 endif
 
 
+CXXFLAGS += $(OPENMP)
 CPPFLAGS = $(GSL_CPPFLAGS) -I${KARIBA}
 LD = $(CXX)
-LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
+LDFLAGS = $(OPENMP) $(GSL_LDFLAGS)
 LDLIBS = -lgsl -lm
 RM = rm -f
 

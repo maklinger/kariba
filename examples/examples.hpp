@@ -7,11 +7,14 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <omp.h>
 #include <sstream>
 #include <stdarg.h>
 #include <string>
 #include <vector>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include <gsl/gsl_const_cgsm.h>
 #include <gsl/gsl_const_num.h>

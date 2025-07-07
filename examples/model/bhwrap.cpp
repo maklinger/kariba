@@ -8,10 +8,19 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <omp.h>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#ifdef _OPENMP
+#include <omp.h>
+#else
+double omp_get_wtime() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + ts.tv_nsec / 1e9;
+}
+#endif
 
 namespace fs = std::filesystem;
 

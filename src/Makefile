@@ -11,9 +11,10 @@ else
 endif
 
 
+CXXFLAGS += $(OPENMP)
 CPPFLAGS = $(GSL_CPPFLAGS)
 LD = $(CXX)
-LDFLAGS = -fPIC -fopenmp $(GSL_LDFLAGS)
+LDFLAGS = $(OPENMP) $(GSL_LDFLAGS)
 LDLIBS = -lgsl
 AR = ar
 AR_OPTS = rcs
