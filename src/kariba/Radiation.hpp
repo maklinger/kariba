@@ -68,7 +68,6 @@ struct DiskIcParams {
 //! Base class for photon/neutrino distributions
 class Radiation {
   protected:
-    size_t size;                         //!< M size of arrays
     std::vector<double> en_phot;         //!< array of photon energies
     std::vector<double> num_phot;        //!< array of number of photons in units of erg/s/Hz
     std::vector<double> en_phot_obs;     //!< same as above but in observer frame
@@ -93,7 +92,7 @@ class Radiation {
 
     const std::vector<double> &get_nphot_obs() const { return num_phot_obs; }
 
-    size_t get_size() const { return size; }
+    size_t get_size() const { return en_phot.size(); }
 
     double get_volume() const { return vol; }
 

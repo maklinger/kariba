@@ -642,7 +642,7 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_nu
 void Powerlaw::test() {
     std::cout << "Power-law distribution;" << std::endl;
     std::cout << "pspec: " << pspec << std::endl;
-    std::cout << "Array size: " << size << std::endl;
+    std::cout << "Array size: " << p.size() << std::endl;
     std::cout << "Default normalization: " << plnorm << std::endl;
     std::cout << "Particle mass in grams: " << mass_gr << std::endl;
 }

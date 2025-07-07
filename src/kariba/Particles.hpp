@@ -75,8 +75,6 @@ struct InjectionBknParams {
 //! non-thermal and mixed distributions
 class Particles {
   protected:
-    size_t size;
-
     double mass_gr;     //!< particle mass in grams
     double mass_kev;    //!< same as above but in keV, using electrons as "reference"
 
