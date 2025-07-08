@@ -17,7 +17,7 @@ endif
 CXXFLAGS += $(OPENMP)
 CPPFLAGS = -I${GSL}/include -I${KARIBA} -I.
 LD = $(CXX)
-LDFLAGS = -L${GSL}/lib $(OPENMP)
+LDFLAGS = -L${GSL}/lib $(OPENMP) $(EXTRA_LDFLAGS)
 LDLIBS = -lgsl -lm
 RM = rm -f
 
