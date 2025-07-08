@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include <gsl/gsl_integration.h>
@@ -24,36 +25,36 @@ void Mixed::set_p(double ucom, double bfield, double betaeff, double r, double f
     pmin_pl = av_th_p();
     pmax_pl = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax_th);
 
-    double pinc = (log10(pmax_pl) - log10(pmin_th)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax_pl) - std::log10(pmin_th)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin_th) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin_th) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 //! Same as above, but assuming a fixed maximum Lorentz factor
 void Mixed::set_p(double gmax) {
     pmin_pl = av_th_p();
-    pmax_pl = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax_pl = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax_pl) - log10(pmin_th)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax_pl) - std::log10(pmin_th)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin_th) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin_th) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 void Mixed::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
         if (p[i] <= pmin_pl) {
-            ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta);
+            ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta);
         } else if (p[i] < pmax_th) {
-            ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta) +
-                       plnorm * pow(p[i], -pspec) * exp(-p[i] / pmax_pl);
+            ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta) +
+                       plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl);
         } else {
-            ndens[i] = plnorm * pow(p[i], -pspec) * exp(-p[i] / pmax_pl);
+            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl);
         }
     }
     initialize_gdens();
@@ -71,8 +72,8 @@ void Mixed::set_temp_kev(double T) {
 
     gmin_th = emin_th / mass_kev + 1.;
     gmax_th = emax_th / mass_kev + 1.;
-    pmin_th = pow(pow(gmin_th, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-    pmax_th = pow(pow(gmax_th, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmin_th = std::pow(std::pow(gmin_th, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax_th = std::pow(std::pow(gmax_th, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 void Mixed::set_pspec(double s1) { pspec = s1; }
@@ -83,24 +84,25 @@ void Mixed::set_plfrac(double Le, double r, double eldens) {
     double gpmax =
         sqrt(pmax_pl * pmax_pl / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
     double sum = 0;
-    double dx = log10(gamma[2] / gamma[1]);
+    double dx = std::log10(gamma[2] / gamma[1]);
     for (size_t i = 0; i < p.size(); i++) {
-        sum += log(10.) * pow(gamma[i], -pspec + 2.) * exp(-gamma[i] / gpmax) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 2.) * std::exp(-gamma[i] / gpmax) * dx;
     }
     double Ue = Le / (constants::pi * r * r * constants::cee);
     double K = std::max(Ue / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
     sum = 0.;
     for (size_t i = 0; i < gamma.size(); i++) {
-        sum += log(10.) * pow(gamma[i], -pspec + 1.) * exp(-gamma[i] / gpmax) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 1.) * std::exp(-gamma[i] / gpmax) * dx;
     }
     double n_nth = K * sum;
     plfrac = n_nth / eldens;
 }
 
 void Mixed::set_norm(double n) {
-    thnorm = (1. - plfrac) * n / (pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
-    plnorm = plfrac * n * (1. - pspec) / (pow(pmax_pl, (1. - pspec)) - pow(pmin_pl, (1. - pspec)));
+    thnorm = (1. - plfrac) * n / (std::pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
+    plnorm = plfrac * n * (1. - pspec) /
+             (std::pow(pmax_pl, (1. - pspec)) - std::pow(pmin_pl, (1. - pspec)));
 }
 
 //! Injection function to be integrated in cooling
@@ -115,30 +117,30 @@ double injection_mixed_int(double x, void *pars) {
     double max = params->max;
     double cutoff = params->cutoff;
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
     if (x <= min) {
-        return nth * pow(mom_int, 2.) * exp(-x / t);
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / t);
     } else if (x < max) {
-        return nth * pow(mom_int, 2.) * exp(-x / t) +
-               npl * pow(mom_int, -s) * exp(-mom_int / cutoff);
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / t) +
+               npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
     } else {
-        return npl * pow(mom_int, -s) * exp(-mom_int / cutoff);
+        return npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
     }
 }
 
 //! Method to solve steady state continuity equation. NOTE: KN cross section not
 //! included in IC cooling
 void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r, double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     double pdot_ad = betaeff * constants::cee / r;
-    double pdot_rad =
-        (4. * constants::sigtom * constants::cee * Urad) / (3. * mass_gr * pow(constants::cee, 2.));
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * std::pow(constants::cee, 2.));
     double tinj = r / constants::cee;
 
     double gam_min, gam_max;
-    gam_min = pow(pow(pmin_pl / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
-    gam_max = pow(pow(pmax_th / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    gam_min = std::pow(std::pow(pmin_pl / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    gam_max = std::pow(std::pow(pmax_th / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     double integral, error;
     gsl_function F1;
@@ -160,7 +162,7 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
                                      pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[ndens.size() - 1] =
-                ndens[ndens.size() - 2] * pow(p[p.size() - 1] / p[p.size() - 2], -pspec - 1);
+                ndens[ndens.size() - 2] * std::pow(p[p.size() - 1] / p[p.size() - 2], -pspec - 1);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -185,7 +187,7 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
 //! acceleration and cooling timescales
 double Mixed::max_p(double ucom, double bfield, double betaeff, double r, double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     escom = betaeff * constants::cee / r;
     syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
     accon = (3. * fsc * constants::charg * bfield) / (4. * mass_gr * constants::cee);
@@ -193,9 +195,9 @@ double Mixed::max_p(double ucom, double bfield, double betaeff, double r, double
     b = escom / syncon;
     c = accon / syncon;
 
-    gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
+    gmax = (-b + std::pow(std::pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    return std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 //! Evaluate Bessel function for MJ normalization
@@ -218,9 +220,9 @@ double th_num_dens_int(double x, void *pars) {
     double n = params->n;
     double m = params->m;
 
-    double gam_int = pow(pow(x / (m * constants::cee), 2.) + 1., 1. / 2.);
+    double gam_int = std::pow(std::pow(x / (m * constants::cee), 2.) + 1., 1. / 2.);
 
-    return n * pow(x, 2.) * exp(-gam_int / t);
+    return n * std::pow(x, 2.) * std::exp(-gam_int / t);
 }
 
 double av_th_p_int(double x, void *pars) {
@@ -229,9 +231,9 @@ double av_th_p_int(double x, void *pars) {
     double n = params->n;
     double m = params->m;
 
-    double gam_int = pow(pow(x / (m * constants::cee), 2.) + 1., 1. / 2.);
+    double gam_int = std::pow(std::pow(x / (m * constants::cee), 2.) + 1., 1. / 2.);
 
-    return n * pow(x, 3.) * exp(-gam_int / t);
+    return n * std::pow(x, 3.) * std::exp(-gam_int / t);
 }
 
 double Mixed::count_th_particles() {
@@ -267,7 +269,7 @@ double Mixed::av_th_gamma() {
     double avp;
     avp = av_th_p();
 
-    return pow(pow(avp / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    return std::pow(std::pow(avp / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 }
 
 //! Methods to calculate number density and average energy in non-thermal part
@@ -276,7 +278,7 @@ double pl_num_dens_int(double x, void *pars) {
     double s = params->s;
     double n = params->n;
 
-    return n * pow(x, -s);
+    return n * std::pow(x, -s);
 }
 
 double av_pl_p_int(double x, void *pars) {
@@ -284,7 +286,7 @@ double av_pl_p_int(double x, void *pars) {
     double s = params->s;
     double n = params->n;
 
-    return n * pow(x, -s + 1.);
+    return n * std::pow(x, -s + 1.);
 }
 
 double Mixed::count_pl_particles() {
@@ -320,7 +322,7 @@ double Mixed::av_pl_gamma() {
     double avp;
     avp = av_pl_p();
 
-    return pow(pow(avp / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    return std::pow(std::pow(avp / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 }
 
 //! simple method to check quantities.

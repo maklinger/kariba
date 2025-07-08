@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include <gsl/gsl_integration.h>
@@ -23,24 +24,24 @@ void Bknpower::set_p(double min, double brk, double ucom, double bfield, double 
     pbrk = brk;
     pmax = max_p(ucom, bfield, betaeff, r, fsc);
 
-    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 void Bknpower::set_p(double min, double brk, double gmax) {
     pmin = min;
     pbrk = brk;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -48,8 +49,8 @@ void Bknpower::set_p(double min, double brk, double gmax) {
 //! normalization, and momentum array
 void Bknpower::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
-        ndens[i] = norm * pow(p[i] / pbrk, -pspec1) / (1. + pow(p[i] / pbrk, -pspec1 + pspec2)) *
-                   exp(-p[i] / pmax);
+        ndens[i] = norm * std::pow(p[i] / pbrk, -pspec1) /
+                   (1. + std::pow(p[i] / pbrk, -pspec1 + pspec2)) * std::exp(-p[i] / pmax);
     }
     initialize_gdens();
     gdens_differentiate();
@@ -72,16 +73,17 @@ double norm_bkn_int(double x, void *pars) {
     double max = params->max;
     double m = params->m;
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    return pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) * exp(-mom_int / max);
+    return std::pow(mom_int / brk, -s1) / (1. + std::pow(mom_int / brk, -s1 + s2)) *
+           std::exp(-mom_int / max);
 }
 
 void Bknpower::set_norm(double n) {
     double norm_integral, error, min, max;
 
-    min = pow(pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
-    max = pow(pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    min = std::pow(std::pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    max = std::pow(std::pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     gsl_integration_workspace *w1;
     w1 = gsl_integration_workspace_alloc(100);
@@ -105,19 +107,20 @@ double injection_bkn_int(double x, void *pars) {
     double m = params->m;
     double n = params->n;
 
-    double mom_int = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    return n * pow(mom_int / brk, -s1) / (1. + pow(mom_int / brk, -s1 + s2)) * exp(-mom_int / max);
+    return n * std::pow(mom_int / brk, -s1) / (1. + std::pow(mom_int / brk, -s1 + s2)) *
+           std::exp(-mom_int / max);
 }
 
 //! Method to solve steady state continuity equation. NOTE: KN cross section not
 //! included in IC cooling
 void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double r,
                                    double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     double pdot_ad = betaeff * constants::cee / r;
-    double pdot_rad =
-        (4. * constants::sigtom * constants::cee * Urad) / (3. * mass_gr * pow(constants::cee, 2.));
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * std::pow(constants::cee, 2.));
     double tinj = r / (constants::cee);
 
     double integral, error;
@@ -139,7 +142,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double
                                      pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[p.size() - 1] =
-                ndens[p.size() - 2] * pow(p[p.size() - 1] / p[p.size() - 2], -pspec2 - 1);
+                ndens[p.size() - 2] * std::pow(p[p.size() - 1] / p[p.size() - 2], -pspec2 - 1);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -167,7 +170,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double
 //! old version
 double Bknpower::max_p(double ucom, double bfield, double betaeff, double r, double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     escom = betaeff * constants::cee / r;
     syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
     accon = (3. * fsc * constants::charg * bfield) / (4. * mass_gr * constants::cee);
@@ -175,9 +178,9 @@ double Bknpower::max_p(double ucom, double bfield, double betaeff, double r, dou
     b = escom / syncon;
     c = accon / syncon;
 
-    gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
+    gmax = (-b + std::pow(std::pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    return std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 //! simple method to check quantities.

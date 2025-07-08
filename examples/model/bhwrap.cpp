@@ -51,7 +51,7 @@ int main([[maybe_unused]] int argc, char *argv[]) {
     std::vector<double> dumarr(ne - 1, 0.0);
 
     for (size_t i = 0; i < ne; i++) {
-        ebins[i] = pow(10, (emin + static_cast<double>(i) * einc));
+        ebins[i] = std::pow(10, (emin + static_cast<double>(i) * einc));
     }
 
     read_params(input_path, param);

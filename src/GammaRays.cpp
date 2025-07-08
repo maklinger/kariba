@@ -3,6 +3,7 @@ Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 *************************************************************************************************************/
 
 #include <array>
+#include <cmath>
 
 #include <gsl/gsl_integration.h>
 
@@ -31,9 +32,10 @@ Grays::Grays(size_t size, double numin, double numax) : Radiation(size) {
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
     size_t lsize = en_phot.size();
-    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(lsize - 1);
+    double nuinc = (std::log10(numax) - std::log10(numin)) / static_cast<double>(lsize - 1);
     for (size_t i = 0; i < lsize; i++) {
-        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
+        en_phot[i] =
+            std::pow(10., std::log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + lsize] = en_phot[i];
     }
@@ -78,8 +80,8 @@ void Grays::set_grays_pp(double p, double gammap_min, double gammap_max, double 
     double dopfac_cj;
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
-    ymin = log10(xmin);
-    ymax = log10(xmax);
+    ymin = std::log10(xmin);
+    ymax = std::log10(xmax);
     dy = (ymax - ymin) / (N - 1);
 
     transition = 0.10;    // The transition between delta approximation and
@@ -90,34 +92,34 @@ void Grays::set_grays_pp(double p, double gammap_min, double gammap_max, double 
         Eg = en_phot[j] * 1.0e-12 * constants::erg;
         if (Eg < transition) {    // Delta approximation for distribution
             Epimin = Eg + constants::mpionTeV * constants::mpionTeV /
-                              (4. * Eg);              // The min pion energy in TeV for the integral
-            Epimax = 1.e6;                            // The max pion energy in Tev for the integral
-            dw = log10(Epimax / Epimin) / (N - 1);    // The logarithmic step with which the pion
-                                                      // energy increases.
+                              (4. * Eg);    // The min pion energy in TeV for the integral
+            Epimax = 1.e6;                  // The max pion energy in Tev for the integral
+            dw = std::log10(Epimax / Epimin) / (N - 1);    // The logarithmic step with which the
+                                                           // pion energy increases.
             sum = 0.;
             for (int i = 1; i < N; i++) {    // I am using 1 instead of 0 because I get a weird
                                              // spine otherwise
                                              // at x~10^-4 (production of particles from protons
                                              // with total energy less than the rest mass --
                                              // impossible)
-                w = log10(Epimin) + i * dw;
-                Ep = constants::mprotTeV + pow(10., w) / constants::Kpi;
+                w = std::log10(Epimin) + i * dw;
+                Ep = constants::mprotTeV + std::pow(10., w) / constants::Kpi;
                 sinel = sigma_pp(Ep);
                 Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp, acc_Jp);
                 qpi = 2. * ntilde / constants::Kpi * sinel *
                       Jp;    // The production rate of neutral pions
-                Fpi = qpi * pow(10., w) /
-                      sqrt(pow(10., (2. * w)) -
+                Fpi = qpi * std::pow(10., w) /
+                      sqrt(std::pow(10., (2. * w)) -
                            constants::mpionTeV * constants::mpionTeV);    // eq 78 in Kelner+2006
                 sum += dw * Fpi;
             }
             Phig = constants::cee * pp_targets * sum * constants::mbarn *
-                   log(10.);    // dNg/dEg in #/TeV/cm3/sec
+                   std::log(10.);    // dNg/dEg in #/TeV/cm3/sec
         } else if ((Eg > transition) && (Eg <= Epcode_max)) {
             sum = 0.;
             for (int i = 1; i < N; i++) {
                 y = ymin + (i - 1) * dy;
-                Ep = pow(10., (log10(Eg) - y));
+                Ep = std::pow(10., (std::log10(Eg) - y));
                 if ((Ep >= 0.1) && (Ep <= Epcode_max)) {
                     sinel = sigma_pp(Ep);
                     Jp = proton_dist(gammap_min, Ep, Epcode_max, spline_Jp, acc_Jp);
@@ -126,18 +128,18 @@ void Grays::set_grays_pp(double p, double gammap_min, double gammap_max, double 
                 }
             }
             Phig = constants::cee * pp_targets * sum * constants::mbarn *
-                   log(10.);    // dNg/dEg in #/TeV/cm3/sec
+                   std::log(10.);    // dNg/dEg in #/TeV/cm3/sec
         }    // end of if argument for Eg<0.1 or Eg>0.1.
         else {    // in case the energy of the photon fails the limits ==> no
                   // gamma-rays are produced
             Phig = 1.e-50;
         }
-        num_phot[j] = Phig * constants::herg * vol * Eg;        // erg/s/Hz per segment
-        en_phot_obs[j] = en_phot[j] * dopfac;                   //*dopfac;
-        num_phot_obs[j] = num_phot[j] * pow(dopfac, dopnum);    //*dopfac;	//L'_v' -> L_v
+        num_phot[j] = Phig * constants::herg * vol * Eg;             // erg/s/Hz per segment
+        en_phot_obs[j] = en_phot[j] * dopfac;                        //*dopfac;
+        num_phot_obs[j] = num_phot[j] * std::pow(dopfac, dopnum);    //*dopfac;	//L'_v' -> L_v
         if (counterjet == true) {
             en_phot_obs[j + size] = en_phot[j] * dopfac_cj;
-            num_phot_obs[j + size] = num_phot[j] * pow(dopfac_cj, dopnum);
+            num_phot_obs[j + size] = num_phot[j] * std::pow(dopfac_cj, dopnum);
         }
     }    // end of loop for photon energies
 }    // End of function that produces the gamma-rays produced by neutral pion
@@ -179,14 +181,14 @@ double sigma_pp(double Ep) {    // cross section of pp in mb (that's why I
                                 // multiply with 1.e-27 at Phie)
 
     double Ethres = 1.22e-3;    // threshold energy (in TeV) for pp interactions (= 1.22GeV)
-    double L = log(Ep);         // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
+    double L = std::log(Ep);    // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
                                 // for the cross section
     double sinel;               // σ_inel in mb
 
     sinel = 1.e-50;
     if (Ep >= Ethres) {
-        sinel = (34.3 + 1.88 * L + 0.25 * L * L) * (1. - pow((Ethres / Ep), 4)) *
-                (1. - pow((Ethres / Ep), 4));
+        sinel = (34.3 + 1.88 * L + 0.25 * L * L) * (1. - std::pow((Ethres / Ep), 4)) *
+                (1. - std::pow((Ethres / Ep), 4));
     }
     return sinel;
 }
@@ -205,25 +207,26 @@ double proton_dist(double gpmin, double Ep, double Epcode_max, gsl_spline *splin
 
 double gspec_pp(double Ep, double y) {
 
-    double L = log(Ep);    // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
-                           // for the cross section
-    double Betag, bg, ykg; /* The sub-functions that describe the function F_e(x,E_p) that
-                              implies the number of electrons in the interval (x,x+dx) per
-                              collision. In particular, eqs. 59-61 from Kelner et al. 2006.*/
-    double Fg;             // The spectrum of gamma-rays produced from pion decay. Eq 58
-                           // from Kelner +06
+    double L = std::log(Ep);    // L = ln(Ep/1TeV) as definied in Kelner et al. 2006
+                                // for the cross section
+    double Betag, bg, ykg;      /* The sub-functions that describe the function F_e(x,E_p) that
+                                   implies the number of electrons in the interval (x,x+dx) per
+                                   collision. In particular, eqs. 59-61 from Kelner et al. 2006.*/
+    double Fg;                  // The spectrum of gamma-rays produced from pion decay. Eq 58
+                                // from Kelner +06
 
     Betag = 1.30 + 0.14 * L + 0.011 * L * L;
     bg = 1.0 / (1.79 + 0.11 * L + 0.008 * L * L);
     ykg = 1.0 / (0.801 + 0.049 * L + 0.014 * L * L);
 
-    Fg = Betag * y * log(10.) / (pow(10., y)) *
-         pow(((1. - pow(10., (y * bg))) /
-              (1. + ykg * pow(10., (y * bg)) * (1. - pow(10., (y * bg))))),
-             4) *
-         (1. / (y * log(10.)) - (4. * bg * pow(10., (y * bg)) / (1. - pow(10., (y * bg)))) -
-          (4. * ykg * bg * pow(10., (y * bg)) * (1. - 2. * pow(10., (y * bg)))) /
-              (1. + ykg * pow(10., (y * bg)) * (1. - pow(10., (y * bg)))));
+    Fg = Betag * y * std::log(10.) / (std::pow(10., y)) *
+         std::pow(((1. - std::pow(10., (y * bg))) /
+                   (1. + ykg * std::pow(10., (y * bg)) * (1. - std::pow(10., (y * bg))))),
+                  4) *
+         (1. / (y * std::log(10.)) -
+          (4. * bg * std::pow(10., (y * bg)) / (1. - std::pow(10., (y * bg)))) -
+          (4. * ykg * bg * std::pow(10., (y * bg)) * (1. - 2. * std::pow(10., (y * bg)))) /
+              (1. + ykg * std::pow(10., (y * bg)) * (1. - std::pow(10., (y * bg)))));
 
     return Fg;
 }
@@ -233,17 +236,18 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
                  size_t ntarg, const std::vector<double> &targ_en,
                  const std::vector<double> &targ_lum) {
 
-    std::vector<double> lx(ntarg, 0.0);    // log10 of targ_en[]/emerg
-    std::vector<double> lL(ntarg, 0.0);    // log10 of Luminosity of targets in erg/s/Hz
+    std::vector<double> lx(ntarg, 0.0);    // std::log10 of targ_en[]/emerg
+    std::vector<double> lL(ntarg, 0.0);    // std::log10 of Luminosity of targets in erg/s/Hz
 
     double logx;
 
-    for (size_t i = 0; i < ntarg; i++) {    // lx = log10(hv/mec2) of target photons with energy hv
-        lx[i] = log10(targ_en[i] / constants::emerg);
+    for (size_t i = 0; i < ntarg;
+         i++) {    // lx = std::log10(hv/mec2) of target photons with energy hv
+        lx[i] = std::log10(targ_en[i] / constants::emerg);
         if (targ_lum[i] == 0.) {
             lL[i] = -100.;
         } else {
-            lL[i] = log10(targ_lum[i]);
+            lL[i] = std::log10(targ_lum[i]);
         }
     }
 
@@ -253,10 +257,10 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
     gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
-        logx = log10(en_perseg[i] / constants::emerg);
+        logx = std::log10(en_perseg[i] / constants::emerg);
         if (logx >= lx[0] && logx <= lx[ntarg - 5]) {
             lum_perseg[i] +=
-                std::max(1.e-200, pow(10., gsl_spline_eval(spline_targ, logx, acc_targ)));
+                std::max(1.e-200, std::pow(10., gsl_spline_eval(spline_targ, logx, acc_targ)));
         }
     }
 
@@ -267,17 +271,18 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
                  std::vector<double> &lum_perseg, size_t ntarg, const std::vector<double> &targ_en,
                  const std::vector<double> &targ_lum) {
 
-    std::vector<double> lx(ntarg, 0.0);    // log10 of targ_en[]/emerg
-    std::vector<double> lL(ntarg, 0.0);    // log10 of Luminosity of targets in erg/s/Hz
+    std::vector<double> lx(ntarg, 0.0);    // std::log10 of targ_en[]/emerg
+    std::vector<double> lL(ntarg, 0.0);    // std::log10 of Luminosity of targets in erg/s/Hz
 
     double logx;
 
-    for (size_t i = 0; i < ntarg; i++) {    // lx = log10(hv/mec2) of target photons with energy hv
-        lx[i] = log10(targ_en[i] / constants::emerg);
+    for (size_t i = 0; i < ntarg;
+         i++) {    // lx = std::log10(hv/mec2) of target photons with energy hv
+        lx[i] = std::log10(targ_en[i] / constants::emerg);
         if (targ_lum[i] == 0.) {
             lL[i] = -100.;
         } else {
-            lL[i] = log10(targ_lum[i]);
+            lL[i] = std::log10(targ_lum[i]);
         }
     }
 
@@ -287,10 +292,10 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
     gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
-        logx = log10(en_perseg[i] / constants::emerg);
+        logx = std::log10(en_perseg[i] / constants::emerg);
         if (logx >= lx[0] && logx <= lx[ntarg - 5]) {
             lum_perseg[i] +=
-                std::max(1.e-200, pow(10., gsl_spline_eval(spline_targ, logx, acc_targ)));
+                std::max(1.e-200, std::pow(10., gsl_spline_eval(spline_targ, logx, acc_targ)));
         }
     }
 
@@ -331,7 +336,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
     gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
-    deta = log10(eta_max / eta_min) / static_cast<double>(N - 1);
+    deta = std::log10(eta_max / eta_min) / static_cast<double>(N - 1);
     size_t size = en_phot.size();
 #pragma omp parallel for private(eta, Hg, dNdEg)    // possibly lost: 9,424 bytes in 31 blocks
     for (size_t i = 0; i < size; i++) {             // for every produced γ ray energy
@@ -342,7 +347,8 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {
-                eta = eta_zero * (pow(10., log10(eta_min) + static_cast<double>(j) * deta));
+                eta =
+                    eta_zero * (std::pow(10., std::log10(eta_min) + static_cast<double>(j) * deta));
                 auto F1params = HetagParams{eta,    eta_zero,  Eg,     gp_min,
                                             gp_max, spline_Jp, acc_Jp,    // product,
                                             acc_ng, spline_ng, nu_min, nu_max};
@@ -354,7 +360,8 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
                     std::log10(Eg / (gp_max * constants::pmgm * constants::cee * constants::cee));
                 gsl_integration_qag(&F1, min, max, 1e0, 1e0, 100, 1, w1, &result1, &error1);
                 Hg = std::pow(constants::pmgm * constants::cee * constants::cee, 2) / 4. * result1;
-                sum += Hg * deta * eta * std::log(10.);    // todo: replace log(10) with std::M_LN10
+                sum += Hg * deta * eta *
+                       std::log(10.);    // todo: replace std::log(10) with std::M_LN10
             }
             dNdEg = sum;    // in #/erg/cm3/sec
             gsl_integration_workspace_free(w1);
@@ -364,10 +371,10 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
 
         num_phot[i] = dNdEg * constants::herg * en_phot[i] * vol;    // erg/sec/Hz
         en_phot_obs[i] = en_phot[i] * dopfac;
-        num_phot_obs[i] = num_phot[i] * pow(dopfac, dopnum);    // L'_v' -> L_v
+        num_phot_obs[i] = num_phot[i] * std::pow(dopfac, dopnum);    // L'_v' -> L_v
         if (counterjet == true) {
             en_phot_obs[i + size] = en_phot[i] * dopfac_cj;
-            num_phot_obs[i + size] = num_phot[i] * pow(dopfac_cj, dopnum);
+            num_phot_obs[i + size] = num_phot[i] * std::pow(dopfac_cj, dopnum);
         }
     }
 
@@ -396,13 +403,13 @@ double Hetag(double x, void *pars) {
     double Ep;         // proton energy Ep=x/Eg
     double fph_jet;    // number density of target photons in #/cm3/Hz
 
-    Ep = Eg / pow(10., x);
+    Ep = Eg / std::pow(10., x);
     fp = colliding_protons(spline_Jp, acc_Jp, gp_min, gp_max, Ep);
     fph_jet = photons_jet(eta, Ep, spline_ng, acc_ng, nu_min, nu_max);
     fph = fph_jet;    // all the target photons are now included into the
                       // fph_jet function
-    Phig = PhiFunc_gamma(eta, eta_zero, pow(10., x));
-    return fp * fph * Phig * log(10.) / Eg;
+    Phig = PhiFunc_gamma(eta, eta_zero, std::pow(10., x));
+    return fp * fph * Phig * std::log(10.) / Eg;
 }
 
 //************************************************************************************************************
@@ -429,7 +436,7 @@ double photons_jet(double eta, double Ep, gsl_spline *spline_ng, gsl_interp_acce
     // processes)
     double nu_g;    // the freq of the colliding photon
 
-    nu_g = eta * pow(constants::pmgm * constants::cee * constants::cee, 2) / (4. * Ep) /
+    nu_g = eta * std::pow(constants::pmgm * constants::cee * constants::cee, 2) / (4. * Ep) /
            constants::herg;    // epsilon from KA08 over herg
     if (nu_g >= nu_min && nu_g <= nu_max) {
         return gsl_spline_eval(spline_ng, nu_g, acc_ng);
@@ -459,10 +466,10 @@ double PhiFunc_gamma(double eta, double eta0, double x) {
     double y;
     y = (x - xminus) / (xplus - xminus);
     if (x > xminus && x < xplus) {
-        Phi = Beta * exp(-s * pow(log(x / xminus), delta)) *
-              pow(log(2. / (1. + y * y)), 2.5 + 0.4 * log(eta / eta0));
+        Phi = Beta * std::exp(-s * std::pow(std::log(x / xminus), delta)) *
+              std::pow(std::log(2. / (1. + y * y)), 2.5 + 0.4 * std::log(eta / eta0));
     } else if (x <= xminus) {
-        Phi = Beta * pow(log(2.), 2.5 + 0.4 * log(eta / eta0));
+        Phi = Beta * std::pow(std::log(2.), 2.5 + 0.4 * std::log(eta / eta0));
     } else {
         Phi = 1.e-100;
     }

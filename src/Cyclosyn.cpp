@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include <gsl/gsl_integration.h>
@@ -50,26 +51,26 @@ double cyclosyn_emis(double gamma, void *pars) {
     gsl_interp_accel *acc_eldis = params->acc_eldis;
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma;
-    gamma = exp(gamma);
+    gamma = std::exp(gamma);
     // this is in the synchrotron regime
     if (gamma > 2.) {
-        nu_c = (3. * constants::charg * b * pow(gamma, 2.)) /
+        nu_c = (3. * constants::charg * b * std::pow(gamma, 2.)) /
                (4. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_c;
         if (x <= 1.e-4) {
-            emisfunc = 4. * constants::pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
+            emisfunc = 4. * constants::pi * std::pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
         } else if (x > 50.) {
-            emisfunc = sqrt(constants::pi * x / 2.) * exp(-x);
+            emisfunc = sqrt(constants::pi * x / 2.) * std::exp(-x);
         } else {
-            emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
+            emisfunc = std::pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
     } else {    // cyclotron regime
         nu_larmor =
             (constants::charg * b) / (2. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_larmor;
-        psquared = pow(gamma, 2.) - 1.;
-        emisfunc =
-            (2. * psquared) / (1. + 3. * psquared) * exp((2. * (1. - x)) / (1. + 3. * psquared));
+        psquared = std::pow(gamma, 2.) - 1.;
+        emisfunc = (2. * psquared) / (1. + 3. * psquared) *
+                   std::exp((2. * (1. - x)) / (1. + 3. * psquared));
     }
 
     ngamma = gsl_spline_eval(eldis, gamma, acc_eldis);
@@ -87,30 +88,30 @@ double cyclosyn_abs(double gamma, void *pars) {
     gsl_interp_accel *acc_derivs = (params->acc_derivs);
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma_diff;
-    gamma = exp(gamma);
+    gamma = std::exp(gamma);
     // this is in the synchrotron regime
     if (gamma > 2.) {
-        nu_c = (3. * constants::charg * b * pow(gamma, 2.)) /
+        nu_c = (3. * constants::charg * b * std::pow(gamma, 2.)) /
                (4. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_c;
         if (x <= 1.e-4) {
-            emisfunc = 4. * constants::pi * pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
+            emisfunc = 4. * constants::pi * std::pow(x / 2., (1. / 3.)) / (sqrt(3.) * 2.68);
         } else if (x > 50.) {
-            emisfunc = sqrt(constants::pi * x / 2.) * exp(-x);
+            emisfunc = sqrt(constants::pi * x / 2.) * std::exp(-x);
         } else {
-            emisfunc = pow(10., gsl_spline_eval(syn, x, acc_syn));
+            emisfunc = std::pow(10., gsl_spline_eval(syn, x, acc_syn));
         }
     } else {    // cyclotron regime
         nu_larmor =
             (constants::charg * b) / (2. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_larmor;
-        psquared = pow(gamma, 2.) - 1.;
-        emisfunc =
-            (2. * psquared) / (1. + 3. * psquared) * exp((2. * (1. - x)) / (1. + 3. * psquared));
+        psquared = std::pow(gamma, 2.) - 1.;
+        emisfunc = (2. * psquared) / (1. + 3. * psquared) *
+                   std::exp((2. * (1. - x)) / (1. + 3. * psquared));
     }
     ngamma_diff = gsl_spline_eval(derivs, gamma, acc_derivs);
 
-    return ngamma_diff * pow(gamma, 2.) * emisfunc;
+    return ngamma_diff * std::pow(gamma, 2.) * emisfunc;
 }
 
 //! Integrals of single particle emissivity/absorption coefficient over particle
@@ -124,7 +125,8 @@ double Cyclosyn::emis_integral(double nu, double gmin, double gmax, gsl_spline *
     auto F1params = CyclosynEmisParams{nu, bfield, syn_f, syn_acc, eldis, acc_eldis};
     F1.function = &cyclosyn_emis;
     F1.params = &F1params;
-    gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1, &result1, &error1);
+    gsl_integration_qag(&F1, std::log(gmin), std::log(gmax), 1e1, 1e1, 100, 2, w1, &result1,
+                        &error1);
     gsl_integration_workspace_free(w1);
 
     return result1;
@@ -139,7 +141,8 @@ double Cyclosyn::abs_integral(double nu, double gmin, double gmax, gsl_spline *d
     auto F1params = CyclosynAbsParams{nu, bfield, syn_f, syn_acc, derivs, acc_derivs};
     F1.function = &cyclosyn_abs;
     F1.params = &F1params;
-    gsl_integration_qag(&F1, log(gmin), log(gmax), 1e1, 1e1, 100, 2, w1, &result1, &error1);
+    gsl_integration_qag(&F1, std::log(gmin), std::log(gmax), 1e1, 1e1, 100, 2, w1, &result1,
+                        &error1);
     gsl_integration_workspace_free(w1);
 
     return result1;
@@ -165,7 +168,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
         }
         emis = emis_integral(en_phot[k] / constants::herg, gmin, gmax, eldis, acc_eldis);
         abs = abs_integral(en_phot[k] / constants::herg, gmin, gmax, eldis_diff, acc_eldis_diff);
-        if (log10(emis) < -50. || log10(abs) < -50.) {
+        if (std::log10(emis) < -50. || std::log10(abs) < -50.) {
             num_phot_obs[k] = 0;
             if (counterjet == true) {
                 num_phot_obs[k + size] = 0;
@@ -174,7 +177,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
             elcons = sqrt(3.) * (constants::charg * constants::charg * constants::charg) * bfield *
                      sin(pitch) / constants::emerg;
             acons = -constants::cee * constants::cee /
-                    (8. * constants::pi * pow(en_phot[k] / constants::herg, 2.));
+                    (8. * constants::pi * std::pow(en_phot[k] / constants::herg, 2.));
             asyn = acons * elcons * abs;
             epsasyn = emis / (acons * abs);
             if (geometry == "cylinder") {
@@ -183,9 +186,9 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 tsyn = constants::pi / 3. * asyn * r;
             }
             if (tsyn >= 1.) {
-                absfac = (1. - exp(-tsyn));
+                absfac = (1. - std::exp(-tsyn));
             } else {
-                absfac = tsyn - pow(tsyn, 2.) / 2. + pow(tsyn, 3.) / 6.;
+                absfac = tsyn - std::pow(tsyn, 2.) / 2. + std::pow(tsyn, 3.) / 6.;
             }
             // This includes skin depth/viewing angle effects for cylinder case
             if (geometry == "cylinder") {
@@ -194,13 +197,13 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
                 tsyn_obs = constants::pi / 3. * asyn * r;
             }
             if (tsyn_obs >= 1.) {
-                absfac_obs = (1. - exp(-tsyn_obs));
+                absfac_obs = (1. - std::exp(-tsyn_obs));
             } else {
-                absfac_obs = tsyn_obs - pow(tsyn_obs, 2.) / 2. + pow(tsyn_obs, 3.) / 6.;
+                absfac_obs = tsyn_obs - std::pow(tsyn_obs, 2.) / 2. + std::pow(tsyn_obs, 3.) / 6.;
             }
 
             num_phot[k] = constants::pi * r * r * absfac * epsasyn;
-            num_phot_obs[k] = 2. * r * z * absfac_obs * epsasyn * pow(dopfac, dopnum);
+            num_phot_obs[k] = 2. * r * z * absfac_obs * epsasyn * std::pow(dopfac, dopnum);
 
             if (counterjet == true) {
                 if (geometry == "cylinder") {
@@ -209,11 +212,13 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
                     tsyn_obs = constants::pi / 3. * asyn * r;
                 }
                 if (tsyn_obs >= 1.) {
-                    absfac_obs = (1. - exp(-tsyn_obs));
+                    absfac_obs = (1. - std::exp(-tsyn_obs));
                 } else {
-                    absfac_obs = tsyn_obs - pow(tsyn_obs, 2.) / 2. + pow(tsyn_obs, 3.) / 6.;
+                    absfac_obs =
+                        tsyn_obs - std::pow(tsyn_obs, 2.) / 2. + std::pow(tsyn_obs, 3.) / 6.;
                 }
-                num_phot_obs[k + size] = 2. * r * z * absfac_obs * epsasyn * pow(dopfac_cj, dopnum);
+                num_phot_obs[k + size] =
+                    2. * r * z * absfac_obs * epsasyn * std::pow(dopfac_cj, dopnum);
             } else {
                 num_phot_obs[k + size] = 0.;
             }
@@ -228,7 +233,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
 //! the simple way, this accounts for the fact that the peak may be caused by
 //! synchrotron self absorption rather than coinciding with the scale frequency
 double Cyclosyn::nu_syn(double gamma) {
-    return (3. * constants::charg * bfield * pow(gamma, 2.)) /
+    return (3. * constants::charg * bfield * std::pow(gamma, 2.)) /
            (4. * constants::pi * constants::emgm * constants::cee);
 }
 
@@ -246,10 +251,12 @@ double Cyclosyn::nu_syn() {
 
 //! Method to set up the frequency array over desired range
 void Cyclosyn::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(en_phot.size() - 1);
+    double nuinc =
+        (std::log10(numax) - std::log10(numin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
+        en_phot[i] =
+            std::pow(10., std::log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
     }
 }
 

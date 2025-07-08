@@ -1,4 +1,5 @@
 #include <array>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -97,9 +98,9 @@ Neutrinos_pg::Neutrinos_pg(size_t size, double Emin, double Emax) : Radiation(si
     en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
     num_phot_obs.resize(2 * num_phot_obs.size(), 0.0);
 
-    double einc = log10(Emax / Emin) / static_cast<double>(size - 1);
+    double einc = std::log10(Emax / Emin) / static_cast<double>(size - 1);
     for (size_t i = 0; i < size; i++) {
-        en_phot[i] = pow(10., log10(Emin) + static_cast<double>(i) * einc);
+        en_phot[i] = std::pow(10., std::log10(Emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + size] = en_phot[i];
     }
@@ -157,7 +158,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_steffen, nphot);
     gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
-    deta = log10(eta_max / eta_min) / (N - 1);
+    deta = std::log10(eta_max / eta_min) / (N - 1);
 #pragma omp parallel for private(eta, Hfunction,                                                   \
                                      dNdEv)          // possibly lost: 9,424 bytes in 31 blocks
     for (size_t i = 0; i < en_phot.size(); i++) {    // for every neutrino of energy en_phot[i](erg)
@@ -170,21 +171,22 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {    // eq 69 from KA08
-                eta = eta_zero * (pow(10., log10(eta_min) + static_cast<double>(j) * deta));
+                eta =
+                    eta_zero * (std::pow(10., std::log10(eta_min) + static_cast<double>(j) * deta));
                 auto F1params = HetaParams{eta,    eta_zero, Ev,     gp_min,    gp_max, spline_Jp,
                                            acc_Jp, flavor,   acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;
                 F1.params = &F1params;
                 double max =
-                    log10(Ev / (gp_min * constants::pmgm * constants::cee * constants::cee));
+                    std::log10(Ev / (gp_min * constants::pmgm * constants::cee * constants::cee));
                 double min =
-                    log10(Ev / (gp_max * constants::pmgm * constants::cee * constants::cee));
+                    std::log10(Ev / (gp_max * constants::pmgm * constants::cee * constants::cee));
                 gsl_integration_qag(&F1, min, max, 1e0, 1e0, 100, 1, w1, &result1, &error1);
                 // Have to increase to 3 to get a good shape without arificial
                 // features
-                Hfunction = pow(constants::pmgm * constants::cee * constants::cee, 2) / 4. *
+                Hfunction = std::pow(constants::pmgm * constants::cee * constants::cee, 2) / 4. *
                             result1;    // eq 70 from KA08
-                sum += Hfunction * deta * eta * log(10.);
+                sum += Hfunction * deta * eta * std::log(10.);
             }
             dNdEv = sum;    // in #/erg/cm3/sec
             gsl_integration_workspace_free(w1);
@@ -193,7 +195,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
         }
         num_phot[i] = dNdEv * constants::herg * en_phot[i] * vol;    // erg/sec/Hz
         en_phot_obs[i] = en_phot[i] * dopfac;                        //*dopfac;
-        num_phot_obs[i] = num_phot[i] * pow(dopfac, dopnum);         //*dopfac*dopfac;
+        num_phot_obs[i] = num_phot[i] * std::pow(dopfac, dopnum);    //*dopfac*dopfac;
                                                                      ////L'_v' -> L_v
     }
 
@@ -235,15 +237,15 @@ double Heta(double x, void *pars) {
     double Ep;         // proton energy Ep=x/Ee
     double fph_jet;    // number density of target photons in #/cm3/Hz
 
-    Ep = E / pow(10., x);
+    Ep = E / std::pow(10., x);
     fp = colliding_protons(spline_Jp, acc_Jp, gp_min, gp_max, Ep);
     fph_jet = photons_jet(eta, Ep, spline_ng, acc_ng, nu_min, nu_max);
     fph = fph_jet;    // all the target photons are now included into the
                       // fph_jet function
     //	double Tstar = 2.7;
     //	fph = photon_field(eta,Ep,Tstar);
-    Phi = PhiFunc(eta, eta_zero, pow(10., x), product);
-    return fp * fph * Phi * log(10.) / Ep;    // tod: replace log(10) with m_ln10
+    Phi = PhiFunc(eta, eta_zero, std::pow(10., x), product);
+    return fp * fph * Phi * std::log(10.) / Ep;    // tod: replace std::log(10) with m_ln10
 }
 
 //************************************************************************************************************
@@ -269,10 +271,10 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
         double y;
         y = (x - xminus) / (xplus - xminus);
         if (x > xminus && x < xplus) {
-            Phi = Beta * exp(-s * pow(log(x / xminus), delta)) *
-                  pow(log(2. / (1. + y * y)), 2.5 + 0.4 * log(eta / eta0));
+            Phi = Beta * std::exp(-s * std::pow(std::log(x / xminus), delta)) *
+                  std::pow(std::log(2. / (1. + y * y)), 2.5 + 0.4 * std::log(eta / eta0));
         } else if (x <= xminus) {
-            Phi = Beta * pow(log(2.), 2.5 + 0.4 * log(eta / eta0));
+            Phi = Beta * std::pow(std::log(2.), 2.5 + 0.4 * std::log(eta / eta0));
         } else {
             Phi = 1.e-100;
         }
@@ -285,17 +287,17 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
         xplusprime = xplus;                                                 // eq40 comments
         xminusprime = xminus / 2.;                                          // eq40 comments
         if (xeta >= 4.0) {
-            psi = 6. * (1. - exp(1.5 * (4. - xeta)));
+            psi = 6. * (1. - std::exp(1.5 * (4. - xeta)));
         } else {
             psi = 0.;
         }
 
         if (x < xminusprime) {    // eq33
-            Phi = Beta * pow(log(2.), psi);
+            Phi = Beta * std::pow(std::log(2.), psi);
         } else if (xminusprime <= x and x < xplusprime) {    // eq31
             yprime = (x - xminusprime) / (xplusprime - xminusprime);
-            Phi = Beta * exp(-s * pow(log(x / xminusprime), delta)) *
-                  pow(log(2. / (1. + yprime * yprime)), psi);
+            Phi = Beta * std::exp(-s * std::pow(std::log(x / xminusprime), delta)) *
+                  std::pow(std::log(2. / (1. + yprime * yprime)), psi);
         } else {
             Phi = 1.e-100;
         }
@@ -305,14 +307,14 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
         xplusprime = xplus;
         xminusprime = xminus / 4.;
 
-        psi = 2.5 + 1.4 * log(xeta);
+        psi = 2.5 + 1.4 * std::log(xeta);
 
         if (x < xminusprime) {    // eq33
-            Phi = Beta * pow(log(2.), psi);
+            Phi = Beta * std::pow(std::log(2.), psi);
         } else if (xminusprime <= x and x < xplusprime) {    // eq31
             yprime = (x - xminusprime) / (xplusprime - xminusprime);
-            Phi = Beta * exp(-s * pow(log(x / xminusprime), delta)) *
-                  pow(log(2. / (1. + yprime * yprime)), psi);
+            Phi = Beta * std::exp(-s * std::pow(std::log(x / xminusprime), delta)) *
+                  std::pow(std::log(2. / (1. + yprime * yprime)), psi);
         } else {
             Phi = 1.e-200;
         }
@@ -327,14 +329,14 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
         }
         xminusprime = 0.427 * xminus;
 
-        psi = 2.5 + 1.4 * log(xeta);
+        psi = 2.5 + 1.4 * std::log(xeta);
 
         if (x < xminusprime) {    // eq33
-            Phi = Beta * pow(log(2.), psi);
+            Phi = Beta * std::pow(std::log(2.), psi);
         } else if (xminusprime <= x and x < xplusprime) {    // eq31
             yprime = (x - xminusprime) / (xplusprime - xminusprime);
-            Phi = Beta * exp(-s * pow(log(x / xminusprime), delta)) *
-                  pow(log(2. / (1. + yprime * yprime)), psi);
+            Phi = Beta * std::exp(-s * std::pow(std::log(x / xminusprime), delta)) *
+                  std::pow(std::log(2. / (1. + yprime * yprime)), psi);
         } else {
             Phi = 1.e-200;
         }
