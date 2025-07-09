@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include "kariba/BBody.hpp"
@@ -16,10 +17,10 @@ void BBody::set_temp_kev(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
+    einc = (std::log10(emax) - std::log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
+        en_phot[i] = std::pow(10., std::log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }
@@ -32,10 +33,10 @@ void BBody::set_temp_k(double T) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
+    einc = (std::log10(emax) - std::log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
+        en_phot[i] = std::pow(10., std::log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }
@@ -48,26 +49,26 @@ void BBody::set_temp_hz(double nu) {
     emin = 0.02 * constants::kboltz * Tbb;
     emax = 30. * constants::kboltz * Tbb;
 
-    einc = (log10(emax) - log10(emin)) / static_cast<double>(en_phot.size() - 1);
+    einc = (std::log10(emax) - std::log10(emin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(emin) + static_cast<double>(i) * einc);
+        en_phot[i] = std::pow(10., std::log10(emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
     }
 }
 
 void BBody::set_lum(double L) {
     Lbb = L;
-    normbb = Lbb / (constants::sbconst * pow(Tbb, 4.));
+    normbb = Lbb / (constants::sbconst * std::pow(Tbb, 4.));
 }
 
 //! Method to set BB spectrum
 void BBody::bb_spectrum() {
     for (size_t i = 0; i < num_phot.size(); i++) {
-        num_phot[i] =
-            normbb * 2. * constants::pi * constants::herg *
-            pow(en_phot_obs[i] / constants::herg, 3.) /
-            (pow(constants::cee, 2.) * (exp(en_phot_obs[i] / (Tbb * constants::kboltz)) - 1.));
+        num_phot[i] = normbb * 2. * constants::pi * constants::herg *
+                      std::pow(en_phot_obs[i] / constants::herg, 3.) /
+                      (std::pow(constants::cee, 2.) *
+                       (std::exp(en_phot_obs[i] / (Tbb * constants::kboltz)) - 1.));
         num_phot_obs[i] = num_phot[i];
     }
 }
@@ -85,7 +86,7 @@ double BBody::lum() const { return Lbb; }
 double BBody::norm() const { return normbb; }
 
 double BBody::Urad(double d) const {
-    return Lbb / (4. * constants::pi * pow(d, 2.) * constants::cee);
+    return Lbb / (4. * constants::pi * std::pow(d, 2.) * constants::cee);
 }
 
 void BBody::test() {

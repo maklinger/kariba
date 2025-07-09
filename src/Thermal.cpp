@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include <gsl/gsl_math.h>
@@ -25,13 +26,13 @@ void Thermal::set_p() {
     gmin = emin / mass_kev + 1.;
     gmax = emax / mass_kev + 1.;
 
-    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-    pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
+    pmin = std::pow(std::pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
@@ -39,7 +40,7 @@ void Thermal::set_p() {
 //! normalization, and momentum array
 void Thermal::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
-        ndens[i] = thnorm * pow(p[i], 2.) * exp(-gamma[i] / theta);
+        ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta);
     }
     initialize_gdens();
     gdens_differentiate();
@@ -53,7 +54,7 @@ void Thermal::set_temp_kev(double T) {
 }
 
 void Thermal::set_norm(double n) {
-    thnorm = n / (pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
+    thnorm = n / (std::pow(mass_gr * constants::cee, 3.) * theta * K2(1. / theta));
 }
 
 //! Evaluate Bessel function as in old agnjet

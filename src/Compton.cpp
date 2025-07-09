@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include <gsl/gsl_integration.h>
@@ -107,7 +108,7 @@ double comfnc(double ein, void *pars) {
     double tm1, tm2, tm3;
     double btst, eg4;
 
-    einit = exp(ein);
+    einit = std::exp(ein);
     btst = einit / (game * constants::emerg);
     eg4 = 4. * einit * game;
     utst = eg4 / (constants::emerg + eg4);
@@ -118,10 +119,10 @@ double comfnc(double ein, void *pars) {
         biggam = eg4 / constants::emerg;
         q = e1 / (biggam * (1. - e1));
         phonum = gsl_spline_eval(phodis, einit, acc_phodis);
-        tm1 = 2. * q * log(q);
+        tm1 = 2. * q * std::log(q);
         tm2 = (1. + 2. * q) * (1. - q);
-        tm3 = 0.5 * (pow(biggam * q, 2.) * (1. - q)) / (1. + biggam * q);
-        return (tm1 + tm2 + tm3) * pow(10., phonum);
+        tm3 = 0.5 * (std::pow(biggam * q, 2.) * (1. - q)) / (1. + biggam * q);
+        return (tm1 + tm2 + tm3) * std::pow(10., phonum);
     }
 }
 
@@ -143,8 +144,8 @@ double comint(double gam, void *pars) {
     game = exp(gam);
     e1 = eph / (game * constants::emerg);
     econst = 2. * constants::pi * constants::re0 * constants::re0 * constants::cee;
-    blim = log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
-    ulim = log(std::min(eph, ephmax));
+    blim = std::log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
+    ulim = std::log(std::min(eph, ephmax));
 
     if (ulim <= blim) {
         return 0;
@@ -207,8 +208,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
     size_t size = en_phot.size();
     for (size_t it = 0; it < Niter; it++) {
         for (size_t i = 0; i < size; i++) {
-            blim = log(std::max(gmin, en_phot[i] / constants::emerg));
-            ulim = log(gmax);
+            blim = std::log(std::max(gmin, en_phot[i] / constants::emerg));
+            ulim = std::log(gmax);
             if (blim >= ulim) {
                 com = 1e-100;
             } else {
@@ -216,10 +217,10 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
             }
             num_phot[i] = num_phot[i] + com * vol * en_phot[i] * constants::herg;
             en_phot_obs[i] = en_phot[i] * dopfac;
-            num_phot_obs[i] = num_phot[i] * pow(dopfac, dopnum);
+            num_phot_obs[i] = num_phot[i] * std::pow(dopfac, dopnum);
             if (counterjet == true) {
                 en_phot_obs[i + size] = en_phot[i] * dopfac_cj;
-                num_phot_obs[i + size] = num_phot[i] * pow(dopfac_cj, dopnum);
+                num_phot_obs[i + size] = num_phot[i] * std::pow(dopfac_cj, dopnum);
             } else {
                 en_phot_obs[i + size] = 0.0;
                 num_phot_obs[i + size] = 0.0;
@@ -227,8 +228,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
             if (com == 0) {
                 iter_urad[i] = -50;
             } else {
-                iter_urad[i] =
-                    log10(escape_corr * com * vol / (constants::pi * pow(r, 2.) * constants::cee));
+                iter_urad[i] = std::log10(escape_corr * com * vol /
+                                          (constants::pi * std::pow(r, 2.) * constants::cee));
             }
         }
         ephmin = en_phot.front();    // [0];
@@ -249,16 +250,16 @@ void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
     for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
         if (seed_urad[i] != 0) {
-            seed_urad[i] = log10(pow(10., seed_urad[i]) +
-                                 seed_lum[i] / (constants::cee * constants::herg * seed_energ[i] *
-                                                constants::pi * r * r));
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) +
+                                      seed_lum[i] / (constants::cee * constants::herg *
+                                                     seed_energ[i] * constants::pi * r * r));
         } else if (seed_lum[i] /
                        (constants::cee * constants::herg * seed_energ[i] * constants::pi * r * r) <=
                    0) {
             seed_urad[i] = -100;
         } else {
-            seed_urad[i] = log10(seed_lum[i] / (constants::cee * constants::herg * seed_energ[i] *
-                                                constants::pi * r * r));
+            seed_urad[i] = std::log10(seed_lum[i] / (constants::cee * constants::herg *
+                                                     seed_energ[i] * constants::pi * r * r));
         }
     }
     gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
@@ -276,16 +277,16 @@ void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad, double
 
     for (size_t i = 0; i < seed_arr.size(); i++) {
         if (seed_energ[i] < ulim) {
-            bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
-                      (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
-                       pow(Tbb, 4) * (exp(seed_energ[i] / (constants::kboltz * Tbb)) - 1.));
+            bbfield = (2. * Urad * std::pow(seed_energ[i] / constants::herg, 2.)) /
+                      (constants::herg * std::pow(constants::cee, 2.) * constants::sbconst *
+                       std::pow(Tbb, 4) * (exp(seed_energ[i] / (constants::kboltz * Tbb)) - 1.));
         } else {
             bbfield = 1.e-100;
         }
         if (seed_urad[i] != 0) {
-            seed_urad[i] = log10(pow(10., seed_urad[i]) + bbfield);
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + bbfield);
         } else if (bbfield > 0) {
-            seed_urad[i] = log10(bbfield);
+            seed_urad[i] = std::log10(bbfield);
         } else {
             seed_urad[i] = -100;
         }
@@ -302,17 +303,17 @@ void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, doub
 
     for (size_t i = 0; i < seed_arr.size(); i++) {
         if (seed_energ[i] < ulim) {
-            bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
-                      (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
-                       pow(Tbb * constants::kboltz_kev2erg / constants::kboltz, 4) *
+            bbfield = (2. * Urad * std::pow(seed_energ[i] / constants::herg, 2.)) /
+                      (constants::herg * std::pow(constants::cee, 2.) * constants::sbconst *
+                       std::pow(Tbb * constants::kboltz_kev2erg / constants::kboltz, 4) *
                        (exp(seed_energ[i] / (Tbb * constants::kboltz_kev2erg)) - 1.));
         } else {
             bbfield = 1.e-100;
         }
         if (seed_urad[i] != 0) {
-            seed_urad[i] = log10(pow(10., seed_urad[i]) + bbfield);
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + bbfield);
         } else if (bbfield > 0) {
-            seed_urad[i] = log10(bbfield);
+            seed_urad[i] = std::log10(bbfield);
         } else {
             seed_urad[i] = -100;
         }
@@ -343,13 +344,13 @@ double disk_integral(double alfa, void *pars) {
     x = a / b;
     y = x / tan(alfa) + z;
 
-    r = pow(pow(x, 2.) + pow(y, 2.), 1. / 2.);
-    T_eff = delta * tin * pow(rin / r, 0.75);
+    r = std::pow(std::pow(x, 2.) + std::pow(y, 2.), 1. / 2.);
+    T_eff = delta * tin * std::pow(rin / r, 0.75);
     nu_eff = delta * nu;
     fac = (constants::herg * nu_eff) / (constants::kboltz * T_eff);
 
-    Urad = 4. * constants::pi * pow(nu_eff, 2.) /
-           (constants::herg * pow(constants::cee, 3.) * (exp(fac) - 1.));
+    Urad = 4. * constants::pi * std::pow(nu_eff, 2.) /
+           (constants::herg * std::pow(constants::cee, 3.) * (exp(fac) - 1.));
 
     return Urad;
 }
@@ -358,7 +359,7 @@ void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, doub
                            double h, double z) {
     double ulim, blim, nulim, Gamma, result, error, diskfield;
 
-    Gamma = 1. / pow((1. - pow(beta, 2.)), 1. / 2.);
+    Gamma = 1. / std::pow((1. - std::pow(beta, 2.)), 1. / 2.);
 
     blim = atan(rin / z);
     if (z < h * rout / 2.) {
@@ -387,9 +388,9 @@ void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, doub
             diskfield = 1.e-100;
         }
         if (seed_urad[i] != 0) {
-            seed_urad[i] = log10(pow(10., seed_urad[i]) + diskfield);
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + diskfield);
         } else if (diskfield > 0) {
-            seed_urad[i] = log10(diskfield);
+            seed_urad[i] = std::log10(diskfield);
         } else {
             seed_urad[i] = -100;
         }
@@ -409,7 +410,7 @@ void Compton::set_niter(double nu0, double Te) {
 
     x0 = constants::herg * nu0 / constants::emerg;
     xf = Te / constants::emerg;
-    k = log(xf / x0);
+    k = std::log(xf / x0);
     Niter = static_cast<size_t>(k + 0.5);
 }
 
@@ -424,7 +425,7 @@ void Compton::set_tau(double n, double Te) {
 
     theta = Te * constants::kboltz_kev2erg / constants::emerg;
     tau = n * r * constants::sigtom;
-    ypar = std::max(tau * tau, tau) * (pow(4.0 * theta, 1) + pow(4.0 * theta, 2));
+    ypar = std::max(tau * tau, tau) * (std::pow(4.0 * theta, 1) + std::pow(4.0 * theta, 2));
     rphot = 1. / (n * constants::sigtom);
 
     // set up the radiative transfer correction (first two ifs), and handle out
@@ -455,9 +456,9 @@ void Compton::set_tau(double n, double Te) {
     }
     // set up the photopshere correction if optical depth greater than 1
     if (geometry == "sphere" && tau > 1.) {
-        vol = (4. / 3.) * constants::pi * (pow(r, 3.) - pow(r - rphot, 3.));
+        vol = (4. / 3.) * constants::pi * (std::pow(r, 3.) - std::pow(r - rphot, 3.));
     } else if (geometry == "cylinder" && tau > 1.) {
-        vol = constants::pi * z * (pow(r, 2.) - pow(r - rphot, 2.));
+        vol = constants::pi * z * (std::pow(r, 2.) - std::pow(r - rphot, 2.));
     }
 }
 
@@ -465,10 +466,12 @@ void Compton::set_tau(double _tau) { tau = _tau; }
 
 //! Method to set up the frequency array over desired range
 void Compton::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(en_phot.size() - 1);
+    double nuinc =
+        (std::log10(numax) - std::log10(numin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
+        en_phot[i] =
+            std::pow(10., std::log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
     }
 }
 

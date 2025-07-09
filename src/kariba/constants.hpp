@@ -16,7 +16,8 @@ namespace constants {
     const double kboltz_kev2erg = 1.6022e-9;    //!< Boltzman constant in keV/erg
     const double gr_to_kev = 5.6095883571872e+29;
     const double me_kev = 511.0;
-    const double emerg = GSL_CONST_CGSM_MASS_ELECTRON * pow(GSL_CONST_CGSM_SPEED_OF_LIGHT, 2.0);
+    const double emerg = GSL_CONST_CGSM_MASS_ELECTRON * GSL_CONST_CGSM_SPEED_OF_LIGHT *
+                         GSL_CONST_CGSM_SPEED_OF_LIGHT;
     const double pi = M_PI;
     const double charg = 4.8e-10;
     const double sigtom = GSL_CONST_CGSM_THOMSON_CROSS_SECTION;

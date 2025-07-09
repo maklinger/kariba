@@ -126,8 +126,9 @@ double photon_index(size_t size, double numin, double numax, const std::vector<d
             counter_2 = i;
         }
     }
-    delta_y = log10(input_lum[counter_2]) - log10(input_lum[counter_1]);
-    delta_x = log10(input_en[counter_2] / karcst::herg) - log10(input_en[counter_1] / karcst::herg);
+    delta_y = std::log10(input_lum[counter_2]) - std::log10(input_lum[counter_1]);
+    delta_x = std::log10(input_en[counter_2] / karcst::herg) -
+              std::log10(input_en[counter_1] / karcst::herg);
     gamma = delta_y / delta_x - 1.;
     return gamma;
 }

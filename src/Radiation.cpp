@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 
 #include "kariba/Radiation.hpp"
@@ -21,13 +22,13 @@ void Radiation::set_geometry(const std::string &geom, double l1, double l2) {
     if (geom == "cylinder") {
         r = l1;
         z = l2;
-        vol = constants::pi * pow(r, 2.) * z;
+        vol = constants::pi * std::pow(r, 2.) * z;
         dopnum = 2.;
         geometry = geom;
     } else if (geom == "sphere") {
         r = l1;
         z = r;
-        vol = (4. / 3.) * constants::pi * pow(r, 3.);
+        vol = (4. / 3.) * constants::pi * std::pow(r, 3.);
         dopnum = 3.;
         geometry = geom;
     } else {
@@ -48,13 +49,13 @@ void Radiation::set_geometry(const std::string &geom, double l1) {
                   << std::endl;
         r = l1;
         z = l1;
-        vol = constants::pi * pow(r, 2.) * z;
+        vol = constants::pi * std::pow(r, 2.) * z;
         dopnum = 2.;
         geometry = geom;
     } else if (geom == "sphere") {
         r = l1;
         z = r;
-        vol = (4. / 3.) * constants::pi * pow(r, 3.);
+        vol = (4. / 3.) * constants::pi * std::pow(r, 3.);
         dopnum = 3.;
         geometry = geom;
     } else {

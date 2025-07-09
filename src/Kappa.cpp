@@ -1,7 +1,8 @@
+#include <cmath>
+#include <iostream>
+
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_math.h>
-
-#include <iostream>
 
 #include "kariba/Kappa.hpp"
 #include "kariba/Particles.hpp"
@@ -28,8 +29,8 @@ void Kappa::set_temp_kev(double T) {
 
     gmin = emin / mass_kev + 1.;
     gmax = emax / mass_kev + 1.;
-    pmin = pow(pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmin = std::pow(std::pow(gmin, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 void Kappa::set_kappa(double k) { kappa = k; }
@@ -38,30 +39,30 @@ void Kappa::set_kappa(double k) { kappa = k; }
 void Kappa::set_p(double ucom, double bfield, double betaeff, double r, double fsc) {
     pmax = std::max(max_p(ucom, bfield, betaeff, r, fsc), pmax);
 
-    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 //! Same as above, but assuming a fixed maximum Lorentz factor
 void Kappa::set_p(double gmax) {
-    pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    pmax = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
-        gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+        p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
+        gamma[i] = std::pow(std::pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
 
 void Kappa::set_ndens() {
     for (size_t i = 0; i < gdens.size(); i++) {
-        gdens[i] = knorm * gamma[i] * pow(pow(gamma[i], 2.) - 1., 1. / 2.) *
-                   pow(1. + (gamma[i] - 1.) / (kappa * theta), -kappa - 1.);
+        gdens[i] = knorm * gamma[i] * std::pow(std::pow(gamma[i], 2.) - 1., 1. / 2.) *
+                   std::pow(1. + (gamma[i] - 1.) / (kappa * theta), -kappa - 1.);
     }
     initialize_pdens();
     gdens_differentiate();
@@ -73,14 +74,14 @@ double norm_kappa_int(double x, void *pars) {
     double t = params->t;
     double k = params->k;
 
-    return x * pow(pow(x, 2.) - 1., 1. / 2.) * pow(1. + (x - 1.) / (k * t), -k - 1.);
+    return x * std::pow(std::pow(x, 2.) - 1., 1. / 2.) * std::pow(1. + (x - 1.) / (k * t), -k - 1.);
 }
 
 void Kappa::set_norm(double n) {
     double norm_integral, error, min, max;
 
-    min = pow(pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
-    max = pow(pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    min = std::pow(std::pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
+    max = std::pow(std::pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
     gsl_function F1;
     auto params = KParams{theta, kappa};
@@ -103,18 +104,19 @@ double injection_kappa_int(double x, void *pars) {
     double n = params->n;
     double m = params->m;
 
-    double mom = pow(pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
-    double diff = mom / (pow(m * constants::cee, 2.) *
-                         pow(pow(mom / (m * constants::cee), 2.) + 1., 1. / 2.));
+    double mom = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double diff = mom / (std::pow(m * constants::cee, 2.) *
+                         std::pow(std::pow(mom / (m * constants::cee), 2.) + 1., 1. / 2.));
 
-    return diff * n * x * pow(pow(x, 2.) - 1., 1. / 2.) * pow(1. + (x - 1.) / (k * t), -k - 1.);
+    return diff * n * x * std::pow(std::pow(x, 2.) - 1., 1. / 2.) *
+           std::pow(1. + (x - 1.) / (k * t), -k - 1.);
 }
 
 void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r, double betaeff) {
-    double Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    double Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     double pdot_ad = betaeff * constants::cee / r;
-    double pdot_rad =
-        (4. * constants::sigtom * constants::cee * Urad) / (3. * mass_gr * pow(constants::cee, 2.));
+    double pdot_rad = (4. * constants::sigtom * constants::cee * Urad) /
+                      (3. * mass_gr * std::pow(constants::cee, 2.));
     double tinj = r / (constants::cee);
 
     double integral, error;
@@ -136,7 +138,7 @@ void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
                                      pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             ndens[ndens.size() - 1] =
-                ndens[ndens.size() - 2] * pow(p[p.size() - 1] / p[p.size() - 2], -kappa);
+                ndens[ndens.size() - 2] * std::pow(p[p.size() - 1] / p[p.size() - 2], -kappa);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is
@@ -162,7 +164,7 @@ void Kappa::cooling_steadystate(double ucom, double n0, double bfield, double r,
 //! acceleration and cooling timescales
 double Kappa::max_p(double ucom, double bfield, double betaeff, double r, double fsc) {
     double Urad, escom, accon, syncon, b, c, gmax;
-    Urad = pow(bfield, 2.) / (8. * constants::pi) + ucom;
+    Urad = std::pow(bfield, 2.) / (8. * constants::pi) + ucom;
     escom = betaeff * constants::cee / r;
     syncon = (4. * constants::sigtom * Urad) / (3. * mass_gr * constants::cee);
     accon = (3. * fsc * constants::charg * bfield) / (4. * mass_gr * constants::cee);
@@ -170,9 +172,9 @@ double Kappa::max_p(double ucom, double bfield, double betaeff, double r, double
     b = escom / syncon;
     c = accon / syncon;
 
-    gmax = (-b + pow(pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
+    gmax = (-b + std::pow(std::pow(b, 2.) + 4. * c, 1. / 2.)) / 2.;
 
-    return pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    return std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 }
 
 void Kappa::test() {
