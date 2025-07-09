@@ -34,7 +34,7 @@ int main([[maybe_unused]] int argc, char *argv[]) {
     size_t ne = 201;
     double emin = -10;
     double emax = 10;
-    double einc = (emax - emin) / ne;
+    double einc = (emax - emin) / static_cast<double>(ne);
 
     std::vector<double> ebins(ne, 0.0);
     std::vector<double> param(npar, 0.0);
@@ -42,7 +42,7 @@ int main([[maybe_unused]] int argc, char *argv[]) {
     std::vector<double> dumarr(ne - 1, 0.0);
 
     for (size_t i = 0; i < ne; i++) {
-        ebins[i] = pow(10, (emin + i * einc));
+        ebins[i] = pow(10, (emin + static_cast<double>(i) * einc));
     }
 
     read_params(input_path, param);
@@ -65,7 +65,7 @@ void read_params(const std::string &path, std::vector<double> &pars) {
     std::ifstream inFile;
     inFile.open(path);
     std::string line;
-    int line_nb = 0;
+    size_t line_nb = 0;
     if (!inFile) {
         std::cerr << "Can't open input file: " << path << "\n";
         exit(1);

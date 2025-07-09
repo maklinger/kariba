@@ -88,9 +88,9 @@ Neutrinos_pg::Neutrinos_pg(size_t lsize, double Emin, double Emax) : Radiation(l
     en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
     num_phot_obs.resize(2 * num_phot_obs.size(), 0.0);
 
-    double Einc = log10(Emax / Emin) / (lsize - 1);
+    double einc = log10(Emax / Emin) / static_cast<double>(lsize - 1);
     for (size_t i = 0; i < lsize; i++) {
-        en_phot[i] = pow(10., log10(Emin) + i * Einc);
+        en_phot[i] = pow(10., log10(Emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + lsize] = en_phot[i];
     }
@@ -161,7 +161,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {    // eq 69 from KA08
-                eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
+                eta = eta_zero * (pow(10., log10(eta_min) + static_cast<double>(j) * deta));
                 auto F1params = HetaParams{eta,    eta_zero, Ev,     gp_min,    gp_max, spline_Jp,
                                            acc_Jp, flavor,   acc_ng, spline_ng, nu_min, nu_max};
                 F1.function = &Heta;

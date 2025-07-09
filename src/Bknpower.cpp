@@ -23,10 +23,10 @@ void Bknpower::set_p(double min, double brk, double ucom, double bfield, double 
     pbrk = brk;
     pmax = max_p(ucom, bfield, betaeff, r, fsc);
 
-    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + i * pinc);
+        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
         gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }
@@ -36,10 +36,10 @@ void Bknpower::set_p(double min, double brk, double gmax) {
     pbrk = brk;
     pmax = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax) - log10(pmin)) / (p.size() - 1);
+    double pinc = (log10(pmax) - log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
-        p[i] = pow(10., log10(pmin) + i * pinc);
+        p[i] = pow(10., log10(pmin) + static_cast<double>(i) * pinc);
         gamma[i] = pow(pow(p[i] / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     }
 }

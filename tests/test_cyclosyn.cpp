@@ -46,10 +46,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
         gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma(),
-                        electrons.get_gdens(), nel);
-        gsl_spline_init(spline_deriv, electrons.get_gamma(),
-                        electrons.get_gdens_diff(), nel);
+        gsl_spline_init(spline_eldis, electrons.get_gamma(), electrons.get_gdens(), nel);
+        gsl_spline_init(spline_deriv, electrons.get_gamma(), electrons.get_gdens_diff(), nel);
 
         // Calculate synchrotron emission
         kariba::Cyclosyn syncro(nfreq);
@@ -61,8 +59,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         double gmin_actual = electrons.get_gamma()[0];
         double gmax_actual = electrons.get_gamma()[nel - 1];
 
-        CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin_actual, gmax_actual,
-                                             spline_eldis, acc_eldis,
+        CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis,
                                              spline_deriv, acc_deriv));
 
         // Verify synchrotron spectrum
@@ -88,8 +85,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         // Use synchrotron photons as seed
         ssc.cyclosyn_seed(syncro.get_energy(), syncro.get_nphot());
 
-        CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual,
-                                           spline_eldis, acc_eldis));
+        CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis));
 
         // Verify SSC spectrum
         double *ssc_energy = ssc.get_energy();
@@ -97,8 +93,7 @@ TEST_CASE("Integration tests - Complete workflows") {
 
         bool has_ssc_emission = false;
         for (int i = 0; i < nfreq; i++) {
-            CHECK(ssc_energy[i] >=
-                  syn_energy[nfreq - 1]);    // SSC should be higher energy
+            CHECK(ssc_energy[i] >= syn_energy[nfreq - 1]);    // SSC should be higher energy
             if (ssc_flux[i] > 0.0) {
                 has_ssc_emission = true;
             }

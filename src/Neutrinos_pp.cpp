@@ -13,9 +13,9 @@ Neutrinos_pp::Neutrinos_pp(size_t size, double Emin, double Emax) : Radiation(si
     en_phot_obs.resize(2 * en_phot_obs.size(), 0.0);
     num_phot_obs.resize(2 * num_phot_obs.size(), 0.0);
 
-    double Einc = log10(Emax / Emin) / (size - 1);
+    double einc = log10(Emax / Emin) / static_cast<double>(size - 1);
     for (size_t i = 0; i < size; i++) {
-        en_phot[i] = pow(10., log10(Emin) + i * Einc);
+        en_phot[i] = pow(10., log10(Emin) + static_cast<double>(i) * einc);
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + size] = en_phot[i];
     }
@@ -139,13 +139,13 @@ double prob_fve() {    // it is the same as of electrons
     size_t N = 20;                  // The steps of integration.
     double r = .573;                // r = 1-λ = m_μ^2/m_p^2 = 0.573.
     double xmin = 0., xmax = 1.;    // x = E_{particle}/E_p.
-    double x, dx = (xmax - xmin) / (N - 1);
+    double x, dx = (xmax - xmin) / static_cast<double>(N - 1);
     double gn, hn1, hn2, fve;    // (equations 40-43 from Kelner et al. 2006)
     double sum = 0.;
     double Bprob;
 
     for (size_t i = 0; i < N; i++) {
-        x = xmin + i * dx;
+        x = xmin + static_cast<double>(i) * dx;
         gn = 2. / (3. * (1. - r) * (1. - r)) *
              ((1. - x) * (6. * (1. - x) * (1. - x) + r * (5. + 5. * x - 4. * x * x)) +
               6. * r * log(x));

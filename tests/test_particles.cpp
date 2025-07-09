@@ -75,8 +75,8 @@ TEST_CASE("Particles subclass functionality") {
 
             // Check relativistic energy-momentum relation for first few points
             for (size_t i = 0; i < 5; i++) {
-                double expected_gamma = std::sqrt(
-                    1.0 + std::pow(p[i] / (karcst::emgm * karcst::cee), 2.0));
+                double expected_gamma =
+                    std::sqrt(1.0 + std::pow(p[i] / (karcst::emgm * karcst::cee), 2.0));
                 CHECK(std::abs(gamma[i] - expected_gamma) < 1e-10);
             }
         }
@@ -136,8 +136,7 @@ TEST_CASE("Particles subclass functionality") {
             double r = 1e10;
             double tshift = 0.1;
 
-            CHECK_NOTHROW(
-                powerlaw.cooling_steadystate(ucom, n0, bfield, r, tshift));
+            CHECK_NOTHROW(powerlaw.cooling_steadystate(ucom, n0, bfield, r, tshift));
         }
     }
 
@@ -238,8 +237,8 @@ TEST_CASE("Particle distribution consistency checks") {
 
         // Check relativistic energy-momentum relation: E^2 = (pc)^2 + (mc^2)^2
         for (size_t i = 0; i < 10; i++) {
-            double expected_gamma = std::sqrt(
-                1.0 + std::pow(p[i] / (karcst::emgm * karcst::cee), 2.0));
+            double expected_gamma =
+                std::sqrt(1.0 + std::pow(p[i] / (karcst::emgm * karcst::cee), 2.0));
             CHECK(std::abs(gamma[i] - expected_gamma) < 1e-10);
         }
     }

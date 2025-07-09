@@ -71,9 +71,9 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
     std::vector<double> gby_vel_mag(size, 0.0);
     double step;
 
-    step = (std::log10(dyn.max) + 1. - std::log10(dyn.min)) / (size - 3.);
+    step = (std::log10(dyn.max) + 1. - std::log10(dyn.min)) / static_cast<double>(size - 3);
     for (size_t i = 0; i < size; i++) {
-        gbx_vel_mag[i] = std::pow(10., std::log10(dyn.min) + i * step);
+        gbx_vel_mag[i] = std::pow(10., std::log10(dyn.min) + static_cast<double>(i) * step);
         if (gbx_vel_mag[i] < dyn.h0) {
             gby_vel_mag[i] = dyn.gam0;
         } else if (gbx_vel_mag[i] < dyn.acc) {
@@ -154,7 +154,7 @@ void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
 }
 
 // Function to set up distance grid for calculations along the jet axies
-void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z) {
+void jetgrid(size_t i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z) {
     double zinc, z_next;
     // note: the distance grid changes in steps of 2r up to a distance zcut, and
     // then becomes logarithmic this prevents resolution errors for the IC
@@ -175,9 +175,11 @@ void jetgrid(int i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, d
         if (i == grid.cut) {
             grid.zcut = z + delz;
         }
-        zinc = (std::log10(dyn.max) - std::log10(grid.zcut)) / (grid.nz - grid.cut);
-        z = std::pow(10., std::log10(grid.zcut) + zinc * (i - grid.cut));
-        z_next = std::pow(10., std::log10(grid.zcut) + zinc * (i + 1 - grid.cut));
+        zinc =
+            (std::log10(dyn.max) - std::log10(grid.zcut)) / static_cast<double>(grid.nz - grid.cut);
+        z = std::pow(10., std::log10(grid.zcut) + zinc * static_cast<double>(i - grid.cut));
+        z_next =
+            std::pow(10., std::log10(grid.zcut) + zinc * static_cast<double>(i + 1 - grid.cut));
         delz = z_next - z;
     }
 }

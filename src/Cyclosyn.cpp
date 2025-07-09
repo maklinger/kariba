@@ -234,7 +234,7 @@ double Cyclosyn::nu_syn(double gamma) {
 
 double Cyclosyn::nu_syn() {
     double temp_lum = 0.;
-    int temp = 0;
+    size_t temp = 0;
     for (size_t i = 0; i < num_phot.size(); i++) {
         if (num_phot[i] > temp_lum) {
             temp_lum = num_phot[i];
@@ -246,10 +246,10 @@ double Cyclosyn::nu_syn() {
 
 //! Method to set up the frequency array over desired range
 void Cyclosyn::set_frequency(double numin, double numax) {
-    double nuinc = (log10(numax) - log10(numin)) / (en_phot.size() - 1);
+    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(en_phot.size() - 1);
 
     for (size_t i = 0; i < en_phot.size(); i++) {
-        en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
+        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
     }
 }
 

@@ -93,7 +93,7 @@ class Radiation {
 
     const std::vector<double> &get_nphot_obs() const { return num_phot_obs; }
 
-    int get_size() const { return size; }
+    size_t get_size() const { return size; }
 
     double get_volume() const { return vol; }
 

@@ -10,7 +10,7 @@ void read_params(const std::string &path, std::vector<double> &pars) {
     std::ifstream inFile;
     inFile.open(path);
     std::string line;
-    int line_nb = 0;
+    size_t line_nb = 0;
     if (!inFile) {
         std::cerr << "Can't open input file\n";
         exit(1);
@@ -33,25 +33,25 @@ void read_params(const std::string &path, std::vector<double> &pars) {
 // file on the provided path. Note: the factor 1+z in
 // the specific luminosity calculation is to ensure that the output spectrum
 // only moves to lower frequency, not up/down.
-void plot_write(int size, const std::vector<double> &en, const std::vector<double> &lum,
+void plot_write(size_t size, const std::vector<double> &en, const std::vector<double> &lum,
                 const std::string &path, double redsh) {
     std::ofstream file;
     file.open(path, std::ios::app);
 
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < size; k++) {
         file << en[k] / (karcst::herg * (1. + redsh)) << " " << lum[k] << "\n";
     }
 
     file.close();
 }
 
-void plot_write(int size, const std::vector<double> &p, const std::vector<double> &g,
+void plot_write(size_t size, const std::vector<double> &p, const std::vector<double> &g,
                 const std::vector<double> &pdens, const std::vector<double> &gdens,
                 const std::string &path) {
 
     std::ofstream file;
     file.open(path, std::ios::app);
-    for (int k = 0; k < size; k++) {
+    for (size_t k = 0; k < size; k++) {
         file << p[k] << " " << g[k] << " " << pdens[k] << " " << gdens[k] << "\n";
     }
 
@@ -98,10 +98,10 @@ void sum_ext(size_t size_in, size_t size_out, const std::vector<double> &input_e
 // erg/s/Hz for the luminosity array to be integrated, Hz for the integration
 // bounds; size is the dimension of the input arrays Note: this uses a VERY
 // rough method and wide bins, so thread carefully
-double integrate_lum(int size, double numin, double numax, const std::vector<double> &input_en,
+double integrate_lum(size_t size, double numin, double numax, const std::vector<double> &input_en,
                      const std::vector<double> &input_lum) {
     double temp = 0.;
-    for (int i = 0; i < size - 1; i++) {
+    for (size_t i = 0; i < size - 1; i++) {
         if (input_en[i] / karcst::herg > numin && input_en[i + 1] / karcst::herg < numax) {
             temp = temp + (1. / 2.) *
                               (input_en[i + 1] / karcst::herg - input_en[i] / karcst::herg) *
@@ -114,11 +114,11 @@ double integrate_lum(int size, double numin, double numax, const std::vector<dou
 // Overly simplified estimate of the photon index between numin and numax of a
 // given array; input is the same as integrate_lum. Note that this assumes
 // input_lum is a power-law in shape
-double photon_index(int size, double numin, double numax, const std::vector<double> &input_en,
+double photon_index(size_t size, double numin, double numax, const std::vector<double> &input_en,
                     const std::vector<double> &input_lum) {
-    int counter_1 = 0, counter_2 = 0;
+    size_t counter_1 = 0, counter_2 = 0;
     double delta_y, delta_x, gamma;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         if (input_en[i] / karcst::herg < numin) {
             counter_1 = i;
         }

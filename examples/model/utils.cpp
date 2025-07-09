@@ -17,7 +17,7 @@ namespace karcst = kariba::constants;    // alias the kariba::constants namespac
 // large BH mass) it assumes you are not trying to compute the gamma ray
 // spectrum. This is because neither class of objects actually has any gamma ray
 // detections
-bool Compton_check(bool IsShock, int i, double Mbh, double Nj, double Urad, double velsw,
+bool Compton_check(bool IsShock, size_t i, double Mbh, double Nj, double Urad, double velsw,
                    zone_pars &zone) {
     double Lumnorm, Ub, Usyn, Lsyn, Lcom;
     Lumnorm = karcst::pi * std::pow(zone.r, 2.) * zone.delz * std::pow(zone.delta, 4.) *
@@ -112,10 +112,10 @@ void sum_counterjet(size_t size, const std::vector<double> &input_en,
     en_cj_min = input_en[size];
     en_j_max = input_en[size - 1];
     en_cj_max = input_en[2 * size - 1];
-    einc = (std::log10(en_j_max) - std::log10(en_cj_min)) / (size - 1);
+    einc = (std::log10(en_j_max) - std::log10(en_cj_min)) / static_cast<double>(size - 1);
 
     for (size_t i = 0; i < size; i++) {
-        en[i] = std::pow(10., std::log10(en_cj_min) + i * einc);
+        en[i] = std::pow(10., std::log10(en_cj_min) + static_cast<double>(i) * einc);
         en_j[i] = input_en[i];
         en_cj[i] = input_en[i + size];
         lum_j[i] = std::max(input_lum[i], 1.e-50);
@@ -234,7 +234,7 @@ double integrate_lum(size_t size, double numin, double numax, const std::vector<
 // input_lum is a power-law in shape
 double photon_index(size_t size, double numin, double numax, const std::vector<double> &input_en,
                     const std::vector<double> &input_lum) {
-    int counter_1 = 0, counter_2 = 0;
+    size_t counter_1 = 0, counter_2 = 0;
     double delta_y = 0.0, delta_x = 0.0, gamma = 0.0;
     for (size_t i = 0; i < size; i++) {
         if (input_en[i] / karcst::herg < numin) {
@@ -284,9 +284,10 @@ void clean_file(std::string path, int check) {
 
 // Used for interpolation by slang code
 void jetinterp(std::vector<double> &ear, std::vector<double> &energ, std::vector<double> &phot,
-               std::vector<double> &photar, int ne, int newne) {
-    int i, iplus1, j, jplus1;
+               std::vector<double> &photar, size_t ne, size_t newne) {
+    size_t i, iplus1, j, jplus1;
     double emid, phflux;
+    bool bracket = true;
 
     j = 0;
     for (i = 0; i < newne; i++) {
@@ -294,15 +295,20 @@ void jetinterp(std::vector<double> &ear, std::vector<double> &energ, std::vector
         iplus1 = i + 1;
         emid = (ear[i] + ear[iplus1]) / 2.;
         // Linear search if we don't bracket yet
-        if (j == -1) {
+        if (!bracket) {
             j = 1;
+            bracket = true;
         }
         while (j <= ne && energ[j] < emid) {
             j++;
         }
 
         jplus1 = j;
-        j = j - 1;
+        if (j == 0) {
+            bracket = false;
+        } else {
+            j = j - 1;
+        }
 
         if (j < 1 || j > ne) {
             photar[i] = 0.;

@@ -29,9 +29,9 @@ Grays::Grays(size_t size, double numin, double numax) : Radiation(size) {
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
     size_t lsize = en_phot.size();
-    double nuinc = (log10(numax) - log10(numin)) / (lsize - 1);
+    double nuinc = (log10(numax) - log10(numin)) / static_cast<double>(lsize - 1);
     for (size_t i = 0; i < lsize; i++) {
-        en_phot[i] = pow(10., log10(numin) + i * nuinc) * constants::herg;
+        en_phot[i] = pow(10., log10(numin) + static_cast<double>(i) * nuinc) * constants::herg;
         en_phot_obs[i] = en_phot[i];
         en_phot_obs[i + lsize] = en_phot[i];
     }
@@ -298,9 +298,9 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
 //************************************************************************************************************
 void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
                          gsl_spline *spline_Jp, std::vector<double> &en_perseg,
-                         std::vector<double> &lum_perseg, int nphot) {
+                         std::vector<double> &lum_perseg, size_t nphot) {
 
-    int N = 10;
+    size_t N = 10;
     double mpion =
         137.5e6 / constants::erg / (constants::cee * constants::cee);    // mass of pion in g
     double eta, deta;           // eta parameter: η = 4εE_p/(m_p^2*c^4) and its step
@@ -317,7 +317,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     double dopfac_cj;
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
-    for (int k = 0; k < nphot; k++) {
+    for (size_t k = 0; k < nphot; k++) {
         freq[k] = en_perseg[k] / constants::herg;    // Hz from erg
         Uphot[k] =
             lum_perseg[k] * (r / constants::cee /
@@ -329,7 +329,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
     gsl_spline_init(spline_ng, freq, Uphot, nphot);
 
-    deta = log10(eta_max / eta_min) / (N - 1);
+    deta = log10(eta_max / eta_min) / static_cast<double>(N - 1);
     size_t size = en_phot.size();
 #pragma omp parallel for private(eta, Hg, dNdEg)    // possibly lost: 9,424 bytes in 31 blocks
     for (size_t i = 0; i < size; i++) {             // for every produced γ ray energy
@@ -339,7 +339,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
             gsl_integration_workspace *w1 = gsl_integration_workspace_alloc(100);
             double result1, error1;
             gsl_function F1;
-            for (int j = 0; j < N; j++) {
+            for (size_t j = 0; j < N; j++) {
                 eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
                 auto F1params = HetagParams{eta,    eta_zero,  Eg,     gp_min,
                                             gp_max, spline_Jp, acc_Jp,    // product,

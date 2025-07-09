@@ -21,7 +21,7 @@ TEST_CASE("Integration tests - Complete workflows") {
     SUBCASE("Single zone jet model workflow") {
         // This test replicates the singlezone example workflow
 
-        int nel = 50;    // Smaller arrays for faster testing
+        size_t nel = 50;    // Smaller arrays for faster testing
 
         double B = 1.5e-3;
         double n = 9.5e-3;

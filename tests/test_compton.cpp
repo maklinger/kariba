@@ -16,8 +16,8 @@ TEST_CASE("Integration tests - Complete workflows") {
     SUBCASE("Single zone jet model workflow") {
         // This test replicates the singlezone example workflow
 
-        int nel = 50;    // Smaller arrays for faster testing
-        int nfreq = 50;
+        size_t nel = 50;    // Smaller arrays for faster testing
+        size_t nfreq = 50;
 
         // Model parameters (simplified from example)
         double Mbh = 6.5e9;
@@ -46,8 +46,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
         gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma().data(),
-                        electrons.get_gdens().data(), nel);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        nel);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
                         electrons.get_gdens_diff().data(), nel);
 
@@ -61,8 +61,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         double gmin_actual = electrons.get_gamma()[0];
         double gmax_actual = electrons.get_gamma()[nel - 1];
 
-        CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin_actual, gmax_actual,
-                                             spline_eldis, acc_eldis,
+        CHECK_NOTHROW(syncro.cycsyn_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis,
                                              spline_deriv, acc_deriv));
 
         // Verify synchrotron spectrum
@@ -70,7 +69,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         const std::vector<double> &syn_flux = syncro.get_nphot();
 
         bool has_syn_emission = false;
-        for (int i = 0; i < nfreq; i++) {
+        for (size_t i = 0; i < nfreq; i++) {
             CHECK(syn_energy[i] > 0.0);
             if (syn_flux[i] > 0.0) {
                 has_syn_emission = true;
@@ -88,17 +87,15 @@ TEST_CASE("Integration tests - Complete workflows") {
         // Use synchrotron photons as seed
         ssc.cyclosyn_seed(syncro.get_energy(), syncro.get_nphot());
 
-        CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual,
-                                           spline_eldis, acc_eldis));
+        CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis));
 
         // Verify SSC spectrum
         const std::vector<double> &ssc_energy = ssc.get_energy();
         const std::vector<double> &ssc_flux = ssc.get_nphot();
 
         bool has_ssc_emission = false;
-        for (int i = 0; i < nfreq; i++) {
-            CHECK(ssc_energy[i] >=
-                  syn_energy[nfreq - 1]);    // SSC should be higher energy
+        for (size_t i = 0; i < nfreq; i++) {
+            CHECK(ssc_energy[i] >= syn_energy[nfreq - 1]);    // SSC should be higher energy
             if (ssc_flux[i] > 0.0) {
                 has_ssc_emission = true;
             }
@@ -124,8 +121,8 @@ TEST_CASE("Integration tests - Complete workflows") {
     SUBCASE("Corona Comptonization workflow") {
         // This test replicates the corona example workflow
 
-        int nel = 50;
-        int nfreq = 50;
+        size_t nel = 50;
+        size_t nfreq = 50;
 
         // Parameters
         double Mbh = 10.0;
@@ -170,8 +167,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
         gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma().data(),
-                        electrons.get_gdens().data(), nel);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        nel);
 
         // Set up Comptonization
         kariba::Compton ic(nfreq, 50);    // 50 is disk spectrum size
@@ -182,8 +179,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         ic.set_niter(5);    // Reduced iterations for testing
 
         // Use disk as seed photon field
-        ic.shsdisk_seed(disk.get_energy(), disk.tin(), Rin, Rout, disk.hdisk(),
-                        0.0);
+        ic.shsdisk_seed(disk.get_energy(), disk.tin(), Rin, Rout, disk.hdisk(), 0.0);
 
         double gmin = electrons.get_gamma()[0];
         double gmax = electrons.get_gamma()[nel - 1];
@@ -195,7 +191,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         const std::vector<double> &ic_flux = ic.get_nphot();
 
         bool has_ic_emission = false;
-        for (int i = 0; i < nfreq; i++) {
+        for (size_t i = 0; i < nfreq; i++) {
             CHECK(ic_energy[i] > 0.0);
             if (ic_flux[i] > 0.0) {
                 has_ic_emission = true;
@@ -205,8 +201,7 @@ TEST_CASE("Integration tests - Complete workflows") {
 
         // Check that Compton spectrum extends to higher energies than disk
         const std::vector<double> &disk_energy = disk.get_energy();
-        CHECK(ic_energy[nfreq - 1] >
-              disk_energy[49]);    // IC should extend higher
+        CHECK(ic_energy[nfreq - 1] > disk_energy[49]);    // IC should extend higher
 
         // Cleanup
         gsl_spline_free(spline_eldis);
