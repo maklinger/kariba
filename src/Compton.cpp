@@ -67,8 +67,7 @@ Compton::~Compton() {
 }
 
 Compton::Compton(size_t size, size_t seed_size)
-    : Radiation(size), seed_size(seed_size), seed_energ(seed_size, 0.0), seed_urad(seed_size, 0.0),
-      iter_urad(size, 0.0) {
+    : Radiation(size), seed_energ(seed_size, 0.0), seed_urad(seed_size, 0.0), iter_urad(size, 0.0) {
     en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
@@ -86,10 +85,10 @@ Compton::Compton(size_t size, size_t seed_size)
     gsl_spline2d_init(esc_p_sph, Te_table, tau_table, esc_table_sph, 15, 15);
     gsl_spline2d_init(esc_p_cyl, Te_table, tau_table, esc_table_cyl, 15, 15);
 
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, seed_size);
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, seed_energ.size());
     acc_seed = gsl_interp_accel_alloc();
 
-    iter_ph = gsl_spline_alloc(gsl_interp_steffen, size);
+    iter_ph = gsl_spline_alloc(gsl_interp_steffen, en_phot.size());
     acc_iter = gsl_interp_accel_alloc();
 }
 
@@ -166,7 +165,7 @@ double comint(double gam, void *pars) {
 
 //! This integrates the individual electron spectrum from comint over the total
 //! electron distribution
-double Compton::comintegral(int it, double blim, double ulim, double enphot, double enphmin,
+double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double enphmin,
                             double enphmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis) {
     double result, error;
     gsl_integration_workspace *w1;
@@ -206,7 +205,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
     size_t size = en_phot.size();
-    for (int it = 0; it < Niter; it++) {
+    for (size_t it = 0; it < Niter; it++) {
         for (size_t i = 0; i < size; i++) {
             blim = log(std::max(gmin, en_phot[i] / constants::emerg));
             ulim = log(gmax);
@@ -247,7 +246,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
 void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
                             const std::vector<double> &seed_lum) {
     // to do: asssert input and member sizes are the same
-    for (size_t i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
         if (seed_urad[i] != 0) {
             seed_urad[i] = log10(pow(10., seed_urad[i]) +
@@ -262,7 +261,7 @@ void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
                                                 constants::pi * r * r));
         }
     }
-    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
 //! Method to include black body to seed field for IC;
@@ -275,7 +274,7 @@ void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad, double
     // seed_freq_array(seed_arr);
     seed_energ = seed_arr;
 
-    for (size_t i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_arr.size(); i++) {
         if (seed_energ[i] < ulim) {
             bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
                       (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
@@ -291,7 +290,7 @@ void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad, double
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
 void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, double Tbb) {
@@ -301,7 +300,7 @@ void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, doub
     // seed_freq_array(seed_arr);
     seed_energ = seed_arr;
 
-    for (size_t i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_arr.size(); i++) {
         if (seed_energ[i] < ulim) {
             bbfield = (2. * Urad * pow(seed_energ[i] / constants::herg, 2.)) /
                       (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
@@ -318,7 +317,7 @@ void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, doub
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
 //! Calculates incident photon field for a Shakura-Sunyaev disk with aspect ratio
@@ -371,7 +370,7 @@ void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, doub
     // seed_freq_array(seed_arr);
     seed_energ = seed_arr;
 
-    for (size_t i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_energ.size(); i++) {
         if (seed_energ[i] < nulim) {
             gsl_integration_workspace *w1;
             w1 = gsl_integration_workspace_alloc(100);
@@ -395,7 +394,7 @@ void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, doub
             seed_urad[i] = -100;
         }
     }
-    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_size);
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
 //! Method to estimate the number of scatterings the electrons go through;
@@ -411,10 +410,10 @@ void Compton::set_niter(double nu0, double Te) {
     x0 = constants::herg * nu0 / constants::emerg;
     xf = Te / constants::emerg;
     k = log(xf / x0);
-    Niter = int(k + 0.5);
+    Niter = static_cast<size_t>(k + 0.5);
 }
 
-void Compton::set_niter(int n) { Niter = n; }
+void Compton::set_niter(size_t n) { Niter = n; }
 
 //! Sets optical depth for given number density of emitting region (assuming
 //! radius is set correctly), and compton-Y for a given electron average Lorentz
@@ -480,7 +479,7 @@ void Compton::set_escape(double escape) { escape_corr = escape; }
 //! Method to set up seed frequency array
 void Compton::seed_freq_array(const std::vector<double> &seed_arr) {
     // to do: asssert input and member sizes are the same
-    for (size_t i = 0; i < seed_size; i++) {
+    for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
     }
 }

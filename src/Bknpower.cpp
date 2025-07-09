@@ -186,7 +186,7 @@ void Bknpower::test() {
     std::cout << "pspec1: " << pspec1 << std::endl;
     std::cout << "pspec2: " << pspec2 << std::endl;
     std::cout << "pbreak: " << pbrk << std::endl;
-    std::cout << "Array size: " << size << std::endl;
+    std::cout << "Array size: " << p.size() << std::endl;
     std::cout << "Default normalization: " << norm << std::endl;
     std::cout << "Particle mass: " << mass_gr << std::endl;
 }

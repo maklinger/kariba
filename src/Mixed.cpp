@@ -37,7 +37,7 @@ void Mixed::set_p(double gmax) {
     pmin_pl = av_th_p();
     pmax_pl = pow(pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
 
-    double pinc = (log10(pmax_pl) - log10(pmin_th)) / static_cast<double>(size - 1);
+    double pinc = (log10(pmax_pl) - log10(pmin_th)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = pow(10., log10(pmin_th) + static_cast<double>(i) * pinc);

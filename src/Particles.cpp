@@ -10,8 +10,7 @@
 namespace kariba {
 
 Particles::Particles(size_t size)
-    : size(size), p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0), gdens(size, 0.0),
-      gdens_diff(size, 0.0) {}
+    : p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0), gdens(size, 0.0), gdens_diff(size, 0.0) {}
 
 //! Simple numerical integrals /w trapeze method
 double Particles::count_particles() {
@@ -75,12 +74,13 @@ void Particles::initialize_pdens() {
 
 void Particles::gdens_differentiate() {
     std::vector<double> temp;
+    size_t size = gdens.size();
 
-    for (size_t i = 0; i < gdens.size(); i++) {
+    for (size_t i = 0; i < size; i++) {
         temp.push_back(gdens[i] / (pow(gamma[i], 1.)));
     }
 
-    for (size_t i = 0; i < temp.size() - 1; i++) {
+    for (size_t i = 0; i < size - 1; i++) {
         gdens_diff[i] = (temp[i + 1] - temp[i]) /
                         (mass_gr * pow(constants::cee, 2.) * (gamma[i + 1] - gamma[i]));
     }

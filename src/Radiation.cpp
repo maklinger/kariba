@@ -6,8 +6,7 @@
 namespace kariba {
 
 Radiation::Radiation(size_t size)
-    : size(size), en_phot(size, 0.0), num_phot(size, 0.0), en_phot_obs(size, 0.0),
-      num_phot_obs(size, 0.0) {}
+    : en_phot(size, 0.0), num_phot(size, 0.0), en_phot_obs(size, 0.0), num_phot_obs(size, 0.0) {}
 
 //! Methods to set viewing angle, beaming and geometry of emission region
 void Radiation::set_beaming(double theta, double speed, double doppler) {

@@ -9,8 +9,7 @@ namespace kariba {
 //! Class inverse Compton, inherited from Radiation.hpp
 class Compton : public Radiation {
   protected:
-    size_t seed_size;      //!< size of seed photon field
-    int Niter;             //!< number of IC iterations
+    size_t Niter;          //!< number of IC iterations
     double tau, ypar;      //!< optical depth/comtpon Y of emitting region
     double rphot;          //!< photospheric radius when tau > 1, used to renormalize volume
     double escape_corr;    //!< escape term, used to renormalize our spectra to CompPS
@@ -40,7 +39,7 @@ class Compton : public Radiation {
     friend double comfnc(double ein, void *p);
     friend double comint(double gam, void *p);
     friend double disk_integral(double alfa, void *p);
-    double comintegral(int it, double blim, double ulim, double nu, double numin, double numax,
+    double comintegral(size_t it, double blim, double ulim, double nu, double numin, double numax,
                        gsl_spline *eldis, gsl_interp_accel *acc_eldis);
     void compton_spectrum(double gmin, double gmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis);
 
@@ -55,7 +54,7 @@ class Compton : public Radiation {
     void set_tau(double _tau);
     void set_escape(double escape);
     void set_niter(double nu0, double Te);
-    void set_niter(int n);
+    void set_niter(size_t n);
     void seed_freq_array(const std::vector<double> &seed_energ);
 
     double get_tau() const { return tau; };
