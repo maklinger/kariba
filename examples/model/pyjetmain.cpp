@@ -7,10 +7,13 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <omp.h>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 using namespace std;
 

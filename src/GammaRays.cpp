@@ -2,6 +2,8 @@
 Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 *************************************************************************************************************/
 
+#include <array>
+
 #include <gsl/gsl_integration.h>
 
 #include "kariba/GammaRays.hpp"
@@ -9,17 +11,17 @@ Gamma-rays from neutral pion decay, products of inelastic pp and pγ collisions
 
 namespace kariba {
 
-static const int NITEMS = 22;
-static const double etagTable[NITEMS] = {1.1, 1.2,  1.3,  1.4, 1.5,  1.6,  1.7, 1.8,
+static const size_t nitems = 22;
+    static const std::array<double, nitems> etagTable = {1.1, 1.2,  1.3,  1.4, 1.5,  1.6,  1.7, 1.8,
                                          1.9, 2.0,  3.0,  4.0, 5.0,  6.0,  7.0, 8.0,
                                          9.0, 10.0, 20.0, 30., 40.0, 100.0};
-static const double sgTable[NITEMS] = {0.0768, 0.106,  0.182, 0.201,  0.219,  0.216, 0.233, 0.233,
+    static const std::array<double, nitems> sgTable = {0.0768, 0.106,  0.182, 0.201,  0.219,  0.216, 0.233, 0.233,
                                        0.248,  0.244,  0.188, 0.131,  0.120,  0.107, 0.102, 0.0932,
                                        0.0838, 0.0761, 0.107, 0.0928, 0.0722, 0.0479};
-static const double deltagTable[NITEMS] = {0.544, 0.540, 0.750, 0.791, 0.788, 0.831, 0.839, 0.825,
+    static const std::array<double, nitems> deltagTable = {0.544, 0.540, 0.750, 0.791, 0.788, 0.831, 0.839, 0.825,
                                            0.805, 0.779, 1.23,  1.82,  2.05,  2.19,  2.23,  2.29,
                                            2.37,  2.43,  2.27,  2.33,  2.42,  2.59};
-static const double BetagTable[NITEMS] = {
+    static const std::array<double, nitems> BetagTable = {
     2.86e-19, 2.24e-18, 5.61e-18, 1.02e-17, 1.60e-17, 2.23e-17, 3.10e-17, 4.07e-17,
     5.30e-17, 6.74e-17, 1.51e-16, 1.24e-16, 1.37e-16, 1.62e-16, 1.71e-16, 1.78e-16,
     1.84e-16, 1.93e-16, 4.74e-16, 7.70e-16, 1.06e-15, 2.73e-15};
@@ -231,8 +233,8 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
                  size_t ntarg, const std::vector<double> &targ_en,
                  const std::vector<double> &targ_lum) {
 
-    double lx[ntarg];    // log10 of targ_en[]/emerg
-    double lL[ntarg];    // log10 of Luminosity of targets in erg/s/Hz
+    std::vector<double> lx(ntarg, 0.0);    // log10 of targ_en[]/emerg
+    std::vector<double> lL(ntarg, 0.0);    // log10 of Luminosity of targets in erg/s/Hz
 
     double logx;
 
@@ -248,7 +250,7 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
     // We interpolate over the targets
     gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
     gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
-    gsl_spline_init(spline_targ, lx, lL, ntarg);
+    gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
         logx = log10(en_perseg[i] / constants::emerg);
@@ -311,8 +313,8 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     double eta_min = 1.10;      // min η
     double nu_min = en_perseg[0] / constants::herg;            // the min freq of photon targets
     double nu_max = en_perseg[nphot - 1] / constants::herg;    // the max freq of photon targets
-    double freq[nphot];     // frequency of photons per segment in Hz
-    double Uphot[nphot];    // diff energy density per segment in #/cm3/erg
+    std::vector<double> freq(nphot, 0.0);     // frequency of photons per segment in Hz
+    std::vector<double> Uphot(nphot, 0.0);    // diff energy density per segment in #/cm3/erg
 
     double dopfac_cj;
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
@@ -327,7 +329,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     // Interpolation for jet photon distribution
     gsl_interp_accel *acc_ng = gsl_interp_accel_alloc();
     gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
-    gsl_spline_init(spline_ng, freq, Uphot, nphot);
+    gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
     deta = log10(eta_max / eta_min) / static_cast<double>(N - 1);
     size_t size = en_phot.size();
@@ -340,7 +342,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {
-                eta = eta_zero * (pow(10., log10(eta_min) + j * deta));
+                eta = eta_zero * (pow(10., log10(eta_min) + static_cast<double>(j) * deta));
                 auto F1params = HetagParams{eta,    eta_zero,  Eg,     gp_min,
                                             gp_max, spline_Jp, acc_Jp,    // product,
                                             acc_ng, spline_ng, nu_min, nu_max};
@@ -470,16 +472,17 @@ double PhiFunc_gamma(double eta, double eta0, double x) {
 //! The tables from KA08 for photomeson that give s,δ and B
 void tables_photomeson_gamma(double &s, double &delta, double &Beta, double xeta) {
     // Gamma rays from neutral pion decay:
+    size_t size = etagTable.size();
     gsl_interp_accel *acc_sigma = gsl_interp_accel_alloc();
-    gsl_spline *spline_sigma = gsl_spline_alloc(gsl_interp_cspline, NITEMS);
+    gsl_spline *spline_sigma = gsl_spline_alloc(gsl_interp_cspline, size);
     gsl_interp_accel *acc_delta = gsl_interp_accel_alloc();
-    gsl_spline *spline_delta = gsl_spline_alloc(gsl_interp_cspline, NITEMS);
+    gsl_spline *spline_delta = gsl_spline_alloc(gsl_interp_cspline, size);
     gsl_interp_accel *acc_Beta = gsl_interp_accel_alloc();
-    gsl_spline *spline_Beta = gsl_spline_alloc(gsl_interp_cspline, NITEMS);
+    gsl_spline *spline_Beta = gsl_spline_alloc(gsl_interp_cspline, size);
 
-    gsl_spline_init(spline_sigma, etagTable, sgTable, NITEMS);
-    gsl_spline_init(spline_delta, etagTable, deltagTable, NITEMS);
-    gsl_spline_init(spline_Beta, etagTable, BetagTable, NITEMS);
+    gsl_spline_init(spline_sigma, etagTable.data(), sgTable.data(), size);
+    gsl_spline_init(spline_delta, etagTable.data(), deltagTable.data(), size);
+    gsl_spline_init(spline_Beta, etagTable.data(), BetagTable.data(), size);
 
     s = gsl_spline_eval(spline_sigma, xeta, acc_sigma);
     delta = gsl_spline_eval(spline_delta, xeta, acc_delta);
