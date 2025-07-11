@@ -80,7 +80,7 @@ In particular, it will:
 - indent consistently (four spaces, except for private/public/protected identifiers)
 
 - break and wrap long lines
-
+  
 - remove trailing whitespace
 
 - ensure a newline at the end of a file
@@ -115,8 +115,7 @@ cumbersome to read (`a_very_long_variable_name` vs
 `aVeryLongVariableName`).
 
 
-Header / include files
-----------------------
+# Header / include files
 
 Include header files only where they are needed: sometimes, they are
 needed only in the cpp file, so don't include them in the related hpp
@@ -124,3 +123,34 @@ file. If both files need them, include them in both.
 
 Be aware that the order of header files shouldn't matter. In fact,
 clang-format will order the header files alphabetically.
+
+----
+
+An example of the latter where the order of include files causes a
+problem:
+
+- `a.h` includes `<vector>`
+
+- `b.h` defines a function `func` using `std::vector` (as return type
+  of one of its arguments), but does not include `<vector>`.
+
+- `c.cpp` includes `a.h` before `b.h` (and doesn't include `vector`
+  itself). Therefore, when the preprocessor has finished, the
+  `<vector>` is included before `func` is defined, and the compilation
+  works fine.
+
+- If `c.cpp` includes `b.h` before `a.h`, after the preprocessing
+  stage, `func` is defined before `vector` is included, and the
+  compilation will fail.
+
+
+# Unit tests
+
+Try and include some basic unit tests with your new
+functionality. Take care of covering edge cases, such as NaN or
+infinity in the input, out-of-range values as input, empty inputs
+(0-size vectors) and other edge cases. A few basic tests can cover the
+normal cases.
+
+See the EBL unit tests as an example of covering edge cases, and
+running a few tests for more normal cases.

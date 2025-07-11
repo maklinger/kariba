@@ -1,4 +1,3 @@
-// #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
 #include <cmath>
@@ -16,8 +15,8 @@ TEST_CASE("Integration tests - Complete workflows") {
     SUBCASE("Single zone jet model workflow") {
         // This test replicates the singlezone example workflow
 
-        int nel = 50;    // Smaller arrays for faster testing
-        int nfreq = 50;
+        size_t nel = 50;    // Smaller arrays for faster testing
+        size_t nfreq = 50;
 
         // Model parameters (simplified from example)
         double Mbh = 6.5e9;
@@ -37,7 +36,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         electrons.set_norm(n);
         electrons.set_ndens();
 
-        CHECK(electrons.get_p() != nullptr);
+        CHECK(!electrons.get_p().empty());
         CHECK(electrons.count_particles() > 0.0);
 
         // Set up GSL interpolation
@@ -46,8 +45,10 @@ TEST_CASE("Integration tests - Complete workflows") {
         gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
         gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-        gsl_spline_init(spline_eldis, electrons.get_gamma(), electrons.get_gdens(), nel);
-        gsl_spline_init(spline_deriv, electrons.get_gamma(), electrons.get_gdens_diff(), nel);
+        gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
+                        nel);
+        gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
+                        electrons.get_gdens_diff().data(), nel);
 
         // Calculate synchrotron emission
         kariba::Cyclosyn syncro(nfreq);
@@ -63,11 +64,11 @@ TEST_CASE("Integration tests - Complete workflows") {
                                              spline_deriv, acc_deriv));
 
         // Verify synchrotron spectrum
-        double *syn_energy = syncro.get_energy();
-        double *syn_flux = syncro.get_nphot();
+        auto syn_energy = syncro.get_energy();
+        auto syn_flux = syncro.get_nphot();
 
         bool has_syn_emission = false;
-        for (int i = 0; i < nfreq; i++) {
+        for (size_t i = 0; i < nfreq; i++) {
             CHECK(syn_energy[i] > 0.0);
             if (syn_flux[i] > 0.0) {
                 has_syn_emission = true;
@@ -88,11 +89,11 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis));
 
         // Verify SSC spectrum
-        double *ssc_energy = ssc.get_energy();
-        double *ssc_flux = ssc.get_nphot();
+        auto ssc_energy = ssc.get_energy();
+        auto ssc_flux = ssc.get_nphot();
 
         bool has_ssc_emission = false;
-        for (int i = 0; i < nfreq; i++) {
+        for (size_t i = 0; i < nfreq; i++) {
             CHECK(ssc_energy[i] >= syn_energy[nfreq - 1]);    // SSC should be higher energy
             if (ssc_flux[i] > 0.0) {
                 has_ssc_emission = true;
