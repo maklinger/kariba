@@ -24,31 +24,19 @@ RM = rm -f
 # Kariba library
 LIBKARIBA = ${KARIBA}/libkariba.a
 
+
+SOURCES = test_bknpower.cpp test_compton.cpp test_cyclosyn.cpp test_distributions.cpp test_ebl.cpp test_particles.cpp test_powerlaw.cpp test_radiation.cpp
+OBJECTS = $(subst .cpp,.o,$(SOURCES))
+MAIN_OBJ = test_main.cpp
 TEST_MAIN = test_main
 
-# Test source files and objects
-MAIN_OBJ = test_main.o
-PARTICLE_OBJ = test_particles.o
-RADIATION_OBJ = test_radiation.o
-DISTRIBUTIONS_OBJ = test_distributions.o
-POWERLAW_OBJ = test_powerlaw.o
-BKNPOWER_OBJ = test_bknpower.o
-COMPTON_OBJ = test_compton.o
 
-# All test executables
-ALL_TESTS = $(PARTICLE_TESTS) $(DISTRIBUTIONS_TESTS) $(RADIATION_TESTS) $(BKNPOWER_TESTS) $(COMPTON_TESTS) $(POWERLAW_TESTS)
-OBJECTS = $(MAIN_OBJ) $(PARTICLE_OBJ) $(RADIATION_OBJ) $(DISTRIBUTIONS_OBJ) $(POWERLAW_OBJ) $(BKNPOWER_OBJ) $(COMPTON_OBJ)
-
-.PHONY: all tests main distclean
+.PHONY: all tests main clean distclean
 
 all: main
 
-main: $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $(TEST_MAIN) $(OBJECTS) $(LIBKARIBA) $(LDLIBS)
-
-
-%.o: %.cpp doctest.h
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+main: $(OBJECTS) $(LIBKARIBA) $(MAIN_OBJ)
+	$(LD) $(LDFLAGS) -o $(TEST_MAIN) $(OBJECTS) $(MAIN_OBJ) $(LIBKARIBA) $(LDLIBS)
 
 
 clean:

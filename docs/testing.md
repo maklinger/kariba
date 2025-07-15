@@ -41,6 +41,14 @@ If you find a bug, and fix the bug, add a unit test that specifically
 tests for this bug, so that the bug will be caught quicker and more
 easily should it return (a so-called regression test).
 
+### Extensive example unit test
+
+While most unit tests were LLM-derived from the examples, the EBL unit
+test was manually written. It is perhaps not fully complete, but does
+test for edge cases and such. It is suggested to take the EBL unit
+tests as an example when writing your own unit tests for a function.
+
+
 ## Examples
 
 The examples are tested by running them, then comparing the *.dat

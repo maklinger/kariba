@@ -46,7 +46,6 @@ TEST_CASE("Integration tests - Complete workflows") {
 
         // Calculate physical quantities
         double Ue = electrons.av_gamma() * n * karcst::emgm * karcst::cee_cee;
-        std::cout << "Ue = " << Ue << "\n";
         double Ub = B * B / (8.0 * karcst::pi);
         double equip = Ue / Ub;
 
