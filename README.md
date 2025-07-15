@@ -36,3 +36,5 @@ Please cite Lucchini et al. 2021, 2022 if you find Kariba useful in your researc
 # License
 
 The software is licensed under the MIT license -- see the `LICENSE` file.
+
+The unit tests are created and run using the [doctest framework](https://github.com/doctest/doctest); the necessary header file is included directly in this repository, together with MIT license; see `tests/LICENSE`.
