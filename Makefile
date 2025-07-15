@@ -1,8 +1,6 @@
 CONFIG = make.config
 include $(CONFIG)
 
-$(info $(GSL))
-
 
 .PHONY: all lib examples model tests clean distclean
 

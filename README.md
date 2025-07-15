@@ -1,6 +1,8 @@
 # Kariba
 
 [![build-and-test](https://github.com/evertrol/Kariba/actions/workflows/ci.yml/badge.svg)](https://github.com/evertrol/Kariba/actions/workflows/ci.yml)
+[![build-documentation](https://github.com/evertrol/Kariba/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/evertrol/Kariba/actions/workflows/deploy-docs.yml)
+
 
 Kariba is a small C++ library to support jet models. In particular, it was built to support [BHJet](https://github.com/matteolucchini1/BHJet), a semi-analytical, multi-zone jet model designed for modelling steady-state SEDs of jets launched from accreting black holes.
 
@@ -26,7 +28,7 @@ If you find bugs or other issues in the library, or would like to suggest improv
 
 # Documentation
 
-Documentation for Kariba can be found at the GitHub pages of this repository, https://kariba.github.io/Kariba .
+Documentation for Kariba can be found at the GitHub pages of this repository, https://antonpannekoek.github.io/kariba .
 
 
 # Acknowledging and citing Kariba or BHJet

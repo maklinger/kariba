@@ -10,4 +10,4 @@
 
 - [Testing](testing.md)
 
-- [Considerations (a.k.a. F.A.Q.)](considerations)
+- [Considerations (a.k.a. F.A.Q.)](considerations.md)
