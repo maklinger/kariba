@@ -9,3 +9,5 @@
 - [Tips & style guide](style-and-tips.md)
 
 - [Testing](testing.md)
+
+- [Considerations (a.k.a. F.A.Q.)](considerations)
