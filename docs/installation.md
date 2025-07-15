@@ -2,107 +2,92 @@
 
 # Installation
 
-The Kariba library can be installed using CMake. The installation has been tested against CMake version 3.26, 3.28 and 4.0.
+The Kariba library can be installed using make.
 
 ## Prerequisites
 
-The library has two prerequisites:
-
-- The GNU Scientific Library, GSL. This can often be installed with help of a package manager.
-
-- PyBind11. This can be installed with `python -m pip install
-  pybind11`, and sometimes through a package manager. Either option
-  should work; just ensure you are using at least version 2.13.
-
-  If you like, you can install PyBind11 in a virtual environment. Just make
-  sure that virtual environment is activated when you build the Kariba
-  library.
+The library has just one prerequisites: the GNU Scientific Library, GSL. This can often be installed with help of a package manager.
 
 
 ## Download
 
 First, download or clone the repository.
 
-You can download a zip file from https://github.com/evertrol/bhjet (click the green '<> Code' button, then select "Download ZIP"), or
+You can download a zip file from https://github.com/antonpannekoek/kariba (click the green '<> Code' button, then select "Download ZIP"), or
 clone the repository: on the command line, in a suitable directory:
 
 ```
-  git clone https://github.com/evertrol/BHJet.git
+  git clone https://github.com/antonpannekoek/kariba.git
 
-  cd BHJet
+  cd kariba
 ```
 
 ## Set up the installation
 
+Edit `make.config` and set the variables as necessary. You can comment-out or leave blank the variables you don't need.
 
-Once inside the local repository, take the following steps:
+- `GSL`: the main path to your GNU Scientific Library (GSL)
+  directory. If your system package manager installed the GSL, you can
+  leave this blank. You can probably find this path with
+  `pkgconf gsl --variable=prefix` or `pkg-config gsl --variable=prefix`.
 
-- Edit `cmake.config` and set the `CMAKE_INSTALL_PREFIX` variable to the base directory where you want the library to be installed. The actual library will be installed in the `lib` subdirectory, while the header files are installed in the `include/kariba` subdirectory (the directories are created if they do not exist).
+- `CXX`: the C++ compiler. In particular if you use OpenMP, make sure the compiler supports this.
 
-  You can always change this prefix with the `--install-prefix` option on the fly later during the installation process.
+- `CXXFLAGS`: some compiler flags you may want to set (or unset) when building the library.
 
-  Note that you do not actually need to install the library to use it; it only needs to be build.
+- `OPENMP`: the compiler and linker option when using OpenMP. Leave empty or commented-out when not building with OpenMP.
 
-- Edit `cmake.config` and update the base path(s) to the GSL library. If GSL is installed through your system package manager, there is no need to set this. If it is installed in another way or in a non-system location, change this accordingly. For example, Homebrew may install GSL in `/opt/homebrew/Cellar/gsl/2.8` or similar.
-
-  The include path and library path follow from the base directory, by appending `include` and `lib`. If these directories are different, change the `GSL_INCLUDE_DIR` and `GSL_LIBRARY_DIR` explicitly (Note that there should be a `gsl` subdirectory in the `include` directory, which should not be included in the `GSL_INCLUDE_DIR`).
-
-- Check that PyBind11 for Python is installed. Running `python -m pybind11` on the command line should show a help message (instead of an error), and `python -m pybind11 --cmakedir` should print the directory where PyBind11 stores CMake configuration files. (This command is exactly what is being used during the installation to locate and use PyBind11.)
 
 
 ## Build the code
 
-In the base BHJet directory, create a build directory; simply called it `build/`, and change to it:
-```
-mkdir build
-cd build
-```
+From the root directory, just run `make`.
 
-Now, run CMake, pointing to the base directory:
-```
-cmake ..
-```
+This will call the Makefiles in the separate subdirectories: `src/`,
+`examples/`, `examples/model/` and `tests/`. You can build
+subdirectories separately by either going into the directory and
+(re)running `make`, or from the root, run any of
 
-This will configure the build process for your system.
+- `make lib`
 
-Now, build the library
-```
-cmake --build .
-```
+- `make examples`
 
-If something goes wrong during the configuration or build process, you
-can simply remove everything in this `build` directory, fix the
-problem, and run the configuration and build step again.
+- `make model`
 
-The build should result in several library files, called libkariba.a
-(the static library) and libkariba.so (the shared library).
+- `make tests`
 
-The header files are in the `include/kariba` directory inside the
-`build` directory.
+The default is to build everything.
 
-For most projects, the static library is easier to use, in the sense
-that this will result in an executable that includes all the functions
-in the library, and does not need to link against the shared library.
+You can speed up building the code with parallel builds, using `make -j`.
+If you prefer to keep your system responsive during the build,
+supply the `-j` option with the number of cores you want to use for
+building, e.g. `make -j7` would leave one core for the system during
+the build on an 8-core machine.
+
+### Products
+
+The build process produces a `src/libkariba.a` file that is the actual
+Kariba library. This is the actual file that you would need to include
+at the linking stage when building your own model.
+
+In `src/kariba` are the header files. If you include a header file
+like `#include <kariba/Particles.hpp>`, then provide the `src/`
+directory for the include path to the compiler, with the `-I` option.
 
 
-If you want, you can now install the code, with
-```
-cmake --install .
-```
+Other files are the three example files, `examples/corona`,
+`examples/particles` and `examples/singlezone`.
 
-This essentially only copies the files to a more generic directory. If
-you like, you can change this directory from what is configuration in
-the `config.cmake` file, with the `--install-prefix` option. For
-example:
+In the `examples/model/` subdirectory, there is the `bhwrap` executable that
+can serve as an example application.
 
-```
-cmake --install --install-prefix=$HOME/sw .
-```
 
 
 ## Compiling and running the test and examples
 
-If you build everything from the root directory, the unit tests and the examples should already have been built. Otherwise, enter the respective directories, tests/ and examples/, and simply run `make`.
+If you build everything from the root directory, the unit tests and
+the examples should already have been built. Otherwise, enter the
+respective directories, tests/ and examples/, and simply run `make`.
 
 Once build, inside the respective directories, you can run all the unit tests with
 
@@ -111,6 +96,10 @@ Once build, inside the respective directories, you can run all the unit tests wi
 ```
 
 Hopefully all tests pass.
+
+Run `./test_main -h` to see options to select specific unit tests.
+
+----
 
 For the examples, inside their directory, run them with
 
