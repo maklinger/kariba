@@ -11,20 +11,33 @@ else
 endif
 
 
+# Detect OS: Darwin or Linux
+UNAME := $(shell uname -s)
+
 CXXFLAGS += $(OPENMP)
 CPPFLAGS = $(GSL_CPPFLAGS)
 LD = $(CXX)
 LDFLAGS = $(OPENMP) $(GSL_LDFLAGS) $(EXTRA_LDFLAGS)
-LDLIBS = -lgsl
+LDLIBS = -lgsl -lgslcblas -lm
 AR = ar
 AR_OPTS = rcs
 RM = rm -f
 
 
+
 SOURCES = BBody.cpp Bknpower.cpp Compton.cpp Cyclosyn.cpp EBL.cpp Electrons.cpp GammaRays.cpp Kappa.cpp Mixed.cpp Neutrinos_pg.cpp Neutrinos_pp.cpp Particles.cpp Powerlaw.cpp Radiation.cpp ShSDisk.cpp Thermal.cpp
 OBJECTS = $(subst .cpp,.o,$(SOURCES))
-LIBSHARED = libkariba.so
 LIBSTATIC = libkariba.a
+
+# Platform specific stuff for building the shared library
+ifeq ($(UNAME), Darwin)  # macOS
+    DYN_EXT = dylib
+    DYLIB_INSTALL_NAME = @rpath/libkariba.dylib
+else ifeq ($(UNAME), Linux)
+    DYN_EXT = so
+endif
+LIBSHARED = libkariba.$(DYN_EXT)
+
 
 
 .PHONY: all clean distclean
@@ -32,14 +45,16 @@ LIBSTATIC = libkariba.a
 
 all: shared static
 
-# Use .so on macOS as well; the difference between .so and .dylib is minimal
-# This allows the use of the same extension and same -shared option
-shared: $(OBJECTS)
-	$(LD) $(LDFLAGS) -shared -o $(LIBSHARED) $(OBJECTS) $(LDLIBS)
-
 # macOS compatible way to create a static library
 static: $(OBJECTS)
 	$(AR) $(AR_OPTS) $(LIBSTATIC) $(OBJECTS)
+
+shared: $(OBJECTS)
+ifeq ($(UNAME), Darwin)
+	$(LD) -dynamiclib -o $(LIBSHARED) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -install_name $(DYLIB_INSTALL_NAME)
+else ifeq ($(UNAME), Linux)
+	$(LD) -shared -fPIC -o $(LIBSHARED) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -Wl,-soname,$(LIBSHARED)
+endif
 
 clean:
 	$(RM) $(OBJECTS)
