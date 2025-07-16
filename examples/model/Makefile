@@ -17,7 +17,7 @@ CXXFLAGS += $(OPENMP)
 CPPFLAGS = $(GSL_CPPFLAGS) -I${KARIBA}
 LD = $(CXX)
 LDFLAGS = $(OPENMP) $(GSL_LDFLAGS) $(EXTRA_LDFLAGS)
-LDLIBS = -lgsl -lm
+LDLIBS = -lgsl -lgslcblas -lm
 RM = rm -f
 
 
@@ -27,7 +27,11 @@ TARGET_OBJ = bhwrap.o
 TARGET = bhwrap
 PYOBJ = pyjetmain.o
 PYLIB = pyjetmain.so
-LIBKARIBA = ${KARIBA}/libkariba.a
+
+# Kariba library
+LIBKARIBA = $(KARIBA)/libkariba.a
+LIBPATH = $(shell dirname $(realpath $(LIBKARIBA)))
+LIBSHARED = -L$(LIBPATH) -Wl,-rpath,$(LIBPATH) -lkariba
 
 
 .PHONY: all clean distclean
@@ -36,10 +40,13 @@ LIBKARIBA = ${KARIBA}/libkariba.a
 all: $(TARGET) $(PYLIB)
 
 $(TARGET): $(OBJECTS) $(LIBKARIBA) $(TARGET_OBJ)
-	$(LD) $(LDFLAGS) -o $(TARGET) $(OBJECTS) $(TARGET_OBJ) $(LIBKARIBA) $(LDLIBS)
+	$(LD) -o $(TARGET) $(OBJECTS) $(TARGET_OBJ) $(LDFLAGS) $(LIBKARIBA) $(LDLIBS)
 
 $(PYLIB): $(OBJECTS) $(LIKARIBA) $(PYOBJ)
 	$(LD) $(LDFLAGS) -shared -o $(PYLIB) $(OBJECTS) $(PYOBJ) $(LIBKARIBA) $(LDLIBS)
+
+shared: $(OBJECTS) $(TARGET_OBJ)
+	$(LD) -o $(TARGET) $(OBJECTS) $(TARGET_OBJ) $(LDFLAGS) $(LIBSHARED) $(LDLIBS)
 
 clean:
 	$(RM) $(OBJECTS) $(KARIBA_OBJECTS) $(TARGET_OBJ) $(PYOBJ)
