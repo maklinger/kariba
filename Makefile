@@ -2,7 +2,7 @@ CONFIG = make.config
 include $(CONFIG)
 
 
-.PHONY: all lib examples model tests clean distclean
+.PHONY: all lib examples model tests install docs clean distclean
 
 
 all: lib tests examples model
@@ -21,6 +21,10 @@ tests: lib
 
 install: lib
 	$(MAKE) -C src install
+
+docs:
+	$(MAKE) -C docs
+
 
 clean:
 	$(MAKE) -C src clean
