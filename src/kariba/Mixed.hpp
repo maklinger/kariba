@@ -44,14 +44,14 @@ class Mixed : public Particles {
     void cooling_steadystate(double ucom, double n0, double bfield, double r, double betaeff);
     double max_p(double ucom, double bfield, double betaeff, double r, double fsc);
 
-    friend double th_num_dens_int(double x, void *p);
-    friend double av_th_p_int(double x, void *p);
+    friend double th_num_dens_int(double x, void* p);
+    friend double av_th_p_int(double x, void* p);
     double count_th_particles();
     double av_th_p();
     double av_th_gamma();
 
-    friend double pl_num_dens_int(double x, void *p);
-    friend double av_pl_p_int(double x, void *p);
+    friend double pl_num_dens_int(double x, void* p);
+    friend double av_pl_p_int(double x, void* p);
     double count_pl_particles();
     double av_pl_p();
     double av_pl_gamma();

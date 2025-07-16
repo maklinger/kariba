@@ -94,10 +94,10 @@ int main() {
     double gmax = elec_Tau260Te90.get_gamma()[nel - 1];
 
     // splines for electron distribution
-    gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-    gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
-    gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-    gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+    gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+    gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
     gsl_spline_init(spline_eldis, elec_Tau260Te90.get_gamma().data(),
                     elec_Tau260Te90.get_gdens().data(), nel);

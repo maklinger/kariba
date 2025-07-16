@@ -65,8 +65,8 @@ void Powerlaw::set_norm(double n) {
 }
 
 //! Injection function to be integrated in cooling
-double injection_pl_int(double x, void *pars) {
-    InjectionPlParams *params = static_cast<InjectionPlParams *>(pars);
+double injection_pl_int(double x, void* pars) {
+    InjectionPlParams* params = static_cast<InjectionPlParams*>(pars);
     double s = params->s;
     double n = params->n;
     double m = params->m;
@@ -95,7 +95,7 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield, double
 
     for (size_t i = 0; i < gamma.size(); i++) {
         if (i < gamma.size() - 1) {
-            gsl_integration_workspace *w1;
+            gsl_integration_workspace* w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1, w1, &integral,
                                 &error);
@@ -151,8 +151,8 @@ double Powerlaw::max_p(double ucom, double bfield, double betaeff, double r, dou
 // Methods to set energy array for protons
 void Powerlaw::set_energy(double gpmin, double fsc, double f_beta, double bfield, double r_g,
                           double z, double r, int infosw, double protdens, double ntargets,
-                          double Uradjet, const std::string &outputConfiguration,
-                          const std::string &source) {
+                          double Uradjet, const std::string& outputConfiguration,
+                          const std::string& source) {
 
     double gpmax, logdgp;
     if (fsc < 1.) {
@@ -178,10 +178,10 @@ void Powerlaw::set_energy(double gpmin, double fsc, double f_beta, double bfield
     pmax = sqrt(gpmax * gpmax - 1.) * mass_gr * constants::cee;
 }
 
-void Powerlaw::ProtonTimescales(double &logdgp, double fsc, double f_beta, double bfield,
-                                double gpmin, double &gpmax, double r_g, double z, double r,
+void Powerlaw::ProtonTimescales(double& logdgp, double fsc, double f_beta, double bfield,
+                                double gpmin, double& gpmax, double r_g, double z, double r,
                                 int infosw, double pp_targets, double Uradjet,
-                                const std::string &outputConfiguration, const std::string &source) {
+                                const std::string& outputConfiguration, const std::string& source) {
 
     double Tacc0;    // Tacc = Ep*Tacc,0 ==> Tacc,0 = 1/(ηecB)
     double paramG,
@@ -339,7 +339,7 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
 
 // if (Lumsw == 1)
 void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, double pspec,
-                               double &protdens) {
+                               double& protdens) {
     // Sets the normalization of the accelerated protons assuming that a fraction
     // --ep--  of the jet power goes into the proton acceleration, unless Emax<Emin
     // so set to zero
@@ -374,7 +374,7 @@ void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, do
     }
 }
 
-void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
+void Powerlaw::set_gdens(double& plfrac_p, double Up, double protdens) {
     // If mass-loading, I use the specific enthalpy to work the normalisation
     if (isEfficient) {
         double gpmax =
@@ -405,7 +405,7 @@ void Powerlaw::set_gdens(double &plfrac_p, double Up, double protdens) {
 }
 
 //! Function that produces the secondary electrons from pp
-void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, double ntot_prot,
+void Powerlaw::set_pp_elecs(gsl_interp_accel* acc_Jp, gsl_spline* spline_Jp, double ntot_prot,
                             double nwind, double plfrac, double gammap_min, double Ep_max,
                             double bfield, double r) {
 
@@ -518,8 +518,8 @@ void Powerlaw::set_pp_elecs(gsl_interp_accel *acc_Jp, gsl_spline *spline_Jp, dou
 
 //! The method to set the secondary electrons from pg (I have called the Neutrino
 //! object first because I have all the tables from KA09 in this class/file
-void Powerlaw::set_pg_electrons(const std::vector<double> &energy,
-                                const std::vector<double> &density, double f_beta, double r,
+void Powerlaw::set_pg_electrons(const std::vector<double>& energy,
+                                const std::vector<double>& density, double f_beta, double r,
                                 double vol, double B) {
     // the density is in erg/s/Hz (because it's a Radiation object)
     double tcool;    // cooling time to account for synchrotron losses
@@ -536,8 +536,8 @@ void Powerlaw::set_pg_electrons(const std::vector<double> &energy,
 //! Function that produces the secondary electrons from photon-photon
 //! annihilation
 void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_number,
-                             const std::vector<double> &en_perseg,
-                             const std::vector<double> &lum_perseg, double gmax) {
+                             const std::vector<double>& en_perseg,
+                             const std::vector<double>& lum_perseg, double gmax) {
 
     double gmin = 1.002;    // the min Lorentz factor of the secondary
     double ng;              // number density of photons with energy 2gammae (#/cm3/erg)
@@ -600,8 +600,8 @@ void Powerlaw::Qggeefunction(double r, double vol, double bfield, size_t phot_nu
     }
 
     // We interpolate all over the photons added above
-    gsl_interp_accel *acc_lNg = gsl_interp_accel_alloc();
-    gsl_spline *spline_lNg = gsl_spline_alloc(gsl_interp_steffen, phot_number);
+    gsl_interp_accel* acc_lNg = gsl_interp_accel_alloc();
+    gsl_spline* spline_lNg = gsl_spline_alloc(gsl_interp_steffen, phot_number);
     gsl_spline_init(spline_lNg, logx.data(), logNgamma.data(), phot_number);
 
     for (size_t i = 0; i < gamma.size(); i++) {

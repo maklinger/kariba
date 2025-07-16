@@ -23,7 +23,7 @@ TEST_CASE("Particles subclass functionality") {
             CHECK(!thermal.get_gamma().empty());
 
             // Check that gamma values are reasonable for thermal distribution
-            const std::vector<double> &gamma = thermal.get_gamma();
+            const std::vector<double>& gamma = thermal.get_gamma();
             CHECK(gamma[0] >= 1.0);
             CHECK(gamma[99] > gamma[0]);
         }
@@ -70,8 +70,8 @@ TEST_CASE("Particles subclass functionality") {
             thermal.set_ndens();
 
             // Test that gamma arrays are consistent
-            const std::vector<double> &gamma = thermal.get_gamma();
-            const std::vector<double> &p = thermal.get_p();
+            const std::vector<double>& gamma = thermal.get_gamma();
+            const std::vector<double>& p = thermal.get_p();
 
             // Check relativistic energy-momentum relation for first few points
             for (size_t i = 0; i < 5; i++) {
@@ -98,7 +98,7 @@ TEST_CASE("Particles subclass functionality") {
             CHECK(!powerlaw.get_p().empty());
             CHECK(!powerlaw.get_gamma().empty());
 
-            const std::vector<double> &gamma = powerlaw.get_gamma();
+            const std::vector<double>& gamma = powerlaw.get_gamma();
             CHECK(gamma[0] >= 1.0);
             CHECK(gamma[99] <= gmax * 1.001);    // Allow small numerical error
 
@@ -232,8 +232,8 @@ TEST_CASE("Particle distribution consistency checks") {
         thermal.set_norm(1.0);
         thermal.set_ndens();
 
-        const std::vector<double> &p = thermal.get_p();
-        const std::vector<double> &gamma = thermal.get_gamma();
+        const std::vector<double>& p = thermal.get_p();
+        const std::vector<double>& gamma = thermal.get_gamma();
 
         // Check relativistic energy-momentum relation: E^2 = (pc)^2 + (mc^2)^2
         for (size_t i = 0; i < 10; i++) {
@@ -253,8 +253,8 @@ TEST_CASE("Particle distribution consistency checks") {
         powerlaw.set_norm(1.0);
         powerlaw.set_ndens();
 
-        const std::vector<double> &p = powerlaw.get_p();
-        const std::vector<double> &gamma = powerlaw.get_gamma();
+        const std::vector<double>& p = powerlaw.get_p();
+        const std::vector<double>& gamma = powerlaw.get_gamma();
 
         // Check arrays are monotonically increasing
         for (size_t i = 1; i < 50; i++) {

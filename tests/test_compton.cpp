@@ -41,10 +41,10 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK(electrons.count_particles() > 0.0);
 
         // Set up GSL interpolation
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
-        gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-        gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+        gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+        gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         nel);
@@ -65,8 +65,8 @@ TEST_CASE("Integration tests - Complete workflows") {
                                              spline_deriv, acc_deriv));
 
         // Verify synchrotron spectrum
-        const std::vector<double> &syn_energy = syncro.get_energy();
-        const std::vector<double> &syn_flux = syncro.get_nphot();
+        const std::vector<double>& syn_energy = syncro.get_energy();
+        const std::vector<double>& syn_flux = syncro.get_nphot();
 
         bool has_syn_emission = false;
         for (size_t i = 0; i < nfreq; i++) {
@@ -90,8 +90,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK_NOTHROW(ssc.compton_spectrum(gmin_actual, gmax_actual, spline_eldis, acc_eldis));
 
         // Verify SSC spectrum
-        const std::vector<double> &ssc_energy = ssc.get_energy();
-        const std::vector<double> &ssc_flux = ssc.get_nphot();
+        const std::vector<double>& ssc_energy = ssc.get_energy();
+        const std::vector<double>& ssc_flux = ssc.get_nphot();
 
         bool has_ssc_emission = false;
         for (size_t i = 0; i < nfreq; i++) {
@@ -164,8 +164,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK(electrons.count_particles() > 0.0);
 
         // Set up GSL interpolation
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         nel);
@@ -187,8 +187,8 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK_NOTHROW(ic.compton_spectrum(gmin, gmax, spline_eldis, acc_eldis));
 
         // Verify Compton spectrum
-        const std::vector<double> &ic_energy = ic.get_energy();
-        const std::vector<double> &ic_flux = ic.get_nphot();
+        const std::vector<double>& ic_energy = ic.get_energy();
+        const std::vector<double>& ic_flux = ic.get_nphot();
 
         bool has_ic_emission = false;
         for (size_t i = 0; i < nfreq; i++) {
@@ -200,7 +200,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK(has_ic_emission);
 
         // Check that Compton spectrum extends to higher energies than disk
-        const std::vector<double> &disk_energy = disk.get_energy();
+        const std::vector<double>& disk_energy = disk.get_energy();
         CHECK(ic_energy[nfreq - 1] > disk_energy[49]);    // IC should extend higher
 
         // Cleanup

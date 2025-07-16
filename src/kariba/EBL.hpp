@@ -4,6 +4,6 @@
 
 namespace kariba {
 
-void ebl_atten_gil(const std::vector<double> &en, std::vector<double> &lum, double redshift);
+void ebl_atten_gil(const std::vector<double>& en, std::vector<double>& lum, double redshift);
 
 }

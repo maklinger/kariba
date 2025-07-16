@@ -14,7 +14,7 @@ namespace karcst = kariba::constants;
 // velprof_ad) or rg (velprof_mag) and y axis in units of gamma*beta, where
 // gamma is the jet bulk lorentz factor and beta its speed in units of c For
 // information on the 2 velocity profiles below see Crumley et al. 2016
-void velprof_iso(gsl_spline *spline) {
+void velprof_iso(gsl_spline* spline) {
     // Tabulated velocity for 1D quasi-isothermal Bernoulli eq.
     const size_t size = 54;
 
@@ -39,7 +39,7 @@ void velprof_iso(gsl_spline *spline) {
     gsl_spline_init(spline, gbx_vel_iso.data(), gby_vel_iso.data(), size);
 }
 
-void velprof_ad(gsl_spline *spline) {
+void velprof_ad(gsl_spline* spline) {
     // Tabluated velocity for 1D adiabatic Bernoulli eq.
     const size_t size = 54;
 
@@ -65,7 +65,7 @@ void velprof_ad(gsl_spline *spline) {
 }
 
 // For information on this velocity profile see Lucchini et al. 2018
-void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
+void velprof_mag(jet_dynpars& dyn, gsl_spline* spline) {
     size_t size = 54;
     std::vector<double> gbx_vel_mag(size, 0.0);
     std::vector<double> gby_vel_mag(size, 0.0);
@@ -93,7 +93,7 @@ void velprof_mag(jet_dynpars &dyn, gsl_spline *spline) {
 // density at the base for given jet power, jet base radius, initial speed,
 // initial plasma beta, accounting for 1 or 2 jets. One of two functions is
 // called depending on the base assumptions (magnetic/thermal driven jet)
-void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en) {
+void equipartition(int npsw, jet_dynpars& dyn, jet_enpars& en) {
     double eq_fac, dyn_fac;    // the two numbers that change equipartition are
                                // the jet dynamics and equipartition assumptions
     if (npsw == 0) {
@@ -127,7 +127,7 @@ void equipartition(int npsw, jet_dynpars &dyn, jet_enpars &en) {
               (4. * karcst::pi * en.protdens * karcst::pmgm * std::pow(karcst::cee, 2.));
 }
 
-void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
+void equipartition(double Nj, jet_dynpars& dyn, jet_enpars& en) {
     double equip, eq_fac, dyn_fac;
 
     // step one: calculate proton number density from initial equipartition
@@ -154,7 +154,7 @@ void equipartition(double Nj, jet_dynpars &dyn, jet_enpars &en) {
 }
 
 // Function to set up distance grid for calculations along the jet axies
-void jetgrid(size_t i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz, double &z) {
+void jetgrid(size_t i, grid_pars& grid, jet_dynpars& dyn, double r, double& delz, double& z) {
     double zinc, z_next;
     // note: the distance grid changes in steps of 2r up to a distance zcut, and
     // then becomes logarithmic this prevents resolution errors for the IC
@@ -184,8 +184,8 @@ void jetgrid(size_t i, grid_pars &grid, jet_dynpars &dyn, double r, double &delz
     }
 }
 
-void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
-                gsl_spline *spline, gsl_interp_accel *acc) {
+void isojetpars(double z, jet_dynpars& dyn, jet_enpars& en, double& t, zone_pars& zone,
+                gsl_spline* spline, gsl_interp_accel* acc) {
 
     double mj;
     double z_eval;
@@ -216,8 +216,8 @@ void isojetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars
     }
 }
 
-void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
-               gsl_spline *spline, gsl_interp_accel *acc) {
+void adjetpars(double z, jet_dynpars& dyn, jet_enpars& en, double& t, zone_pars& zone,
+               gsl_spline* spline, gsl_interp_accel* acc) {
 
     double mj;
     double z_eval;
@@ -249,8 +249,8 @@ void adjetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars 
     }
 }
 
-void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars &zone,
-               gsl_spline *spline, gsl_interp_accel *acc) {
+void bljetpars(double z, jet_dynpars& dyn, jet_enpars& en, double& t, zone_pars& zone,
+               gsl_spline* spline, gsl_interp_accel* acc) {
 
     double mj, theta, theta_acc, n_acc, b_acc, gb, r_acc;
     double gb0 = dyn.gam0 * dyn.beta0;
@@ -289,7 +289,7 @@ void bljetpars(double z, jet_dynpars &dyn, jet_enpars &en, double &t, zone_pars 
     }
 }
 
-void b_profile(double gam, double n, jet_dynpars &dyn, jet_enpars &en, double &field) {
+void b_profile(double gam, double n, jet_dynpars& dyn, jet_enpars& en, double& field) {
     double sigma, w;
 
     // Only accounts for the injected distribution, not for extra accelerated
@@ -304,7 +304,7 @@ void b_profile(double gam, double n, jet_dynpars &dyn, jet_enpars &en, double &f
 
 // This function is used to set up the external AGN photon fields (torus, BLR)
 // as a function of accretion rate See Ghisellini and Tavecchio 2009 for details
-void agn_photons_init(double lum, double f1, double f2, com_pars &agn_com) {
+void agn_photons_init(double lum, double f1, double f2, com_pars& agn_com) {
     agn_com.rblr = 1.e17 * std::pow(lum / 1.e45, 1. / 2.);
     agn_com.ublr =
         (17. / 12.) * f1 * lum / (4. * karcst::pi * std::pow(agn_com.rblr, 2.) * karcst::cee);
@@ -328,8 +328,8 @@ void agn_photons_init(double lum, double f1, double f2, com_pars &agn_com) {
 // are multiplied by delta^2 instead of gamma^2 as in Dermer, 1995. Because of
 // this, when we compute urad_total (which goes to the cooling term) we
 // sometimes need to convert again with a factor gamma/delta^2
-void zone_agn_phfields(double z, zone_pars &zone, double &ublr_zone, double &udt_zone,
-                       com_pars &agn_com) {
+void zone_agn_phfields(double z, zone_pars& zone, double& ublr_zone, double& udt_zone,
+                       com_pars& agn_com) {
     // these are to calculate the conversion factor to account for z>zblr/zdt,
     // when photons are deboosted. See Ghisellini&Tavecchio 2009
     double blr_conv, dt_conv, mu_blr1, mu_blr2, mu_dt1, mu_dt2, fr;

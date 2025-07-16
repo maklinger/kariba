@@ -64,8 +64,8 @@ void Bknpower::set_pspec2(double s2) { pspec2 = s2; }
 void Bknpower::set_brk(double brk) { pbrk = brk; }
 
 //! Methods to calculate the normalization of the function
-double norm_bkn_int(double x, void *pars) {
-    BknParams *params = static_cast<BknParams *>(pars);
+double norm_bkn_int(double x, void* pars) {
+    BknParams* params = static_cast<BknParams*>(pars);
 
     double s1 = params->s1;
     double s2 = params->s2;
@@ -85,7 +85,7 @@ void Bknpower::set_norm(double n) {
     min = std::pow(std::pow(pmin / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
     max = std::pow(std::pow(pmax / (mass_gr * constants::cee), 2.) + 1., 1. / 2.);
 
-    gsl_integration_workspace *w1;
+    gsl_integration_workspace* w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
     auto params = BknParams{pspec1, pspec2, pbrk, pmax, mass_gr};
@@ -98,8 +98,8 @@ void Bknpower::set_norm(double n) {
 }
 
 //! Injection function to be integrated in cooling
-double injection_bkn_int(double x, void *pars) {
-    InjectionBknParams *params = static_cast<InjectionBknParams *>(pars);
+double injection_bkn_int(double x, void* pars) {
+    InjectionBknParams* params = static_cast<InjectionBknParams*>(pars);
     double s1 = params->s1;
     double s2 = params->s2;
     double brk = params->brk;
@@ -131,7 +131,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double
 
     for (size_t i = 0; i < p.size(); i++) {
         if (i < p.size() - 1) {
-            gsl_integration_workspace *w1;
+            gsl_integration_workspace* w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_integration_qag(&F1, gamma[i], gamma[i + 1], 1e1, 1e1, 100, 1, w1, &integral,
                                 &error);

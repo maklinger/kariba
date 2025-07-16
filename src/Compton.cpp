@@ -96,12 +96,12 @@ Compton::Compton(size_t size, size_t seed_size)
 //! This function is the kernel of eq 2.48 in Blumenthal & Gould(1970),
 //! represents the scattered photon spectrum for a given electron and includes
 //! the Klein-Nishina cross section.
-double comfnc(double ein, void *pars) {
-    ComfncParams *params = static_cast<ComfncParams *>(pars);
+double comfnc(double ein, void* pars) {
+    ComfncParams* params = static_cast<ComfncParams*>(pars);
     double game = params->game;
     double e1 = params->e1;
-    gsl_spline *phodis = params->phodis;
-    gsl_interp_accel *acc_phodis = params->acc_phodis;
+    gsl_spline* phodis = params->phodis;
+    gsl_interp_accel* acc_phodis = params->acc_phodis;
 
     double einit, utst, biggam, q;
     double phonum;
@@ -128,15 +128,15 @@ double comfnc(double ein, void *pars) {
 
 //! This function is the integral of comfnc above over the total seed photon
 //! distribution
-double comint(double gam, void *pars) {
-    ComintParams *params = static_cast<ComintParams *>(pars);
+double comint(double gam, void* pars) {
+    ComintParams* params = static_cast<ComintParams*>(pars);
     double eph = (params->eph);
     double ephmin = (params->ephmin);
     double ephmax = (params->ephmax);
-    gsl_spline *eldis = (params->eldis);
-    gsl_interp_accel *acc_eldis = (params->acc_eldis);
-    gsl_spline *phodis = (params->phodis);
-    gsl_interp_accel *acc_phodis = (params->acc_phodis);
+    gsl_spline* eldis = (params->eldis);
+    gsl_interp_accel* acc_eldis = (params->acc_eldis);
+    gsl_spline* phodis = (params->phodis);
+    gsl_interp_accel* acc_phodis = (params->acc_phodis);
 
     double game, econst, blim, ulim, e1, den;
     double result, error;
@@ -150,7 +150,7 @@ double comint(double gam, void *pars) {
     if (ulim <= blim) {
         return 0;
     } else {
-        gsl_integration_workspace *w2;
+        gsl_integration_workspace* w2;
         w2 = gsl_integration_workspace_alloc(100);
         gsl_function F2;
         auto F2params = ComfncParams{game, e1, phodis, acc_phodis};
@@ -167,9 +167,9 @@ double comint(double gam, void *pars) {
 //! This integrates the individual electron spectrum from comint over the total
 //! electron distribution
 double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double enphmin,
-                            double enphmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis) {
+                            double enphmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis) {
     double result, error;
-    gsl_integration_workspace *w1;
+    gsl_integration_workspace* w1;
     w1 = gsl_integration_workspace_alloc(100);
 
     gsl_function F1;
@@ -194,8 +194,8 @@ double Compton::comintegral(size_t it, double blim, double ulim, double enphot, 
 //! scatters. Note: the reason the Doppler boosting is a factor of 2 instead of 3
 //! is because the calculations are done for a conical jet in the Lind&BLanford
 //! 1985 prescription
-void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
-                               gsl_interp_accel *acc_eldis) {
+void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
+                               gsl_interp_accel* acc_eldis) {
     double blim, ulim, com;
     double dopfac_cj;
     double ephmin, ephmax;
@@ -244,8 +244,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline *eldis,
 //! automatically added to the existing one. note: the second condition has a <=
 //! sign to dodge numerical errors when the seed field energy density is
 //! extremely low, which can result in negative values/nan for the seed_urad
-void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
-                            const std::vector<double> &seed_lum) {
+void Compton::cyclosyn_seed(const std::vector<double>& seed_arr,
+                            const std::vector<double>& seed_lum) {
     // to do: asssert input and member sizes are the same
     for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
@@ -268,7 +268,7 @@ void Compton::cyclosyn_seed(const std::vector<double> &seed_arr,
 //! Method to include black body to seed field for IC;
 //! Note: Urad and Tbb need to be passed in the co-moving frame, the function
 //! does NOT account for beaming
-void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad, double Tbb) {
+void Compton::bb_seed_k(const std::vector<double>& seed_arr, double Urad, double Tbb) {
     double ulim, bbfield;
 
     ulim = 1e2 * Tbb * constants::kboltz;
@@ -294,7 +294,7 @@ void Compton::bb_seed_k(const std::vector<double> &seed_arr, double Urad, double
     gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
-void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, double Tbb) {
+void Compton::bb_seed_kev(const std::vector<double>& seed_arr, double Urad, double Tbb) {
     double ulim, bbfield;
 
     ulim = 1e2 * Tbb * constants::kboltz_kev2erg;
@@ -324,8 +324,8 @@ void Compton::bb_seed_kev(const std::vector<double> &seed_arr, double Urad, doub
 //! Calculates incident photon field for a Shakura-Sunyaev disk with aspect ratio
 //! H, inner temperature Tin, inner radius Rin, at a distance z from the disk,
 //! taking beaming into account
-double disk_integral(double alfa, void *pars) {
-    DiskIcParams *params = static_cast<DiskIcParams *>(pars);
+double disk_integral(double alfa, void* pars) {
+    DiskIcParams* params = static_cast<DiskIcParams*>(pars);
     double gamma = params->gamma;
     double beta = params->beta;
     double tin = params->tin;
@@ -355,7 +355,7 @@ double disk_integral(double alfa, void *pars) {
     return Urad;
 }
 
-void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, double rin, double rout,
+void Compton::shsdisk_seed(const std::vector<double>& seed_arr, double tin, double rin, double rout,
                            double h, double z) {
     double ulim, blim, nulim, Gamma, result, error, diskfield;
 
@@ -373,7 +373,7 @@ void Compton::shsdisk_seed(const std::vector<double> &seed_arr, double tin, doub
 
     for (size_t i = 0; i < seed_energ.size(); i++) {
         if (seed_energ[i] < nulim) {
-            gsl_integration_workspace *w1;
+            gsl_integration_workspace* w1;
             w1 = gsl_integration_workspace_alloc(100);
             gsl_function F;
             auto Fparams =
@@ -480,7 +480,7 @@ void Compton::set_frequency(double numin, double numax) {
 void Compton::set_escape(double escape) { escape_corr = escape; }
 
 //! Method to set up seed frequency array
-void Compton::seed_freq_array(const std::vector<double> &seed_arr) {
+void Compton::seed_freq_array(const std::vector<double>& seed_arr) {
     // to do: asssert input and member sizes are the same
     for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];

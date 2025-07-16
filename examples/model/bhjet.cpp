@@ -18,8 +18,8 @@
 
 namespace karcst = kariba::constants;    // alias the kariba::constants namespace
 
-void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
-             std::vector<double> &photeng, std::vector<double> &photspec) {
+void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
+             std::vector<double>& photeng, std::vector<double>& photspec) {
 
     // STEP 1: VARIABLE/OBJECT DEFINITIONS
     //----------------------------------------------------------------------------------------------
@@ -117,15 +117,15 @@ void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
     kariba::BBody BlackBody;
 
     // splines for jet acceleration
-    gsl_interp_accel *acc_speed = gsl_interp_accel_alloc();
-    gsl_spline *spline_speed = gsl_spline_alloc(gsl_interp_steffen, 54);
+    gsl_interp_accel* acc_speed = gsl_interp_accel_alloc();
+    gsl_spline* spline_speed = gsl_spline_alloc(gsl_interp_steffen, 54);
 
     // splines for electron distribution
-    gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-    gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+    gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-    gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-    gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+    gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
     // STEP 2: PARAMETER/FILE INITIALIZATION
     Mbh = param[0];

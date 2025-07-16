@@ -15,8 +15,8 @@ ShSDisk::ShSDisk(size_t size) : Radiation(size) {}    // size = 50 in the declar
 
 //! return SD spectrum over a given radius, frequency to be integrated over
 //! radius
-double disk_int(double lr, void *pars) {
-    DiskObsParams *params = static_cast<DiskObsParams *>(pars);
+double disk_int(double lr, void* pars) {
+    DiskObsParams* params = static_cast<DiskObsParams*>(pars);
     double tin = params->tin;
     double rin = params->rin;
     double nu = params->nu;
@@ -40,7 +40,7 @@ void ShSDisk::disk_spectrum() {
     double result, error;
 
     for (size_t k = 0; k < en_phot_obs.size(); k++) {
-        gsl_integration_workspace *w1;
+        gsl_integration_workspace* w1;
         w1 = gsl_integration_workspace_alloc(100);
         gsl_function F1;
         auto F1params = DiskObsParams{Tin, r, en_phot_obs[k] / constants::herg};

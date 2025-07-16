@@ -24,7 +24,10 @@ clone the repository: on the command line, in a suitable directory:
 
 ## Set up the installation
 
-Edit `make.config` and set the variables as necessary. You can comment-out or leave blank the variables you don't need.
+Copy the `make.config-template` to `make.config`, and edit the
+`make.config` file to set the configuration variables as
+necessary. You can comment-out or leave blank the variables you don't
+need.
 
 - `GSL`: the main path to your GNU Scientific Library (GSL)
   directory. If your system package manager installed the GSL, you can

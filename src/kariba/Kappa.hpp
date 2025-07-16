@@ -22,8 +22,8 @@ class Kappa : public Particles {
     void set_temp_kev(double T);
     void set_norm(double n);
 
-    friend double norm_kappa_int(double x, void *p);
-    friend double injection_kappa_int(double x, void *p);
+    friend double norm_kappa_int(double x, void* p);
+    friend double injection_kappa_int(double x, void* p);
 
     void cooling_steadystate(double ucom, double n0, double bfield, double r, double gshift);
     double max_p(double ucom, double bfield, double betaeff, double r, double fsc);

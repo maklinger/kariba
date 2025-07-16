@@ -19,34 +19,34 @@ class Compton : public Radiation {
     std::vector<double>
         iter_urad;    //!< array of iterated photon number density in log10(#/erg/cm^3)
 
-    gsl_spline *seed_ph;           //!< interpolation of photon field array seed_urad
-    gsl_interp_accel *acc_seed;    //!< accelerator for above spline
+    gsl_spline* seed_ph;           //!< interpolation of photon field array seed_urad
+    gsl_interp_accel* acc_seed;    //!< accelerator for above spline
 
-    gsl_spline *iter_ph;           //!< interpolation of photon field for multiple scatters
-    gsl_interp_accel *acc_iter;    //!< accelerator of above spline
+    gsl_spline* iter_ph;           //!< interpolation of photon field for multiple scatters
+    gsl_interp_accel* acc_iter;    //!< accelerator of above spline
 
-    gsl_spline2d *esc_p_sph;    //!< interpolation for escape calculation to mimic
+    gsl_spline2d* esc_p_sph;    //!< interpolation for escape calculation to mimic
     //!< radiative transfer
-    gsl_spline2d *esc_p_cyl;    //!< interpolation for escape calculation to mimic
+    gsl_spline2d* esc_p_cyl;    //!< interpolation for escape calculation to mimic
     //!< radiative transfer
-    gsl_interp_accel *acc_tau;    //!< accelerator of above spline over tau
-    gsl_interp_accel *acc_Te;     //!< accelerator of above spline over Te
+    gsl_interp_accel* acc_tau;    //!< accelerator of above spline over tau
+    gsl_interp_accel* acc_Te;     //!< accelerator of above spline over Te
 
   public:
     ~Compton();
     Compton(size_t size, size_t seed_size);
 
-    friend double comfnc(double ein, void *p);
-    friend double comint(double gam, void *p);
-    friend double disk_integral(double alfa, void *p);
+    friend double comfnc(double ein, void* p);
+    friend double comint(double gam, void* p);
+    friend double disk_integral(double alfa, void* p);
     double comintegral(size_t it, double blim, double ulim, double nu, double numin, double numax,
-                       gsl_spline *eldis, gsl_interp_accel *acc_eldis);
-    void compton_spectrum(double gmin, double gmax, gsl_spline *eldis, gsl_interp_accel *acc_eldis);
+                       gsl_spline* eldis, gsl_interp_accel* acc_eldis);
+    void compton_spectrum(double gmin, double gmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis);
 
-    void cyclosyn_seed(const std::vector<double> &seed_arr, const std::vector<double> &seed_lum);
-    void bb_seed_k(const std::vector<double> &seed_arr, double Urad, double Tbb);
-    void bb_seed_kev(const std::vector<double> &seed_energ, double Urad, double Tbb);
-    void shsdisk_seed(const std::vector<double> &seed_arr, double tin, double rin, double rout,
+    void cyclosyn_seed(const std::vector<double>& seed_arr, const std::vector<double>& seed_lum);
+    void bb_seed_k(const std::vector<double>& seed_arr, double Urad, double Tbb);
+    void bb_seed_kev(const std::vector<double>& seed_energ, double Urad, double Tbb);
+    void shsdisk_seed(const std::vector<double>& seed_arr, double tin, double rin, double rout,
                       double h, double z);
 
     void set_frequency(double numin, double numax);
@@ -55,7 +55,7 @@ class Compton : public Radiation {
     void set_escape(double escape);
     void set_niter(double nu0, double Te);
     void set_niter(size_t n);
-    void seed_freq_array(const std::vector<double> &seed_energ);
+    void seed_freq_array(const std::vector<double>& seed_energ);
 
     double get_tau() const { return tau; };
 

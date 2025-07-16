@@ -24,15 +24,15 @@ double omp_get_wtime() {
 
 namespace fs = std::filesystem;
 
-void read_params(const std::string &path, std::vector<double> &pars);
+void read_params(const std::string& path, std::vector<double>& pars);
 
-extern void jetinterp(std::vector<double> &ear, std::vector<double> &energ,
-                      std::vector<double> &phot, std::vector<double> &photar, size_t ne,
+extern void jetinterp(std::vector<double>& ear, std::vector<double>& energ,
+                      std::vector<double>& phot, std::vector<double>& photar, size_t ne,
                       size_t newne);
-extern void jetmain(std::vector<double> &ear, size_t ne, std::vector<double> &param,
-                    std::vector<double> &photeng, std::vector<double> &photspec);
+extern void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
+                    std::vector<double>& photeng, std::vector<double>& photspec);
 
-int main([[maybe_unused]] int argc, char *argv[]) {
+int main([[maybe_unused]] int argc, char* argv[]) {
     // set input path file relative to executable
     fs::path input_path = argv[0];
     input_path.replace_filename("Input/ip.dat");
@@ -70,7 +70,7 @@ int main([[maybe_unused]] int argc, char *argv[]) {
 //
 //  @return pars         Parameters
 //
-void read_params(const std::string &path, std::vector<double> &pars) {
+void read_params(const std::string& path, std::vector<double>& pars) {
     std::ifstream inFile;
     inFile.open(path);
     std::string line;

@@ -50,8 +50,8 @@ TEST_CASE("Radiation base class functionality") {
             CHECK(!disk.get_nphot_obs().empty());
 
             // Check that spectrum has positive values
-            const std::vector<double> &energy = disk.get_energy_obs();
-            const std::vector<double> &nphot = disk.get_nphot_obs();
+            const std::vector<double>& energy = disk.get_energy_obs();
+            const std::vector<double>& nphot = disk.get_nphot_obs();
 
             bool has_positive_flux = false;
             for (size_t i = 0; i < disk.get_size(); i++) {
@@ -95,8 +95,8 @@ TEST_CASE("Radiation base class functionality") {
             CHECK(!bbody.get_nphot().empty());
 
             // Check that spectrum has expected properties
-            const std::vector<double> &energy = bbody.get_energy();
-            const std::vector<double> &nphot = bbody.get_nphot();
+            const std::vector<double>& energy = bbody.get_energy();
+            const std::vector<double>& nphot = bbody.get_nphot();
 
             // Check that all energies are positive and increasing
             bool increasing = true;
@@ -134,10 +134,10 @@ TEST_CASE("Synchrotron radiation") {
         electrons.set_ndens();
 
         // Set up GSL interpolation
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
-        gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-        gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
+        gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+        gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         100);
@@ -163,7 +163,7 @@ TEST_CASE("Synchrotron radiation") {
             CHECK(!syncro.get_nphot().empty());
 
             // Check for positive flux somewhere
-            const std::vector<double> &nphot = syncro.get_nphot();
+            const std::vector<double>& nphot = syncro.get_nphot();
             bool has_flux = false;
             for (size_t i = 0; i < syncro.get_size(); i++) {
                 if (nphot[i] > 0.0) {
@@ -224,8 +224,8 @@ TEST_CASE("Inverse Compton scattering") {
         disk.disk_spectrum();
 
         // Set up GSL interpolation for electrons
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         100);
@@ -293,10 +293,10 @@ TEST_CASE("Inverse Compton scattering") {
         syncro.set_beaming(0.0, 0.0, 1.0);
 
         // GSL setup
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
-        gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-        gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, 100);
+        gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+        gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, 100);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         100);
@@ -355,7 +355,7 @@ TEST_CASE("Radiation consistency checks") {
         syncro.set_frequency(1e10, 1e20);
 
         // Check that frequency arrays are set up correctly
-        const std::vector<double> &energy = syncro.get_energy();
+        const std::vector<double>& energy = syncro.get_energy();
         CHECK(!energy.empty());
 
         // Frequencies should be monotonically increasing

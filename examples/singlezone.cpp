@@ -36,11 +36,11 @@ int main() {
 
     // splines for electron distribution. These are needed by the radiation
     // codes
-    gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-    gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+    gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
 
-    gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-    gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
+    gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+    gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
     // These calls remove the output of previous runs from the output files
     clean_file("Output/Singlezone_Syn.dat", 1);

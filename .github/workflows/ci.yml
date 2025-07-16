@@ -20,7 +20,9 @@ jobs:
            sudo apt install -y build-essential libgsl-dev
 
        - name: Build everything with Make
-         run: make
+         run: |
+           cp make.config-template make.config
+           make
 
        - name: Run tests
          run: ./tests/test_main
