@@ -124,3 +124,16 @@ Total power: 2.21864e+43 erg s^-1, 2.73063e-05 Eddington
 All the examples also write a bunch of output files in the output/
 directory. You can check the output files for correctness by comparing
 them with those in the output_comparison directory.
+
+
+## Installing in a separate directory (optional)
+
+As an optional step, you can install the library files, including the header files, into a separate directory. This could be `/usr/local/`, or something in your home directory, like `$HOME/sw` or `$HOME/.local`.
+
+The install will install the static and shared library files into a `lib/` subdirectory, and the Kariba header files into a `include/kariba/` subdirectory.
+
+Set the `PREFIX` variable in `make.config` to the base directory, then simply run
+
+```
+make install
+```

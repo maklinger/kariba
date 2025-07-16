@@ -19,6 +19,9 @@ model: lib
 tests: lib
 	$(MAKE) -C tests
 
+install: lib
+	$(MAKE) -C src install
+
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C examples clean

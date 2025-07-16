@@ -56,6 +56,12 @@ else ifeq ($(UNAME), Linux)
 	$(LD) -shared -fPIC -o $(LIBSHARED) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -Wl,-soname,$(LIBSHARED)
 endif
 
+install:
+	install -d $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 libkariba.a $(LIBSHARED) $(DESTDIR)$(PREFIX)/lib/
+	install -d $(DESTDIR)$(PREFIX)/include/kariba/
+	install -m 644 kariba/*.hpp $(DESTDIR)$(PREFIX)/include/kariba/
+
 clean:
 	$(RM) $(OBJECTS)
 
