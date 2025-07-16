@@ -107,10 +107,10 @@ Neutrinos_pg::Neutrinos_pg(size_t size, double Emin, double Emax) : Radiation(si
 }
 
 //************************************************************************************************************
-void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                                 gsl_spline *spline_Jp, const std::vector<double> &en_perseg,
-                                 const std::vector<double> &lum_perseg, size_t nphot,
-                                 const std::string &outputConfiguration, const std::string &flavor,
+void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel* acc_Jp,
+                                 gsl_spline* spline_Jp, const std::vector<double>& en_perseg,
+                                 const std::vector<double>& lum_perseg, size_t nphot,
+                                 const std::string& outputConfiguration, const std::string& flavor,
                                  int infosw, std::string_view source) {
 
     std::ofstream PhotopionFile;    // for plotting
@@ -154,8 +154,8 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
     }
 
     // Interpolation for jet photon distribution
-    gsl_interp_accel *acc_ng = gsl_interp_accel_alloc();
-    gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_steffen, nphot);
+    gsl_interp_accel* acc_ng = gsl_interp_accel_alloc();
+    gsl_spline* spline_ng = gsl_spline_alloc(gsl_interp_steffen, nphot);
     gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
     deta = std::log10(eta_max / eta_min) / (N - 1);
@@ -167,7 +167,7 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
         if (Ev > Epion &&
             Ev <= gp_max * constants::pmgm * constants::cee * constants::cee) {    // in erg
             sum = 0.0;
-            gsl_integration_workspace *w1 = gsl_integration_workspace_alloc(100);
+            gsl_integration_workspace* w1 = gsl_integration_workspace_alloc(100);
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {    // eq 69 from KA08
@@ -214,20 +214,20 @@ void Neutrinos_pg::set_neutrinos(double gp_min, double gp_max, gsl_interp_accel 
     gsl_interp_accel_free(acc_ng);
 }
 
-double Heta(double x, void *pars) {
+double Heta(double x, void* pars) {
     // eq 70 from KA08 for pairs and writen as {0< x=Ee/Ep <1} Ee/Epmax <
     // x=Ee/Ep <Ee/Epmin
-    HetaParams *params = static_cast<HetaParams *>(pars);
+    HetaParams* params = static_cast<HetaParams*>(pars);
     double eta = params->eta;
     double eta_zero = params->eta_zero;
     double E = params->E;
     double gp_min = params->gp_min;
     double gp_max = params->gp_max;
-    gsl_spline *spline_Jp = params->spline_Jp;
-    gsl_interp_accel *acc_Jp = params->acc_Jp;
+    gsl_spline* spline_Jp = params->spline_Jp;
+    gsl_interp_accel* acc_Jp = params->acc_Jp;
     std::string product = params->product;
-    gsl_interp_accel *acc_ng = params->acc_ng;
-    gsl_spline *spline_ng = params->spline_ng;
+    gsl_interp_accel* acc_ng = params->acc_ng;
+    gsl_spline* spline_ng = params->spline_ng;
     double nu_min = params->nu_min;
     double nu_max = params->nu_max;
 
@@ -348,7 +348,7 @@ double PhiFunc(double eta, double eta0, double x, std::string_view product) {
 }
 
 // The tables from KA08 for photomeson that give s,δ and B
-void tables_photomeson(double &s, double &delta, double &Beta, std::string_view product,
+void tables_photomeson(double& s, double& delta, double& Beta, std::string_view product,
                        double xeta) {
     // Gamma rays from neutral pion decay:
     size_t sizeTable;
@@ -361,12 +361,12 @@ void tables_photomeson(double &s, double &delta, double &Beta, std::string_view 
         std::cout << "wrong population" << std::endl;
         sizeTable = 2;
     }
-    gsl_interp_accel *acc_sigma = gsl_interp_accel_alloc();
-    gsl_spline *spline_sigma = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
-    gsl_interp_accel *acc_delta = gsl_interp_accel_alloc();
-    gsl_spline *spline_delta = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
-    gsl_interp_accel *acc_Beta = gsl_interp_accel_alloc();
-    gsl_spline *spline_Beta = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
+    gsl_interp_accel* acc_sigma = gsl_interp_accel_alloc();
+    gsl_spline* spline_sigma = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
+    gsl_interp_accel* acc_delta = gsl_interp_accel_alloc();
+    gsl_spline* spline_delta = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
+    gsl_interp_accel* acc_Beta = gsl_interp_accel_alloc();
+    gsl_spline* spline_Beta = gsl_spline_alloc(gsl_interp_cspline, sizeTable);
 
     if (product.compare("electrons") == 0) {
         gsl_spline_init(spline_sigma, etaeTable.data(), seTable.data(), etaeTable.size());

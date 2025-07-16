@@ -23,8 +23,8 @@ class Bknpower : public Particles {
     void set_brk(double brk);
     void set_norm(double n);
 
-    friend double norm_bkn_int(double x, void *p);
-    friend double injection_bkn_int(double x, void *p);
+    friend double norm_bkn_int(double x, void* p);
+    friend double injection_bkn_int(double x, void* p);
 
     void cooling_steadystate(double ucom, double n0, double bfield, double r, double betaeff);
     double max_p(double ucom, double bfield, double bjet, double r, double fsc);

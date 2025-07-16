@@ -40,10 +40,10 @@ TEST_CASE("Integration tests - Complete workflows") {
         CHECK(electrons.count_particles() > 0.0);
 
         // Set up GSL interpolation
-        gsl_interp_accel *acc_eldis = gsl_interp_accel_alloc();
-        gsl_spline *spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
-        gsl_interp_accel *acc_deriv = gsl_interp_accel_alloc();
-        gsl_spline *spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
+        gsl_interp_accel* acc_eldis = gsl_interp_accel_alloc();
+        gsl_spline* spline_eldis = gsl_spline_alloc(gsl_interp_steffen, nel);
+        gsl_interp_accel* acc_deriv = gsl_interp_accel_alloc();
+        gsl_spline* spline_deriv = gsl_spline_alloc(gsl_interp_steffen, nel);
 
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         nel);

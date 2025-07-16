@@ -1105,10 +1105,10 @@ struct {
 //
 // Performs a two-dimensional interpolation over the EBL table,
 // for the given redshift and set of input energies.
-static void interpolate(const std::vector<double> &en, std::vector<double> &lum, double redshift) {
-    gsl_interp_accel *acc_TeV = gsl_interp_accel_alloc();
-    gsl_interp_accel *acc_redshift = gsl_interp_accel_alloc();
-    gsl_spline2d *tau_gil =
+static void interpolate(const std::vector<double>& en, std::vector<double>& lum, double redshift) {
+    gsl_interp_accel* acc_TeV = gsl_interp_accel_alloc();
+    gsl_interp_accel* acc_redshift = gsl_interp_accel_alloc();
+    gsl_spline2d* tau_gil =
         gsl_spline2d_alloc(gsl_interp2d_bicubic, LUT.redshift.size(), LUT.energy.size());
     gsl_spline2d_init(tau_gil, LUT.redshift.data(), LUT.energy.data(), LUT.ebl.data(),
                       LUT.redshift.size(), LUT.energy.size());
@@ -1137,7 +1137,7 @@ static void interpolate(const std::vector<double> &en, std::vector<double> &lum,
 
 //! Define the function that does the EBL attenuation correction for the
 //! model by Gilmore et al. (2012)
-void ebl_atten_gil(const std::vector<double> &en, std::vector<double> &lum, double redshift) {
+void ebl_atten_gil(const std::vector<double>& en, std::vector<double>& lum, double redshift) {
     if (redshift < LUT.redshift.front()) {
         std::cerr << "Redshift is too small for EBL model (0.01 < redshift < "
                      "9.00). Using no attenuation.\n";

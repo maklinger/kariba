@@ -43,8 +43,8 @@ Grays::Grays(size_t size, double numin, double numax) : Radiation(size) {
 
 //************************************************************************************************************
 void Grays::set_grays_pp(double p, double gammap_min, double gammap_max, double ntot_prot,
-                         double ntargets, double plfrac, gsl_interp_accel *acc_Jp,
-                         gsl_spline *spline_Jp) {
+                         double ntargets, double plfrac, gsl_interp_accel* acc_Jp,
+                         gsl_spline* spline_Jp) {
 
     double ntilde =
         set_ntilde(p);    // The number of produced pions for a given proton distribution
@@ -193,8 +193,8 @@ double sigma_pp(double Ep) {    // cross section of pp in mb (that's why I
     return sinel;
 }
 
-double proton_dist(double gpmin, double Ep, double Epcode_max, gsl_spline *spline_Jp,
-                   gsl_interp_accel *acc_Jp) {
+double proton_dist(double gpmin, double Ep, double Epcode_max, gsl_spline* spline_Jp,
+                   gsl_interp_accel* acc_Jp) {
     double fp, gp;
 
     fp = 1.e-80;
@@ -232,9 +232,9 @@ double gspec_pp(double Ep, double y) {
 }
 
 //************************************************************************************************************
-void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<double> &lum_perseg,
-                 size_t ntarg, const std::vector<double> &targ_en,
-                 const std::vector<double> &targ_lum) {
+void sum_photons(size_t nphot, std::vector<double>& en_perseg, std::vector<double>& lum_perseg,
+                 size_t ntarg, const std::vector<double>& targ_en,
+                 const std::vector<double>& targ_lum) {
 
     std::vector<double> lx(ntarg, 0.0);    // std::log10 of targ_en[]/emerg
     std::vector<double> lL(ntarg, 0.0);    // std::log10 of Luminosity of targets in erg/s/Hz
@@ -252,8 +252,8 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
     }
 
     // We interpolate over the targets
-    gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
-    gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
+    gsl_interp_accel* acc_targ = gsl_interp_accel_alloc();
+    gsl_spline* spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
     gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
@@ -267,9 +267,9 @@ void sum_photons(size_t nphot, std::vector<double> &en_perseg, std::vector<doubl
     gsl_spline_free(spline_targ), gsl_interp_accel_free(acc_targ);
 }
 
-void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
-                 std::vector<double> &lum_perseg, size_t ntarg, const std::vector<double> &targ_en,
-                 const std::vector<double> &targ_lum) {
+void sum_photons(size_t nphot, const std::vector<double>& en_perseg,
+                 std::vector<double>& lum_perseg, size_t ntarg, const std::vector<double>& targ_en,
+                 const std::vector<double>& targ_lum) {
 
     std::vector<double> lx(ntarg, 0.0);    // std::log10 of targ_en[]/emerg
     std::vector<double> lL(ntarg, 0.0);    // std::log10 of Luminosity of targets in erg/s/Hz
@@ -287,8 +287,8 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
     }
 
     // We interpolate over the targets
-    gsl_interp_accel *acc_targ = gsl_interp_accel_alloc();
-    gsl_spline *spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
+    gsl_interp_accel* acc_targ = gsl_interp_accel_alloc();
+    gsl_spline* spline_targ = gsl_spline_alloc(gsl_interp_akima, ntarg);
     gsl_spline_init(spline_targ, lx.data(), lL.data(), ntarg);
 
     for (size_t i = 0; i < nphot; i++) {
@@ -303,9 +303,9 @@ void sum_photons(size_t nphot, const std::vector<double> &en_perseg,
 }
 
 //************************************************************************************************************
-void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
-                         gsl_spline *spline_Jp, std::vector<double> &en_perseg,
-                         std::vector<double> &lum_perseg, size_t nphot) {
+void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel* acc_Jp,
+                         gsl_spline* spline_Jp, std::vector<double>& en_perseg,
+                         std::vector<double>& lum_perseg, size_t nphot) {
 
     size_t N = 10;
     double mpion =
@@ -332,8 +332,8 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     }
 
     // Interpolation for jet photon distribution
-    gsl_interp_accel *acc_ng = gsl_interp_accel_alloc();
-    gsl_spline *spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
+    gsl_interp_accel* acc_ng = gsl_interp_accel_alloc();
+    gsl_spline* spline_ng = gsl_spline_alloc(gsl_interp_akima, nphot);
     gsl_spline_init(spline_ng, freq.data(), Uphot.data(), nphot);
 
     deta = std::log10(eta_max / eta_min) / static_cast<double>(N - 1);
@@ -343,7 +343,7 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
         double Eg = en_phot[i];                     // in erg
         if (Eg > mpion * constants::cee * constants::cee) {
             double sum = 0.0;
-            gsl_integration_workspace *w1 = gsl_integration_workspace_alloc(100);
+            gsl_integration_workspace* w1 = gsl_integration_workspace_alloc(100);
             double result1, error1;
             gsl_function F1;
             for (size_t j = 0; j < N; j++) {
@@ -382,18 +382,18 @@ void Grays::set_grays_pg(double gp_min, double gp_max, gsl_interp_accel *acc_Jp,
     gsl_interp_accel_free(acc_ng);
 }
 
-double Hetag(double x, void *pars) {
+double Hetag(double x, void* pars) {
     // eq 70 from KA08 for photons and writen as 0< x=Eg/Ep <1
-    HetagParams *params = static_cast<HetagParams *>(pars);
+    HetagParams* params = static_cast<HetagParams*>(pars);
     double eta = params->eta;
     double eta_zero = params->eta_zero;
     double Eg = params->Eg;
     double gp_min = params->gp_min;
     double gp_max = params->gp_max;
-    gsl_spline *spline_Jp = params->spline_Jp;
-    gsl_interp_accel *acc_Jp = params->acc_Jp;
-    gsl_interp_accel *acc_ng = params->acc_ng;
-    gsl_spline *spline_ng = params->spline_ng;
+    gsl_spline* spline_Jp = params->spline_Jp;
+    gsl_interp_accel* acc_Jp = params->acc_Jp;
+    gsl_interp_accel* acc_ng = params->acc_ng;
+    gsl_spline* spline_ng = params->spline_ng;
     double nu_min = params->nu_min;
     double nu_max = params->nu_max;
 
@@ -416,7 +416,7 @@ double Hetag(double x, void *pars) {
 
 // The following are common with electrons & neutrinos:
 
-double colliding_protons(gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp, double gp_min,
+double colliding_protons(gsl_spline* spline_Jp, gsl_interp_accel* acc_Jp, double gp_min,
                          double gp_max,
                          double Ep) {    // the number density of the protons
     double Jp;    // number density of protons from interpolation for energy Ep
@@ -430,7 +430,7 @@ double colliding_protons(gsl_spline *spline_Jp, gsl_interp_accel *acc_Jp, double
     return Jp / (constants::pmgm * constants::cee * constants::cee);    // in #/erg/cm3
 }
 
-double photons_jet(double eta, double Ep, gsl_spline *spline_ng, gsl_interp_accel *acc_ng,
+double photons_jet(double eta, double Ep, gsl_spline* spline_ng, gsl_interp_accel* acc_ng,
                    double nu_min, double nu_max) {
     // dif number density of photons inside the jet (from other physical
     // processes)
@@ -477,15 +477,15 @@ double PhiFunc_gamma(double eta, double eta0, double x) {
 }
 
 //! The tables from KA08 for photomeson that give s,δ and B
-void tables_photomeson_gamma(double &s, double &delta, double &Beta, double xeta) {
+void tables_photomeson_gamma(double& s, double& delta, double& Beta, double xeta) {
     // Gamma rays from neutral pion decay:
     size_t size = etagTable.size();
-    gsl_interp_accel *acc_sigma = gsl_interp_accel_alloc();
-    gsl_spline *spline_sigma = gsl_spline_alloc(gsl_interp_cspline, size);
-    gsl_interp_accel *acc_delta = gsl_interp_accel_alloc();
-    gsl_spline *spline_delta = gsl_spline_alloc(gsl_interp_cspline, size);
-    gsl_interp_accel *acc_Beta = gsl_interp_accel_alloc();
-    gsl_spline *spline_Beta = gsl_spline_alloc(gsl_interp_cspline, size);
+    gsl_interp_accel* acc_sigma = gsl_interp_accel_alloc();
+    gsl_spline* spline_sigma = gsl_spline_alloc(gsl_interp_cspline, size);
+    gsl_interp_accel* acc_delta = gsl_interp_accel_alloc();
+    gsl_spline* spline_delta = gsl_spline_alloc(gsl_interp_cspline, size);
+    gsl_interp_accel* acc_Beta = gsl_interp_accel_alloc();
+    gsl_spline* spline_Beta = gsl_spline_alloc(gsl_interp_cspline, size);
 
     gsl_spline_init(spline_sigma, etagTable.data(), sgTable.data(), size);
     gsl_spline_init(spline_delta, etagTable.data(), deltagTable.data(), size);

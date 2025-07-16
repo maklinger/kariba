@@ -28,7 +28,7 @@ class ShSDisk : public Radiation {
 
     void disk_spectrum();
     void cover_disk(double f);
-    friend double disk_int(double nu, void *p);
+    friend double disk_int(double nu, void* p);
 
     double total_luminosity();
 

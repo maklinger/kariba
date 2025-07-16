@@ -41,14 +41,14 @@ Cyclosyn::Cyclosyn(size_t size) : Radiation(size) {
 }
 
 //! Single particle emissivity/absorption coefficient calculations
-double cyclosyn_emis(double gamma, void *pars) {
-    CyclosynEmisParams *params = static_cast<CyclosynEmisParams *>(pars);
+double cyclosyn_emis(double gamma, void* pars) {
+    CyclosynEmisParams* params = static_cast<CyclosynEmisParams*>(pars);
     double nu = params->nu;
     double b = params->b;
-    gsl_spline *syn = params->syn;
-    gsl_interp_accel *acc_syn = params->acc_syn;
-    gsl_spline *eldis = params->eldis;
-    gsl_interp_accel *acc_eldis = params->acc_eldis;
+    gsl_spline* syn = params->syn;
+    gsl_interp_accel* acc_syn = params->acc_syn;
+    gsl_spline* eldis = params->eldis;
+    gsl_interp_accel* acc_eldis = params->acc_eldis;
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma;
     gamma = std::exp(gamma);
@@ -78,14 +78,14 @@ double cyclosyn_emis(double gamma, void *pars) {
     return ngamma * gamma * emisfunc;
 }
 
-double cyclosyn_abs(double gamma, void *pars) {
-    CyclosynAbsParams *params = static_cast<CyclosynAbsParams *>(pars);
+double cyclosyn_abs(double gamma, void* pars) {
+    CyclosynAbsParams* params = static_cast<CyclosynAbsParams*>(pars);
     double nu = (params->nu);
     double b = (params->b);
-    gsl_spline *syn = (params->syn);
-    gsl_interp_accel *acc_syn = (params->acc_syn);
-    gsl_spline *derivs = (params->derivs);
-    gsl_interp_accel *acc_derivs = (params->acc_derivs);
+    gsl_spline* syn = (params->syn);
+    gsl_interp_accel* acc_syn = (params->acc_syn);
+    gsl_spline* derivs = (params->derivs);
+    gsl_interp_accel* acc_derivs = (params->acc_derivs);
 
     double nu_c, x, emisfunc, nu_larmor, psquared, ngamma_diff;
     gamma = std::exp(gamma);
@@ -116,10 +116,10 @@ double cyclosyn_abs(double gamma, void *pars) {
 
 //! Integrals of single particle emissivity/absorption coefficient over particle
 //! distribution
-double Cyclosyn::emis_integral(double nu, double gmin, double gmax, gsl_spline *eldis,
-                               gsl_interp_accel *acc_eldis) {
+double Cyclosyn::emis_integral(double nu, double gmin, double gmax, gsl_spline* eldis,
+                               gsl_interp_accel* acc_eldis) {
     double result1, error1;
-    gsl_integration_workspace *w1;
+    gsl_integration_workspace* w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
     auto F1params = CyclosynEmisParams{nu, bfield, syn_f, syn_acc, eldis, acc_eldis};
@@ -132,10 +132,10 @@ double Cyclosyn::emis_integral(double nu, double gmin, double gmax, gsl_spline *
     return result1;
 }
 
-double Cyclosyn::abs_integral(double nu, double gmin, double gmax, gsl_spline *derivs,
-                              gsl_interp_accel *acc_derivs) {
+double Cyclosyn::abs_integral(double nu, double gmin, double gmax, gsl_spline* derivs,
+                              gsl_interp_accel* acc_derivs) {
     double result1, error1;
-    gsl_integration_workspace *w1;
+    gsl_integration_workspace* w1;
     w1 = gsl_integration_workspace_alloc(100);
     gsl_function F1;
     auto F1params = CyclosynAbsParams{nu, bfield, syn_f, syn_acc, derivs, acc_derivs};
@@ -149,9 +149,9 @@ double Cyclosyn::abs_integral(double nu, double gmin, double gmax, gsl_spline *d
 }
 
 //! Comoving and observed specific luminosity for the input particle distribution
-void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline *eldis,
-                               gsl_interp_accel *acc_eldis, gsl_spline *eldis_diff,
-                               gsl_interp_accel *acc_eldis_diff) {
+void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
+                               gsl_interp_accel* acc_eldis, gsl_spline* eldis_diff,
+                               gsl_interp_accel* acc_eldis_diff) {
     double emis, abs;
     double pitch = 0.73;
     double acons, elcons, asyn, epsasyn;

@@ -99,7 +99,7 @@ TEST_CASE("EBL correction") {
 
     SUBCASE("Negative input energy") {
         std::fill(luminosity.begin(), luminosity.end(), 1e40);
-        for (auto &e : energy) {
+        for (auto& e : energy) {
             e = -e;
         }
         std::fill(luminosity.begin(), luminosity.end(), 1e40);
@@ -111,7 +111,7 @@ TEST_CASE("EBL correction") {
     }
 
     SUBCASE("Far too high energy") {
-        for (auto &e : energy) {
+        for (auto& e : energy) {
             e = -1e9 * e;
         }
         std::fill(luminosity.begin(), luminosity.end(), 1e40);

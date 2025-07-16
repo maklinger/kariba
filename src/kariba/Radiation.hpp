@@ -11,20 +11,20 @@ namespace kariba {
 struct CyclosynEmisParams {
     double nu;
     double b;
-    gsl_spline *syn;
-    gsl_interp_accel *acc_syn;
-    gsl_spline *eldis;
-    gsl_interp_accel *acc_eldis;
+    gsl_spline* syn;
+    gsl_interp_accel* acc_syn;
+    gsl_spline* eldis;
+    gsl_interp_accel* acc_eldis;
 };
 
 //! Structure used for GSL integration
 struct CyclosynAbsParams {
     double nu;
     double b;
-    gsl_spline *syn;
-    gsl_interp_accel *acc_syn;
-    gsl_spline *derivs;
-    gsl_interp_accel *acc_derivs;
+    gsl_spline* syn;
+    gsl_interp_accel* acc_syn;
+    gsl_spline* derivs;
+    gsl_interp_accel* acc_derivs;
 };
 
 //! Structure used for GSL integration
@@ -32,18 +32,18 @@ struct ComintParams {
     double eph;
     double ephmin;
     double ephmax;
-    gsl_spline *eldis;
-    gsl_interp_accel *acc_eldis;
-    gsl_spline *phodis;
-    gsl_interp_accel *acc_phodis;
+    gsl_spline* eldis;
+    gsl_interp_accel* acc_eldis;
+    gsl_spline* phodis;
+    gsl_interp_accel* acc_phodis;
 };
 
 //! Structure used for GSL integration
 struct ComfncParams {
     double game;
     double e1;
-    gsl_spline *phodis;
-    gsl_interp_accel *acc_phodis;
+    gsl_spline* phodis;
+    gsl_interp_accel* acc_phodis;
 };
 
 //! Structure used for GSL integration
@@ -84,13 +84,13 @@ class Radiation {
   public:
     Radiation(size_t size);
 
-    const std::vector<double> &get_energy() const { return en_phot; }
+    const std::vector<double>& get_energy() const { return en_phot; }
 
-    const std::vector<double> &get_nphot() const { return num_phot; }
+    const std::vector<double>& get_nphot() const { return num_phot; }
 
-    const std::vector<double> &get_energy_obs() const { return en_phot_obs; }
+    const std::vector<double>& get_energy_obs() const { return en_phot_obs; }
 
-    const std::vector<double> &get_nphot_obs() const { return num_phot_obs; }
+    const std::vector<double>& get_nphot_obs() const { return num_phot_obs; }
 
     size_t get_size() const { return en_phot.size(); }
 
@@ -100,8 +100,8 @@ class Radiation {
 
     void set_beaming(double theta, double speed, double doppler);
     void set_inclination(double theta);
-    void set_geometry(const std::string &geom, double l1, double l2);
-    void set_geometry(const std::string &geom, double l1);
+    void set_geometry(const std::string& geom, double l1, double l2);
+    void set_geometry(const std::string& geom, double l1);
 
     void set_counterjet(bool flag);
     void test_arrays();

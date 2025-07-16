@@ -18,7 +18,7 @@ void Radiation::set_beaming(double theta, double speed, double doppler) {
 
 void Radiation::set_inclination(double theta) { angle = theta * constants::pi / 180.; }
 
-void Radiation::set_geometry(const std::string &geom, double l1, double l2) {
+void Radiation::set_geometry(const std::string& geom, double l1, double l2) {
     if (geom == "cylinder") {
         r = l1;
         z = l2;
@@ -42,7 +42,7 @@ void Radiation::set_geometry(const std::string &geom, double l1, double l2) {
     }
 }
 
-void Radiation::set_geometry(const std::string &geom, double l1) {
+void Radiation::set_geometry(const std::string& geom, double l1) {
     if (geom == "cylinder") {
         std::cout << "Only one length input, assuming the radius and height of "
                      "the cylinder are the same"
