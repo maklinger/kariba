@@ -137,3 +137,16 @@ Set the `PREFIX` variable in `make.config` to the base directory, then simply ru
 ```
 make install
 ```
+
+
+## Documentation
+
+If you like to build the documentation, run
+
+```
+make docs
+```
+
+from the root directory.
+
+The build documentation is then available in `docs/html`. Open the `docs/html/index.html` file to start browsing the documentation.
