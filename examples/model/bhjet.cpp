@@ -20,6 +20,14 @@ namespace karcst = kariba::constants;    // alias the kariba::constants namespac
 
 void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec) {
+    JetOutput empty;
+    jetmain(ear, ne, param, photeng, photspec, true, empty)
+}
+
+
+void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
+             std::vector<double>& photeng, std::vector<double>& photspec,
+             bool writeToFile, JetOutput& output) {
 
     // STEP 1: VARIABLE/OBJECT DEFINITIONS
     //----------------------------------------------------------------------------------------------
@@ -161,7 +169,9 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
     zmin = 2. * Rg;
 
     if (infosw >= 1) {
-        param_write(param, "Output/Starting_pars.dat");
+        if (writeToFile){
+            param_write(param, "Output/Starting_pars.dat");
+        }
     }
 
     // initialize total energy/luminosity arrays
@@ -174,25 +184,27 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
         tot_lum[i] = 1.;
     }
 
-    if (infosw >= 1) {
-        clean_file("Output/Presyn.dat", 2);
-        clean_file("Output/Postsyn.dat", 2);
-        clean_file("Output/Precom.dat", 2);
-        clean_file("Output/Postcom.dat", 2);
-        clean_file("Output/Disk.dat", 2);
-        clean_file("Output/BB.dat", 2);
-        clean_file("Output/Total.dat", 2);
-    }
-    if (infosw >= 2) {
-        clean_file("Output/Numdens.dat", 4);
-        clean_file("Output/Cyclosyn_zones.dat", 2);
-        clean_file("Output/Compton_zones.dat", 2);
-    }
-    if (infosw >= 3) {
-        clean_file("Output/Spectral_properties.dat", 7);
-    }
-    if (infosw >= 5) {
-        clean_file("Output/Profiles.dat", 6);
+    if (writeToFile){
+        if (infosw >= 1) {
+            clean_file("Output/Presyn.dat", 2);
+            clean_file("Output/Postsyn.dat", 2);
+            clean_file("Output/Precom.dat", 2);
+            clean_file("Output/Postcom.dat", 2);
+            clean_file("Output/Disk.dat", 2);
+            clean_file("Output/BB.dat", 2);
+            clean_file("Output/Total.dat", 2);
+        }
+        if (infosw >= 2) {
+            clean_file("Output/Numdens.dat", 4);
+            clean_file("Output/Cyclosyn_zones.dat", 2);
+            clean_file("Output/Compton_zones.dat", 2);
+        }
+        if (infosw >= 3) {
+            clean_file("Output/Spectral_properties.dat", 7);
+        }
+        if (infosw >= 5) {
+            clean_file("Output/Profiles.dat", 6);
+        }
     }
     // STEP 3: DISK/EXTERNAL PHOTON CALCULATIONS
     // The disk is disabled by setting r_in<r_out; its contribution is summed to
@@ -315,6 +327,14 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
         std::cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << "\n";
         std::cout << "Jet nozzle optical depth: "
                   << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom << "\n\n";
+        if (!writeToFile)
+        {
+            output.jet_base_properties.pair_content.push_back(nozzle_ener.eta);
+            output.jet_base_properties.init_mag.push_back(nozzle_ener.sig0);
+            output.jet_base_properties.particle_avg_lorentz_factor.push_back(dummy_elec.av_gamma());
+            output.jet_base_properties.jet_nozzle_end.push_back(jet_dyn.h0 / Rg);
+            output.jet_base_properties.jet_nozzle_optical_depth.push_back(jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom);
+        }
     }
 
     // STEP 5: TOTAL JET CALCULATIONS, LOOPING OVER EACH SEGMENT OF THE JET
@@ -388,8 +408,14 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
                             nel);
 
             if (infosw >= 2) {
-                plot_write(nel, th_lep.get_p(), th_lep.get_gamma(), th_lep.get_pdens(),
-                           th_lep.get_gdens(), "Output/Numdens.dat");
+                if (writeToFile){
+                    plot_write(nel, th_lep.get_p(), th_lep.get_gamma(), th_lep.get_pdens(),
+                               th_lep.get_gdens(), "Output/Numdens.dat");
+                } else {
+                    store_numdens(nel, th_lep.get_p(), th_lep.get_gamma(), th_lep.get_pdens(),
+                                  th_lep.get_gdens(), output.numdens);
+                }
+                
             }
         } else if (zone.nth_frac < 0.5) {
             if (IsShock == false) {
@@ -427,8 +453,13 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
                             acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
-                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
-                           acc_lep.get_gdens(), "Output/Numdens.dat");
+                if (writeToFile){
+                    plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                               acc_lep.get_gdens(), "Output/Numdens.dat");
+                } else {
+                    store_numdens(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                                  acc_lep.get_gdens(), output.numdens);
+                }
             }
         } else if (zone.nth_frac < 1.) {
             if (IsShock == false) {
@@ -470,8 +501,13 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
                             acc_lep.get_gdens_diff().data(), nel);
 
             if (infosw >= 2) {
-                plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
-                           acc_lep.get_gdens(), "Output/Numdens.dat");
+                if (writeToFile){
+                    plot_write(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                               acc_lep.get_gdens(), "Output/Numdens.dat");
+                } else {
+                    store_numdens(nel, acc_lep.get_p(), acc_lep.get_gamma(), acc_lep.get_pdens(),
+                                  acc_lep.get_gdens(), output.numdens);
+                }
             }
         } else if (zone.nth_frac == 1.) {
             if (IsShock == false) {
@@ -532,10 +568,36 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
                       << "\n";
 
             std::ofstream file;
-            file.open("Output/Profiles.dat", std::ios::app);
-            file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " " << zone.lepdens << " "
-                 << zone.gamma << " " << zone.eltemp << " \n";
-            file.close();
+            if (writeToFile){
+                file.open("Output/Profiles.dat", std::ios::app);
+                file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " " << zone.lepdens 
+                     << " " << zone.gamma << " " << zone.eltemp << " \n";
+                file.close();
+            } else {
+                output.jet_zone_properties.jet_bfield.push_back(zone.bfield); 
+                output.jet_zone_properties.lepton_ndens.push_back(zone.lepdens); 
+                output.jet_zone_properties.speed_gamma.push_back(zone.gamma); 
+                output.jet_zone_properties.delta.push_back(zone.delta); 
+                output.jet_zone_properties.tshift.push_back(tshift);
+                output.jet_zone_properties.temp_kev.push_back(zone.eltemp);  
+                output.jet_zone_properties.grid_r.push_back(zone.r/Rg); 
+                output.jet_zone_properties.delz.push_back(zone.delz/Rg);
+                output.jet_zone_properties.dist_z.push_back(z/Rg);  
+                output.jet_zone_properties.z_delz.push_back((zone.delz+z)/Rg); 
+                output.jet_zone_properties.delta.push_back(zone.delta); 
+                output.jet_zone_properties.equpar_check.push_back(2.*Ub/Up);
+                output.jet_zone_properties.ue_ub.push_back(Ue/Ub); 
+
+                // saving the profiles: 
+                output.jetprofile.z_rg.push_back(z/Rg); 
+                output.jetprofile.zone_rg.push_back(zone.r/Rg); 
+                output.jetprofile.zone_bfield.push_back(zone.bfield); 
+                output.jetprofile.zone_lepdens.push_back(zone.lepdens); 
+                output.jetprofile.zone_gamma.push_back(zone.gamma); 
+                output.jetprofile.zone_eltemp.push_back(zone.eltemp); 
+            }
+            
+
         }
         // calculate emission of each zone
         // note: the syn_en array is used for the seed photon fields in the IC
@@ -645,8 +707,13 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
             std::cout << "Out of the Comptonization region\n";
         }
         if (infosw >= 2) {
-            plot_write(nsyn, syn_en, syn_lum, "Output/Cyclosyn_zones.dat", dist, redsh);
-            plot_write(ncom, com_en, com_lum, "Output/Compton_zones.dat", dist, redsh);
+            if (writeToFile){
+                plot_write(nsyn, syn_en, syn_lum, "Output/Cyclosyn_zones.dat", dist, redsh);
+                plot_write(ncom, com_en, com_lum, "Output/Compton_zones.dat", dist, redsh);
+            } else {
+                store_output(nsyn, syn_en, syn_lum, output.cyclosyn_zones, dist, redsh); 
+                store_output(ncom, com_en, com_lum, output.compton_zones, dist, redsh);
+            }
         }
     }
 
@@ -668,19 +735,35 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
 
     // Output to files and print information on terminal if user requires it
     if (infosw >= 1) {
-        plot_write(ne, tot_en, tot_syn_pre, "Output/Presyn.dat", dist, redsh);
-        plot_write(ne, tot_en, tot_syn_post, "Output/Postsyn.dat", dist, redsh);
-        plot_write(ne, tot_en, tot_com_pre, "Output/Precom.dat", dist, redsh);
-        plot_write(ne, tot_en, tot_com_post, "Output/Postcom.dat", dist, redsh);
-        plot_write(50, Disk.get_energy_obs(), Disk.get_nphot_obs(), "Output/Disk.dat", dist, redsh);
-        if (compsw == 2) {
-            plot_write(40, Torus.get_energy_obs(), Torus.get_nphot_obs(), "Output/BB.dat", dist,
-                       redsh);
+        if (writeToFile){
+            plot_write(ne, tot_en, tot_syn_pre, "Output/Presyn.dat", dist, redsh);
+            plot_write(ne, tot_en, tot_syn_post, "Output/Postsyn.dat", dist, redsh);
+            plot_write(ne, tot_en, tot_com_pre, "Output/Precom.dat", dist, redsh);
+            plot_write(ne, tot_en, tot_com_post, "Output/Postcom.dat", dist, redsh);
+            plot_write(50, Disk.get_energy_obs(), Disk.get_nphot_obs(), "Output/Disk.dat", dist, redsh);
+            if (compsw == 2) {
+                plot_write(40, Torus.get_energy_obs(), Torus.get_nphot_obs(), "Output/BB.dat", dist,
+                        redsh);
+            } else {
+                plot_write(40, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(), "Output/BB.dat",
+                        dist, redsh);
+            }
+            plot_write(ne, tot_en, tot_lum, "Output/Total.dat", dist, redsh);
         } else {
-            plot_write(40, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(), "Output/BB.dat",
-                       dist, redsh);
+            store_output(ne, tot_en, tot_syn_pre, output.presyn, dist, redsh); 
+            store_output(ne, tot_en, tot_syn_post, output.postsyn, dist, redsh); 
+            store_output(ne, tot_en, tot_com_pre, output.precom, dist, redsh); 
+            store_output(ne, tot_en, tot_com_post,output.postcom, dist, redsh);
+            store_output(50, Disk.get_energy_obs(), Disk.get_nphot_obs(), output.disk, dist, redsh); 
+
+            if(compsw==2){
+                store_output(40, Torus.get_energy_obs(), Torus.get_nphot_obs(), output.bb, dist, redsh); 
+            } else {
+                store_output(40, BlackBody.get_energy_obs(), BlackBody.get_nphot_obs(),
+                             output.bb, dist, redsh); 
+            }			
+            store_output(ne, tot_en, tot_lum, output.total, dist, redsh); 
         }
-        plot_write(ne, tot_en, tot_lum, "Output/Total.dat", dist, redsh);
     }
     if (infosw >= 3) {
         double disk_lum, IC_lum, Xray_lum, Radio_lum, Xray_index, Radio_index, compactness;
@@ -700,11 +783,21 @@ void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
         std::cout << "X-ray 10-100 keV photon index estimate: " << Xray_index << "\n";
         std::cout << "Radio 10-100 GHz spectral index estimate: " << Radio_index << "\n";
         std::cout << "Jet base compactness: " << compactness << "\n\n";
-        std::ofstream file;
-        file.open("Output/Spectral_properties.dat", std::ios::app);
-        file << disk_lum << " " << IC_lum << " " << Xray_lum << " " << Radio_lum << " "
-             << Xray_index << " " << Radio_index << " " << compactness << "\n";
-        file.close();
+        if (writeToFile){
+            std::ofstream file;
+            file.open("Output/Spectral_properties.dat", std::ios::app);
+            file << disk_lum << " " << IC_lum << " " << Xray_lum << " " << Radio_lum << " "
+                << Xray_index << " " << Radio_index << " " << compactness << "\n";
+            file.close();
+        } else {
+            output.spectral_properties.disk_lum.push_back(disk_lum); 
+            output.spectral_properties.IC_lum.push_back(IC_lum); 
+            output.spectral_properties.xray_lum.push_back(Xray_lum); 
+            output.spectral_properties.radio_lum.push_back(Radio_lum); 
+            output.spectral_properties.xray_index.push_back(Xray_index); 
+            output.spectral_properties.radio_index.push_back(Radio_index); 
+            output.spectral_properties.jetbase_compactness.push_back(compactness); 
+        }
         if (compactness >= 10. * (param[9] / 511.) * std::exp(511. / param[9])) {
             std::cout << "Possible pair production in the jet base!" << "\n";
             std::cout << "Lower limit on allowed compactness: "

@@ -320,3 +320,27 @@ void jetinterp(std::vector<double>& ear, std::vector<double>& energ, std::vector
         }
     }
 }
+
+
+// Used to write arrays to JetOutput --- instead of plot_write functions: 
+void store_output(int size, const double *en, const double *lum, std::vector<DataPoint>& output_vector, double dist, double redsh) {
+
+    for (int k = 0; k < size; ++k) {
+        double energy = en[k] / (herg * (1.0 + redsh));
+        double flux = lum[k] * (1.0 + redsh) / (4.0 * pi * pow(dist, 2.0) * mjy);
+        output_vector.push_back({energy, flux});
+    }
+}
+
+// Used to write arrays to JetOutput --- instead of plot_write functions: 
+void store_numdens(int size, const double *p, const double *g, const double *n_p, const double *n_g, std::vector<NumDenPoint>& output_vector) {
+
+    for (int k = 0; k < size; ++k) {
+        NumDenPoint point;
+        point.momentum = p[k];
+        point.gamma = g[k];
+        point.n_p = n_p[k];
+        point.n_g = n_g[k];
+        output_vector.push_back(point);
+    }
+}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jetoutput.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -140,3 +141,8 @@ void zone_agn_phfields(double z, zone_pars& zone, double& ublr_zone, double& udt
 void clean_file(std::string path, int check);
 void jetinterp(std::vector<double>& ear, std::vector<double>& energ, std::vector<double>& phot,
                std::vector<double>& photar, size_t ne, size_t newne);
+
+
+void store_output(int size, const double *en, const double *lum, std::vector<DataPoint>& output_vector, double dist, double redsh);
+
+void store_numdens(int size, const double *p, const double *g, const double *n_p, const double *n_g, std::vector<NumDenPoint>& output_vector);
