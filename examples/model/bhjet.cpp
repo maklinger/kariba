@@ -646,7 +646,9 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
         Syncro.cycsyn_spectrum(gmin, gmax, spline_eldis, acc_eldis, spline_deriv, acc_deriv);
         sum_counterjet(nsyn, Syncro.get_energy_obs(), Syncro.get_nphot_obs(), syn_en, syn_lum);
         if (infosw >= 4) {
-            Syncro.test();
+            if (writeToFile){
+                Syncro.test();
+            }
         }
         // Include zone's emission to the pre/post particle acceleration
         // spectrum
