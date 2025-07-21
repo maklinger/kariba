@@ -320,15 +320,15 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
     }
 
     if (infosw >= 3) {
-        std::cout << "Jet base parameters: \n";
-        std::cout << "Pair content (ne/np): " << nozzle_ener.eta << "\n";
-        std::cout << "Initial magnetization: " << nozzle_ener.sig0 << "\n";
-        std::cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma() << "\n";
-        std::cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << "\n";
-        std::cout << "Jet nozzle optical depth: "
-                  << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom << "\n\n";
-        if (!writeToFile)
-        {
+        if(writeToFile){
+            std::cout << "Jet base parameters: \n";
+            std::cout << "Pair content (ne/np): " << nozzle_ener.eta << "\n";
+            std::cout << "Initial magnetization: " << nozzle_ener.sig0 << "\n";
+            std::cout << "Particle average Lorenz factor: " << dummy_elec.av_gamma() << "\n";
+            std::cout << "Jet nozzle ends at: " << jet_dyn.h0 / Rg << " Rg" << "\n";
+            std::cout << "Jet nozzle optical depth: "
+                    << jet_dyn.r0 * nozzle_ener.lepdens * karcst::sigtom << "\n\n";
+        } else {
             output.jet_base_properties.pair_content.push_back(nozzle_ener.eta);
             output.jet_base_properties.init_mag.push_back(nozzle_ener.sig0);
             output.jet_base_properties.particle_avg_lorentz_factor.push_back(dummy_elec.av_gamma());
@@ -558,17 +558,17 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
             Ue = sqrt(zone.avgammasq) * zone.lepdens * karcst::emerg;
             Up = (zone.lepdens / nozzle_ener.eta) * karcst::pmgm * std::pow(karcst::cee, 2.);
             Ub = std::pow(zone.bfield, 2.) / (8. * karcst::pi);
-            std::cout << "\n"
-                      << "Jetpars; Bfield: " << zone.bfield << ", Lepton ndens: " << zone.lepdens
-                      << ", speed: " << zone.gamma << ", delta: " << zone.delta << "\n";
-            std::cout << "tshift: " << tshift << ", Temperature in keV: " << zone.eltemp << "\n";
-            std::cout << "Grid; R: " << zone.r / Rg << ", delz: " << zone.delz / Rg
-                      << ", z: " << z / Rg << ", z+delz: " << (zone.delz + z) / Rg << "\n";
-            std::cout << "Equipartition check; Sigma: " << 2. * Ub / Up << " Ue/Ub: " << Ue / Ub
-                      << "\n";
 
             std::ofstream file;
             if (writeToFile){
+                std::cout << "\n"
+                        << "Jetpars; Bfield: " << zone.bfield << ", Lepton ndens: " << zone.lepdens
+                        << ", speed: " << zone.gamma << ", delta: " << zone.delta << "\n";
+                std::cout << "tshift: " << tshift << ", Temperature in keV: " << zone.eltemp << "\n";
+                std::cout << "Grid; R: " << zone.r / Rg << ", delz: " << zone.delz / Rg
+                        << ", z: " << z / Rg << ", z+delz: " << (zone.delz + z) / Rg << "\n";
+                std::cout << "Equipartition check; Sigma: " << 2. * Ub / Up << " Ue/Ub: " << Ue / Ub
+                        << "\n";
                 file.open("Output/Profiles.dat", std::ios::app);
                 file << z / Rg << " " << zone.r / Rg << " " << zone.bfield << " " << zone.lepdens 
                      << " " << zone.gamma << " " << zone.eltemp << " \n";
