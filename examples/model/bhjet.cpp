@@ -755,7 +755,7 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
         } else {
             std::cout << "in storing" << std::endl;
             store_output(ne, tot_en, tot_syn_pre, output.presyn, dist, redsh); 
-            std::cout << output.presyn[0] << std::endl;
+            // std::cout << output.presyn[0] << std::endl;
             store_output(ne, tot_en, tot_syn_post, output.postsyn, dist, redsh); 
             store_output(ne, tot_en, tot_com_pre, output.precom, dist, redsh); 
             store_output(ne, tot_en, tot_com_post,output.postcom, dist, redsh);
