@@ -734,8 +734,11 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
     output_spectrum(ne, tot_en, tot_lum, photspec, redsh, dist);
 
     // Output to files and print information on terminal if user requires it
+    std::cout << "before infsw1" << std::endl;
     if (infosw >= 1) {
+        std::cout << "in infsw1" << std::endl;
         if (writeToFile){
+            std::cout << "in write2file" << std::endl;
             plot_write(ne, tot_en, tot_syn_pre, "Output/Presyn.dat", dist, redsh);
             plot_write(ne, tot_en, tot_syn_post, "Output/Postsyn.dat", dist, redsh);
             plot_write(ne, tot_en, tot_com_pre, "Output/Precom.dat", dist, redsh);
@@ -750,7 +753,9 @@ void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& pa
             }
             plot_write(ne, tot_en, tot_lum, "Output/Total.dat", dist, redsh);
         } else {
+            std::cout << "in storing" << std::endl;
             store_output(ne, tot_en, tot_syn_pre, output.presyn, dist, redsh); 
+            std::cout << output.presyn[0] << std::endl;
             store_output(ne, tot_en, tot_syn_post, output.postsyn, dist, redsh); 
             store_output(ne, tot_en, tot_com_pre, output.precom, dist, redsh); 
             store_output(ne, tot_en, tot_com_post,output.postcom, dist, redsh);
