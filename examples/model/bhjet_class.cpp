@@ -242,7 +242,7 @@ void BhJetClass::run() {
     }
  
     // run the jetmain function: 
-    jetmain(ebins.get(), ne - 1, param, spec.get(), dumarr.get(), true, output);
+    jetmain(ebins, ne - 1, param, spec, dumarr, true, output);
 
     // Stop the timer
     // auto end_time = std::chrono::high_resolution_clock::now();

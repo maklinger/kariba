@@ -147,6 +147,6 @@ void jetinterp(std::vector<double>& ear, std::vector<double>& energ, std::vector
                std::vector<double>& photar, size_t ne, size_t newne);
 
 
-void store_output(int size, const double *en, const double *lum, std::vector<DataPoint>& output_vector, double dist, double redsh);
+void store_output(int size, std::vector<double>& en, std::vector<double>& lum, std::vector<DataPoint>& output_vector, double dist, double redsh);
 
-void store_numdens(int size, const double *p, const double *g, const double *n_p, const double *n_g, std::vector<NumDenPoint>& output_vector);
+void store_numdens(int size, std::vector<double>& p, std::vector<double>& g, std::vector<double>& n_p, std::vector<double>& n_g, std::vector<NumDenPoint>& output_vector);
