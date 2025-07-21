@@ -323,7 +323,7 @@ void jetinterp(std::vector<double>& ear, std::vector<double>& energ, std::vector
 
 
 // Used to write arrays to JetOutput --- instead of plot_write functions: 
-void store_output(int size, std::vector<double>& en, std::vector<double>& lum, std::vector<DataPoint>& output_vector, double dist, double redsh) {
+void store_output(int size, const std::vector<double>& en, const std::vector<double>& lum, std::vector<DataPoint>& output_vector, double dist, double redsh) {
 
     for (int k = 0; k < size; ++k) {
         double energy = en[k] / (karcst::herg * (1.0 + redsh));
@@ -333,7 +333,7 @@ void store_output(int size, std::vector<double>& en, std::vector<double>& lum, s
 }
 
 // Used to write arrays to JetOutput --- instead of plot_write functions: 
-void store_numdens(int size, std::vector<double>& p, std::vector<double>& g, std::vector<double>& n_p, std::vector<double>& n_g, std::vector<NumDenPoint>& output_vector) {
+void store_numdens(int size, const std::vector<double>& p, const std::vector<double>& g, const std::vector<double>& n_p, const std::vector<double>& n_g, std::vector<NumDenPoint>& output_vector) {
 
     for (int k = 0; k < size; ++k) {
         NumDenPoint point;
