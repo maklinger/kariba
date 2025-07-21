@@ -87,10 +87,10 @@ typedef struct com_pars {
     double urad_total;    // total energy density
 } com_pars;
 
-void jetmain(std::vector<double>& ear, int ne, std::vector<double>& param,
+void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec);
 
-void jetmain_output(std::vector<double>& ear, int ne, std::vector<double>& param,
+void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec,
              bool writeToFile, JetOutput& output);
 
