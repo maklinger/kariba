@@ -21,11 +21,11 @@ namespace karcst = kariba::constants;    // alias the kariba::constants namespac
 void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec) {
     JetOutput empty;
-    jetmain(ear, ne, param, photeng, photspec, true, empty);
+    jetmain_output(ear, ne, param, photeng, photspec, true, empty);
 }
 
 
-void jetmain(std::vector<double>& ear, size_t ne, std::vector<double>& param,
+void jetmain_output(std::vector<double>& ear, size_t ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec,
              bool writeToFile, JetOutput& output) {
 
