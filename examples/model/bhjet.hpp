@@ -90,6 +90,10 @@ typedef struct com_pars {
 void jetmain(std::vector<double>& ear, int ne, std::vector<double>& param,
              std::vector<double>& photeng, std::vector<double>& photspec);
 
+void jetmain(std::vector<double>& ear, int ne, std::vector<double>& param,
+             std::vector<double>& photeng, std::vector<double>& photspec,
+             bool writeToFile, JetOutput& output);
+
 void param_write(const std::vector<double>& par, const std::string& path);
 void plot_write(size_t size, const std::vector<double>& en, const std::vector<double>& lum,
                 const std::string& path, double dist, double redshift);
