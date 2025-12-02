@@ -513,7 +513,13 @@ std::vector<double> Compton::get_seed_energ(){
     return seed_energ;
 }
 std::vector<double> Compton::get_seed_urad(){
-    return std::pow(10., seed_urad);
+    std::vector<double> vals(seed_urad.size(), 0.);
+    for (size_t i = 0; i < seed_urad.size(); i++)
+    {
+        vals[i] = std::pow(10., seed_urad[i]);
+    }
+    
+    return vals;
 }
 
 }    // namespace kariba
