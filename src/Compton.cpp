@@ -509,4 +509,11 @@ void Compton::test() {
     std::cout << "Number of scatters: " << Niter << std::endl;
 }
 
+std::vector<double> Compton::get_seed_energ(){
+    return seed_energ;
+}
+std::vector<double> Compton::get_seed_urad(){
+    return std::pow(10., seed_urad);
+}
+
 }    // namespace kariba

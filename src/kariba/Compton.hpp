@@ -64,6 +64,9 @@ class Compton : public Radiation {
     virtual void urad_test();
     virtual void test();
 
+    std::vector<double> get_seed_energ();
+    std::vector<double> get_seed_urad();
+
     friend double comfnc(double ein, void* p);
     friend double comint(double gam, void* p);
     friend double disk_integral(double alfa, void* p);
