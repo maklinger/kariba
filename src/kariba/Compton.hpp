@@ -43,6 +43,7 @@ class Compton : public Radiation {
 
     virtual void cyclosyn_seed(const std::vector<double>& seed_arr,
                                const std::vector<double>& seed_lum);
+    void add_seed(const std::vector<double>& seed_syn_energ, const std::vector<double>& seed_arr);
     virtual void bb_seed_k(const std::vector<double>& seed_arr, double Urad, double Tbb);
     virtual void bb_seed_kev(const std::vector<double>& seed_energ, double Urad, double Tbb);
     virtual void shsdisk_seed(const std::vector<double>& seed_arr, double tin, double rin,

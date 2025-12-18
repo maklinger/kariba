@@ -265,6 +265,32 @@ void Compton::cyclosyn_seed(const std::vector<double>& seed_arr,
     gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
+void Compton::add_seed(const std::vector<double>& seed_syn_energ, const std::vector<double>& seed_arr) {
+    double emin, emax, urad;
+
+    emin = seed_energ[0];
+    emax = seed_energ[seed_energ.size()-1];
+    // seed_freq_array(seed_arr);
+    // seed_energ = seed_arr;
+
+    for (size_t i = 0; i < seed_syn_energ.size(); i++) {
+        if (seed_syn_energ[i] < emin) {
+            urad = 1.e-100;
+        } else if (seed_syn_energ[i] < emax) {
+            urad = seed_arr[i];
+        } else {
+            urad = 1.e-100;
+        }
+        if (seed_urad[i] != 0) {
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + urad);
+        } else if (urad > 0) {
+            seed_urad[i] = std::log10(urad);
+        } else {
+            seed_urad[i] = -100;
+        }
+    }
+    gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
+}
 //! Method to include black body to seed field for IC;
 //! Note: Urad and Tbb need to be passed in the co-moving frame, the function
 //! does NOT account for beaming
