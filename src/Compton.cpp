@@ -247,25 +247,29 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
 void Compton::cyclosyn_seed(const std::vector<double>& seed_arr,
                             const std::vector<double>& seed_lum) {
     // to do: asssert input and member sizes are the same
+    double new_val;
     for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
+        if (geometry == "cylinder") {
+            new_val = seed_lum[i] / (constants::cee * constants::herg *
+                                     seed_energ[i] * constants::pi * r * z);
+        }
+        else {
+            new_val = std::log10(seed_lum[i] / (constants::cee * constants::herg *
+                                                        seed_energ[i] * constants::pi * r * r));
+        }
         if (seed_urad[i] != 0) {
-            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) +
-                                      seed_lum[i] / (constants::cee * constants::herg *
-                                                     seed_energ[i] * constants::pi * r * r));
-        } else if (seed_lum[i] /
-                       (constants::cee * constants::herg * seed_energ[i] * constants::pi * r * r) <=
-                   0) {
+            seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + new_val);
+        } else if (new_val <= 0) {
             seed_urad[i] = -100;
         } else {
-            seed_urad[i] = std::log10(seed_lum[i] / (constants::cee * constants::herg *
-                                                     seed_energ[i] * constants::pi * r * r));
+            seed_urad[i] = std::log10(new_val);
         }
     }
     gsl_spline_init(seed_ph, seed_energ.data(), seed_urad.data(), seed_energ.size());
 }
 
-void Compton::add_seed(const std::vector<double>& seed_syn_energ, const std::vector<double>& seed_arr) {
+void Compton::add_seed(const std::vector<double>& seed_syn_energ, const std::vector<double>& seed_energy_density) {
     double emin, emax, urad;
 
     emin = seed_energ[0];
@@ -277,7 +281,7 @@ void Compton::add_seed(const std::vector<double>& seed_syn_energ, const std::vec
         if (seed_syn_energ[i] < emin) {
             urad = 1.e-100;
         } else if (seed_syn_energ[i] < emax) {
-            urad = seed_arr[i];
+            urad = seed_energy_density[i]/seed_syn_energ[i]/seed_syn_energ[i];
         } else {
             urad = 1.e-100;
         }
