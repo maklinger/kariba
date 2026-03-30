@@ -228,8 +228,13 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
             if (com == 0) {
                 iter_urad[i] = -50;
             } else {
-                iter_urad[i] = std::log10(escape_corr * com * vol /
+                if (geometry == "cylinder"){
+                    iter_urad[i] = std::log10(escape_corr * com * vol /
+                                          (constants::pi * r * z * constants::cee));
+                } else {
+                    iter_urad[i] = std::log10(escape_corr * com * vol /
                                           (constants::pi * std::pow(r, 2.) * constants::cee));
+                }
             }
         }
         ephmin = en_phot.front();    // [0];
