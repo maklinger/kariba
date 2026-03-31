@@ -377,12 +377,13 @@ void Compton::add_target_number_density_on_freq_grid(
 //! sign to dodge numerical errors when the seed field energy density is
 //! extremely low, which can result in negative values/nan for the target_diff_spec
 void Compton::cyclosyn_seed(const std::vector<double>& syn_frequencies,
-                            const std::vector<double>& syn_number_densities) {
+                            const std::vector<double>& syn_number_rates) {
     set_target_frequency_array(syn_frequencies);
 
-    std::vector<double> new_target_diff_spec(syn_number_densities.size());
-    for (size_t i = 0; i < syn_number_densities.size(); ++i) {
-        new_target_diff_spec[i] = syn_number_densities[i] / (syn_frequencies[i] * constants::herg);
+    std::vector<double> new_target_diff_spec(syn_number_rates.size());
+    for (size_t i = 0; i < syn_number_rates.size(); ++i) {
+        new_target_diff_spec[i] = syn_number_rates[i] / (
+            syn_frequencies[i] * constants::herg *constants::cee * constants::pi * r * r);
     }
     add_target_diff_spec(new_target_diff_spec);
 }
