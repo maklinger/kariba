@@ -236,10 +236,10 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                 log_target_diff_spec_iter[i] = -50;
             } else {
                 if (geometry == "cylinder"){
-                    log_target_diff_spec_iter[i] = log10(escape_corr * com * vol /
+                    log_target_diff_spec_iter[i] = log(escape_corr * com * vol /
                                           (constants::pi * r * z * constants::cee));
                 } else {
-                    log_target_diff_spec_iter[i] = log10(escape_corr * com * vol /
+                    log_target_diff_spec_iter[i] = log(escape_corr * com * vol /
                                           (constants::pi * pow(r, 2.) * constants::cee));
                 }
             }
@@ -254,7 +254,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
 void Compton::set_target_energy_array(const std::vector<double>& new_target_energy) {
     log_target_energy = std::vector<double>(new_target_energy.size());
     for (size_t i = 0; i < new_target_energy.size(); i++) {
-        log_target_energy[i] = log10(new_target_energy[i]);
+        log_target_energy[i] = log(new_target_energy[i]);
     }
     log_target_diff_spec = std::vector<double>(new_target_energy.size(), -100);
     gsl_spline_free(seed_ph);
@@ -264,7 +264,7 @@ void Compton::set_target_energy_array(const std::vector<double>& new_target_ener
 void Compton::set_target_frequency_array(const std::vector<double>& new_target_frequency) {
     log_target_energy = std::vector<double>(new_target_frequency.size());
     for (size_t i = 0; i < new_target_frequency.size(); i++) {
-        log_target_energy[i] = log10(new_target_frequency[i] * constants::herg);
+        log_target_energy[i] = log(new_target_frequency[i] * constants::herg);
     }
     log_target_diff_spec = std::vector<double>(new_target_frequency.size(), -100);
     gsl_spline_free(seed_ph);
