@@ -466,7 +466,7 @@ void Compton::shsdisk_seed(double tin, double rin, double rout, double h, double
         if (log_target_energy[i] < logElim) {
             gsl_function F;
             auto Fparams =
-                DiskIcParams{Gamma, beta, tin, rin, rout, h, z, exp(log_target_energy[i] / constants::herg)};
+                DiskIcParams{Gamma, beta, tin, rin, rout, h, z, exp(log_target_energy[i]) / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result, &error);
