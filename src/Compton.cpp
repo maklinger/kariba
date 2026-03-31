@@ -128,17 +128,7 @@ double comfnc(double logein, void* pars) {
     } else {
         biggam = eg4 / constants::emerg;
         q = e1 / (biggam * (1. - e1));
-        // phonum = exp(gsl_spline_eval(phodis, logein, acc_phodis));
-        double y;
-        int status = gsl_spline_eval_e(phodis, logein, acc_phodis, &y);
-        if (status != 0) {
-            std::cerr << "comfnc: gsl_spline_eval_e error " << status
-                    << " at logein=" << logein
-                    << " (E=" << std::exp(logein) << " erg)" << std::endl;
-            // You can also print the domain here if you track it in params.
-            return 0.0;
-        }
-        phonum = std::exp(y);
+        phonum = exp(gsl_spline_eval(phodis, logein, acc_phodis));
         tm1 = 2. * q * log(q);
         tm2 = (1. + 2. * q) * (1. - q);
         tm3 = 0.5 * (pow(biggam * q, 2.) * (1. - q)) / (1. + biggam * q);
@@ -151,8 +141,8 @@ double comfnc(double logein, void* pars) {
 double comint(double gam, void* pars) {
     ComintParams* params = static_cast<ComintParams*>(pars);
     double eph = (params->eph);
-    double ephmin = (params->ephmin);
-    double ephmax = (params->ephmax);
+    double logephmin = (params->ephmin);
+    double logephmax = (params->ephmax);
     gsl_spline* eldis = (params->eldis);
     gsl_interp_accel* acc_eldis = (params->acc_eldis);
     gsl_spline* phodis = (params->phodis);
@@ -165,8 +155,8 @@ double comint(double gam, void* pars) {
     game = exp(gam);
     e1 = eph / (game * constants::emerg);
     econst = 2. * constants::pi * constants::re0 * constants::re0 * constants::cee;
-    blim = log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
-    ulim = log(std::min(eph, ephmax));
+    blim = std::max(log(eph / (4. * game * (game - eph / constants::emerg))), logephmin);
+    ulim = std::min(log(eph), logephmax);
 
     if (ulim <= blim) {
         return 0;
@@ -184,13 +174,13 @@ double comint(double gam, void* pars) {
 
 //! This integrates the individual electron spectrum from comint over the total
 //! electron distribution
-double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double enphmin,
-                            double enphmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis) {
+double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double logenphmin,
+                            double logenphmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis) {
     double result, error;
 
     gsl_function F1;
-    auto F1params = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed, w2};
-    auto F1params_it = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter, w2};
+    auto F1params = ComintParams{enphot, logenphmin, logenphmax, eldis, acc_eldis, seed_ph, acc_seed, w2};
+    auto F1params_it = ComintParams{enphot, logenphmin, logenphmax, eldis, acc_eldis, iter_ph, acc_iter, w2};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;
@@ -214,23 +204,28 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                                gsl_interp_accel* acc_eldis) {
     double blim, ulim, com;
     double dopfac_cj;
-    double ephmin, ephmax;
+    double logephmin, logephmax;
 
-    ephmin = exp(log_target_energy.front());    //[0];
-    ephmax = exp(log_target_energy.back());     //[target_size - 1];
+    logephmin = log_target_energy.front();    //[0];
+    logephmax = log_target_energy.back();     //[target_size - 1];
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
     size_t size = en_phot.size();
     for (size_t it = 0; it < Niter; it++) {
         for (size_t i = 0; i < size; i++) {
-            if (it==0) log_energy_iter[i] = log(en_phot[i]);
+            if (it==0) {
+                log_energy_iter[i] = log(en_phot[i]);
+            } else {
+                logephmin = log_energy_iter.front();    //[0];
+                logephmax = log_energy_iter.back();
+            }
             blim = log(std::max(gmin, en_phot[i] / constants::emerg));
             ulim = log(gmax);
             if (blim >= ulim) {
                 com = 1e-100;
             } else {
-                com = comintegral(it, blim, ulim, en_phot[i], ephmin, ephmax, eldis, acc_eldis);
+                com = comintegral(it, blim, ulim, en_phot[i], logephmin, logephmax, eldis, acc_eldis);
             }
             num_phot[i] = num_phot[i] + com * vol * en_phot[i] * constants::herg;
             en_phot_obs[i] = en_phot[i] * dopfac;
