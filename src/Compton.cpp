@@ -593,7 +593,9 @@ void Compton::reset() {
 
 void Compton::urad_test() {
     for (size_t i = 0; i < log_target_energy.size(); i++) {
-        std::cout << exp(log_target_energy[i]) / constants::herg << " " << exp(log_target_diff_spec[i]) << " " << exp(log_target_diff_spec_iter)[i]
+        std::cout << exp(log_target_energy[i]) / constants::herg 
+                  << " " << exp(log_target_diff_spec[i]) << " " 
+                  << exp(log_target_diff_spec_iter[i])
                   << std::endl;
     }
 }
