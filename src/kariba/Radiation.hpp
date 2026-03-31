@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_integration.h>
 
 namespace kariba {
 
