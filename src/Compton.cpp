@@ -446,7 +446,7 @@ double disk_integral(double alfa, void* pars) {
 }
 
 void Compton::shsdisk_seed(double tin, double rin, double rout, double h, double z) {
-    double ulim, blim, logElim, Gamma, result, error;
+    double ulim, blim, Elim, Gamma, result, error;
     std::vector<double> disk_diff_spec(target_energy.size(), 1e-100);
 
     Gamma = 1. / pow((1. - pow(beta, 2.)), 1. / 2.);
