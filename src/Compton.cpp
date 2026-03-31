@@ -562,7 +562,13 @@ void Compton::set_escape(double escape) { escape_corr = escape; }
 
 
 std::vector<double> Compton::get_target_energy(){
-    return exp(log_target_energy);
+    std::vector<double> vals(log_target_energy.size(), 0.);
+    for (size_t i = 0; i < log_target_energy.size(); i++)
+    {
+        vals[i] = exp(log_target_energy[i]);
+    }
+    
+    return vals;
 }
 
 std::vector<double> Compton::get_target_diff_spec(){
