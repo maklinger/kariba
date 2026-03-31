@@ -312,7 +312,7 @@ void Compton::add_target_energy_density(
     std::vector<double> log_new_target_diff_spec(new_target_energy_density.size());
     for (size_t i = 0; i < new_target_energy.size(); ++i) {
         log_new_target_energy[i] = log(new_target_energy[i]);
-        log_new_target_diff_spec[i] = log(new_target_energy_density[i] / pow(new_target_energy, 2.));
+        log_new_target_diff_spec[i] = log(new_target_energy_density[i] / pow(new_target_energy[i], 2.));
     }
 
     // x = log(E), y = log(E-density)
