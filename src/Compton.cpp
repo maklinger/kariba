@@ -372,14 +372,14 @@ void Compton::add_target_number_density_on_freq_grid(
 //! automatically added to the existing one. note: the second condition has a <=
 //! sign to dodge numerical errors when the seed field energy density is
 //! extremely low, which can result in negative values/nan for the target_diff_spec
-void Compton::cyclosyn_seed(const std::vector<double>& syn_frequencies,
+void Compton::cyclosyn_seed(const std::vector<double>& syn_energies,
                             const std::vector<double>& syn_number_rates) {
-    set_target_frequency_array(syn_frequencies);
+    set_target_energy_array(syn_energies);
 
     std::vector<double> new_target_diff_spec(syn_number_rates.size());
     for (size_t i = 0; i < syn_number_rates.size(); ++i) {
         new_target_diff_spec[i] = syn_number_rates[i] / (
-            syn_frequencies[i] * constants::herg *constants::cee * constants::pi * r * r);
+            syn_energies[i] * constants::herg *constants::cee * constants::pi * r * r);
     }
     add_target_diff_spec(new_target_diff_spec);
 }
@@ -392,7 +392,7 @@ void Compton::bb_seed_k(double Urad, double Tbb) {
     double ulim, energy;
     std::vector<double> bb_diff_spec(target_energy.size(), 1e-100);
 
-    ulim = log(3e2 * Tbb * constants::kboltz);
+    ulim = 3e2 * Tbb * constants::kboltz;
     
     for (size_t i = 0; i < target_energy.size(); i++) {
         if (target_energy[i] < ulim) {
