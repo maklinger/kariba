@@ -168,13 +168,6 @@ double comint(double gam, void* pars) {
     blim = log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
     ulim = log(std::min(eph, ephmax));
 
-    double xmin = gsl_spline_min(phodis);  // log(E_min) for this spline
-    double xmax = gsl_spline_max(phodis);  // log(E_max)
-
-    // Clamp integration range to spline domain
-    blim = std::max(blim, xmin);
-    ulim = std::min(ulim, xmax);
-
     if (ulim <= blim) {
         return 0;
     } else {
