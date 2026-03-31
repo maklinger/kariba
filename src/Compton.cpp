@@ -128,7 +128,17 @@ double comfnc(double logein, void* pars) {
     } else {
         biggam = eg4 / constants::emerg;
         q = e1 / (biggam * (1. - e1));
-        phonum = exp(gsl_spline_eval(phodis, logein, acc_phodis));
+        // phonum = exp(gsl_spline_eval(phodis, logein, acc_phodis));
+        double y;
+        int status = gsl_spline_eval_e(phodis, logein, acc_phodis, &y);
+        if (status != 0) {
+            std::cerr << "comfnc: gsl_spline_eval_e error " << status
+                    << " at logein=" << logein
+                    << " (E=" << std::exp(logein) << " erg)" << std::endl;
+            // You can also print the domain here if you track it in params.
+            return 0.0;
+        }
+        phonum = std::exp(y);
         tm1 = 2. * q * log(q);
         tm2 = (1. + 2. * q) * (1. - q);
         tm3 = 0.5 * (pow(biggam * q, 2.) * (1. - q)) / (1. + biggam * q);
@@ -157,6 +167,13 @@ double comint(double gam, void* pars) {
     econst = 2. * constants::pi * constants::re0 * constants::re0 * constants::cee;
     blim = log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
     ulim = log(std::min(eph, ephmax));
+
+    double xmin = gsl_spline_min(phodis);  // log(E_min) for this spline
+    double xmax = gsl_spline_max(phodis);  // log(E_max)
+
+    // Clamp integration range to spline domain
+    blim = std::max(blim, xmin);
+    ulim = std::min(ulim, xmax);
 
     if (ulim <= blim) {
         return 0;
