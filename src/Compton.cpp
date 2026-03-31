@@ -205,8 +205,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
     double dopfac_cj;
     double ephmin, ephmax;
 
-    ephmin = pow(10., lg_target_energy.front());    //[0];
-    ephmax = pow(10., lg_target_energy.back());     //[target_size - 1];
+    ephmin = pow(10., log_target_energy.front());    //[0];
+    ephmax = pow(10., log_target_energy.back());     //[target_size - 1];
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
@@ -249,23 +249,25 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
     }
 }
 
-//! Method to set new target energy array, resets also lg_target_diff_spec
+//! Method to set new target energy array, resets also log_target_diff_spec
 void Compton::set_target_energy_array(const std::vector<double>& new_target_energy) {
-    lg_target_energy = log10(new_target_energy);
-    lg_target_diff_spec = std::vector<double>(new_target_energy.size(), -100);
-    gsl_spline_free(seed_ph);
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, lg_target_energy.size());
-}
-//! Method to set target energy array from frequency array, resets also lg_target_diff_spec
-void Compton::set_target_frequency_array(const std::vector<double>& new_target_frequency) {
-    lg_target_energy = std::vector<double>(new_target_frequency.size());
-    // to do: asssert input and member sizes are the same
-    for (size_t i = 0; i < new_target_frequency.size(); i++) {
-        lg_target_energy[i] = log10(new_target_frequency[i] * constants::herg);
+    log_target_energy = std::vector<double>(new_target_energy.size());
+    for (size_t i = 0; i < new_target_energy.size(); i++) {
+        log_target_energy[i] = log10(new_target_energy[i]);
     }
-    lg_target_diff_spec = std::vector<double>(new_target_frequency.size(), -100);
+    log_target_diff_spec = std::vector<double>(new_target_energy.size(), -100);
     gsl_spline_free(seed_ph);
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, lg_target_energy.size());
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
+}
+//! Method to set target energy array from frequency array, resets also log_target_diff_spec
+void Compton::set_target_frequency_array(const std::vector<double>& new_target_frequency) {
+    log_target_energy = std::vector<double>(new_target_frequency.size());
+    for (size_t i = 0; i < new_target_frequency.size(); i++) {
+        log_target_energy[i] = log10(new_target_frequency[i] * constants::herg);
+    }
+    log_target_diff_spec = std::vector<double>(new_target_frequency.size(), -100);
+    gsl_spline_free(seed_ph);
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
 }
 
 // adds target and updates spline, assumes ame energy grid
@@ -576,14 +578,14 @@ std::vector<double> Compton::get_target_diff_spec(){
 //! This resets the energy density in case different photon fields want to be
 //! calculated separately to see the contribution of each
 void Compton::reset() {
-    std::fill(lg_target_diff_spec.begin(), lg_target_diff_spec.end(), 0);
-    std::fill(lg_target_energy.begin(), lg_target_energy.end(), 0);
+    std::fill(log_target_diff_spec.begin(), log_target_diff_spec.end(), 0);
+    std::fill(log_target_energy.begin(), log_target_energy.end(), 0);
     std::fill(num_phot.begin(), num_phot.end(), 0);
     std::fill(num_phot_obs.begin(), num_phot_obs.end(), 0);
 }
 
 void Compton::urad_test() {
-    for (size_t i = 0; i < lg_target_energy.size(); i++) {
+    for (size_t i = 0; i < log_target_energy.size(); i++) {
         std::cout << exp(log_target_energy[i]) / constants::herg << " " << exp(log_target_diff_spec[i]) << " " << exp(log_target_diff_spec_iter)[i]
                   << std::endl;
     }
