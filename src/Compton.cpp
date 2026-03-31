@@ -255,14 +255,8 @@ void Compton::cyclosyn_seed(const std::vector<double>& seed_arr,
     double new_val;
     for (size_t i = 0; i < seed_arr.size(); i++) {
         seed_energ[i] = seed_arr[i];
-        if (geometry == "cylinder") {
-            new_val = seed_lum[i] / (constants::cee * constants::herg *
-                                     seed_energ[i] * constants::pi * r * r);
-        }
-        else {
-            new_val = std::log10(seed_lum[i] / (constants::cee * constants::herg *
-                                                        seed_energ[i] * constants::pi * r * r));
-        }
+        new_val = seed_lum[i] / (constants::cee * constants::herg *
+                                    seed_energ[i] * constants::pi * r * r);
         if (seed_urad[i] != 0) {
             seed_urad[i] = std::log10(std::pow(10., seed_urad[i]) + new_val);
         } else if (new_val <= 0) {
