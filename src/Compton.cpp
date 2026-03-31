@@ -249,8 +249,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                 }
             }
         }
-        ephmin = en_phot.front();    // [0];
-        ephmax = en_phot.back();     //[size - 1];
+        // ephmin = en_phot.front();    // [0];
+        // ephmax = en_phot.back();     //[size - 1];
         gsl_spline_init(iter_ph, log_energy_iter.data(), log_target_diff_spec_iter.data(), size);
     }
 }
