@@ -206,8 +206,8 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
     double dopfac_cj;
     double ephmin, ephmax;
 
-    ephmin = pow(10., log_target_energy.front());    //[0];
-    ephmax = pow(10., log_target_energy.back());     //[target_size - 1];
+    ephmin = exp(log_target_energy.front());    //[0];
+    ephmax = exp(log_target_energy.back());     //[target_size - 1];
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
