@@ -72,11 +72,10 @@ Compton::~Compton() {
 }
 
 Compton::Compton(size_t size, size_t target_size)
-    : Radiation(size), log_target_energy(target_size, 0.0), log_target_diff_spec(target_size, 0.0), 
+    : Radiation(size), target_energy(target_size, 0.0), log_target_diff_spec(target_size, 0.0), 
       log_target_diff_spec_iter(size, 0.0) {
     en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
-    log_energy_iter.resize(en_phot.size(), -100.);
 
     Niter = 20;
     ypar = 0;
@@ -128,7 +127,7 @@ double comfnc(double logein, void* pars) {
     } else {
         biggam = eg4 / constants::emerg;
         q = e1 / (biggam * (1. - e1));
-        phonum = exp(gsl_spline_eval(phodis, logein, acc_phodis));
+        phonum = exp(gsl_spline_eval(phodis, einit, acc_phodis));
         tm1 = 2. * q * log(q);
         tm2 = (1. + 2. * q) * (1. - q);
         tm3 = 0.5 * (pow(biggam * q, 2.) * (1. - q)) / (1. + biggam * q);
@@ -141,8 +140,8 @@ double comfnc(double logein, void* pars) {
 double comint(double gam, void* pars) {
     ComintParams* params = static_cast<ComintParams*>(pars);
     double eph = (params->eph);
-    double logephmin = (params->ephmin);
-    double logephmax = (params->ephmax);
+    double ephmin = (params->ephmin);
+    double ephmax = (params->ephmax);
     gsl_spline* eldis = (params->eldis);
     gsl_interp_accel* acc_eldis = (params->acc_eldis);
     gsl_spline* phodis = (params->phodis);
@@ -155,8 +154,8 @@ double comint(double gam, void* pars) {
     game = exp(gam);
     e1 = eph / (game * constants::emerg);
     econst = 2. * constants::pi * constants::re0 * constants::re0 * constants::cee;
-    blim = std::max(log(eph / (4. * game * (game - eph / constants::emerg))), logephmin);
-    ulim = std::min(log(eph), logephmax);
+    blim = log(std::max(eph / (4. * game * (game - eph / constants::emerg)), ephmin));
+    ulim = log(std::min(eph, ephmax));
 
     if (ulim <= blim) {
         return 0;
@@ -174,13 +173,13 @@ double comint(double gam, void* pars) {
 
 //! This integrates the individual electron spectrum from comint over the total
 //! electron distribution
-double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double logenphmin,
-                            double logenphmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis) {
+double Compton::comintegral(size_t it, double blim, double ulim, double enphot, double enphmin,
+                            double enphmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis) {
     double result, error;
 
     gsl_function F1;
-    auto F1params = ComintParams{enphot, logenphmin, logenphmax, eldis, acc_eldis, seed_ph, acc_seed, w2};
-    auto F1params_it = ComintParams{enphot, logenphmin, logenphmax, eldis, acc_eldis, iter_ph, acc_iter, w2};
+    auto F1params = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed, w2};
+    auto F1params_it = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter, w2};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;
@@ -204,28 +203,23 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                                gsl_interp_accel* acc_eldis) {
     double blim, ulim, com;
     double dopfac_cj;
-    double logephmin, logephmax;
+    double ephmin, ephmax;
 
-    logephmin = log_target_energy.front();    //[0];
-    logephmax = log_target_energy.back();     //[target_size - 1];
+    ephmin = target_energy.front();    //[0];
+    ephmax = target_energy.back();     //[target_size - 1];
 
     dopfac_cj = dopfac * (1. - beta * cos(angle)) / (1. + beta * cos(angle));
 
     size_t size = en_phot.size();
     for (size_t it = 0; it < Niter; it++) {
         for (size_t i = 0; i < size; i++) {
-            if (it==0) {
-                log_energy_iter[i] = log(en_phot[i]);
-            } else {
-                logephmin = log_energy_iter.front();    //[0];
-                logephmax = log_energy_iter.back();
-            }
+    
             blim = log(std::max(gmin, en_phot[i] / constants::emerg));
             ulim = log(gmax);
             if (blim >= ulim) {
                 com = 1e-100;
             } else {
-                com = comintegral(it, blim, ulim, en_phot[i], logephmin, logephmax, eldis, acc_eldis);
+                com = comintegral(it, blim, ulim, en_phot[i], ephmin, ephmax, eldis, acc_eldis);
             }
             num_phot[i] = num_phot[i] + com * vol * en_phot[i] * constants::herg;
             en_phot_obs[i] = en_phot[i] * dopfac;
@@ -249,27 +243,24 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                 }
             }
         }
-        // ephmin = en_phot.front();    // [0];
-        // ephmax = en_phot.back();     //[size - 1];
-        gsl_spline_init(iter_ph, log_energy_iter.data(), log_target_diff_spec_iter.data(), size);
+        ephmin = en_phot.front();    // [0];
+        ephmax = en_phot.back();     //[size - 1];
+        gsl_spline_init(iter_ph, en_phot.data(), log_target_diff_spec_iter.data(), size);
     }
 }
 
 //! Method to set new target energy array, resets also log_target_diff_spec
 void Compton::set_target_energy_array(const std::vector<double>& new_target_energy) {
-    log_target_energy = std::vector<double>(new_target_energy.size());
-    for (size_t i = 0; i < new_target_energy.size(); i++) {
-        log_target_energy[i] = log(new_target_energy[i]);
-    }
+    target_energy = new_target_energy;
     log_target_diff_spec = std::vector<double>(new_target_energy.size(), -100);
     gsl_spline_free(seed_ph);
     seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
 }
 //! Method to set target energy array from frequency array, resets also log_target_diff_spec
 void Compton::set_target_frequency_array(const std::vector<double>& new_target_frequency) {
-    log_target_energy = std::vector<double>(new_target_frequency.size());
+    target_energy = std::vector<double>(new_target_frequency.size());
     for (size_t i = 0; i < new_target_frequency.size(); i++) {
-        log_target_energy[i] = log(new_target_frequency[i] * constants::herg);
+        target_energy[i] = new_target_frequency[i] * constants::herg;
     }
     log_target_diff_spec = std::vector<double>(new_target_frequency.size(), -100);
     gsl_spline_free(seed_ph);
@@ -292,7 +283,7 @@ void Compton::add_target_diff_spec(
         }
     }
     
-    gsl_spline_init(seed_ph, log_target_energy.data(), log_target_diff_spec.data(), log_target_energy.size());
+    gsl_spline_init(seed_ph, target_energy.data(), log_target_diff_spec.data(), log_target_energy.size());
 }
 
 // adds target, cuts off outside energy boundaries, interpolates inbetween
@@ -331,8 +322,8 @@ void Compton::add_target_energy_density(
     const double x_max = log_new_target_energy.back();
 
     std::vector<double> interp_new_target_diff_spec(log_target_energy.size());
-    for (size_t i = 0; i < log_target_energy.size(); ++i) {
-        const double x = log_target_energy[i];
+    for (size_t i = 0; i < target_energy.size(); ++i) {
+        const double x = log(target_energy[i]);
 
         // If outside new grid → contribution is zero, so do nothing.
         if (x < x_min || x > x_max) {
@@ -399,13 +390,13 @@ void Compton::cyclosyn_seed(const std::vector<double>& syn_frequencies,
 //! does NOT account for beaming
 void Compton::bb_seed_k(double Urad, double Tbb) {
     double ulim, energy;
-    std::vector<double> bb_diff_spec(log_target_energy.size(), 1e-100);
+    std::vector<double> bb_diff_spec(target_energy.size(), 1e-100);
 
     ulim = log(3e2 * Tbb * constants::kboltz);
     
-    for (size_t i = 0; i < log_target_energy.size(); i++) {
-        if (log_target_energy[i] < ulim) {
-            energy = exp(log_target_energy[i]);
+    for (size_t i = 0; i < target_energy.size(); i++) {
+        if (target_energy[i] < ulim) {
+            energy = target_energy[i];
             bb_diff_spec[i] = (2. * Urad * pow(energy / constants::herg, 2.)) /
                       (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
                        pow(Tbb, 4) * (exp(energy / (constants::kboltz * Tbb)) - 1.));
@@ -456,7 +447,7 @@ double disk_integral(double alfa, void* pars) {
 
 void Compton::shsdisk_seed(double tin, double rin, double rout, double h, double z) {
     double ulim, blim, logElim, Gamma, result, error;
-    std::vector<double> disk_diff_spec(log_target_energy.size(), 1e-100);
+    std::vector<double> disk_diff_spec(target_energy.size(), 1e-100);
 
     Gamma = 1. / pow((1. - pow(beta, 2.)), 1. / 2.);
 
@@ -466,13 +457,13 @@ void Compton::shsdisk_seed(double tin, double rin, double rout, double h, double
     } else {
         ulim = atan(rout / (z - h * rout / 2.));
     }
-    logElim = log(1e1 * tin * constants::kboltz);
+    Elim = 1e1 * tin * constants::kboltz;
 
-    for (size_t i = 0; i < log_target_energy.size(); i++) {
-        if (log_target_energy[i] < logElim) {
+    for (size_t i = 0; i < target_energy.size(); i++) {
+        if (target_energy[i] < Elim) {
             gsl_function F;
             auto Fparams =
-                DiskIcParams{Gamma, beta, tin, rin, rout, h, z, exp(log_target_energy[i]) / constants::herg};
+                DiskIcParams{Gamma, beta, tin, rin, rout, h, z, target_energy[i] / constants::herg};
             F.function = &disk_integral;
             F.params = &Fparams;
             gsl_integration_qag(&F, blim, ulim, 0, 1e-5, 100, 2, w1, &result, &error);
@@ -568,13 +559,7 @@ void Compton::set_escape(double escape) { escape_corr = escape; }
 
 
 std::vector<double> Compton::get_target_energy(){
-    std::vector<double> vals(log_target_energy.size(), 0.);
-    for (size_t i = 0; i < log_target_energy.size(); i++)
-    {
-        vals[i] = exp(log_target_energy[i]);
-    }
-    
-    return vals;
+    return target_energy;
 }
 
 std::vector<double> Compton::get_target_diff_spec(){
@@ -592,14 +577,14 @@ std::vector<double> Compton::get_target_diff_spec(){
 //! calculated separately to see the contribution of each
 void Compton::reset() {
     std::fill(log_target_diff_spec.begin(), log_target_diff_spec.end(), 0);
-    std::fill(log_target_energy.begin(), log_target_energy.end(), 0);
+    std::fill(target_energy.begin(), target_energy.end(), 0);
     std::fill(num_phot.begin(), num_phot.end(), 0);
     std::fill(num_phot_obs.begin(), num_phot_obs.end(), 0);
 }
 
 void Compton::urad_test() {
-    for (size_t i = 0; i < log_target_energy.size(); i++) {
-        std::cout << exp(log_target_energy[i]) / constants::herg 
+    for (size_t i = 0; i < target_energy.size(); i++) {
+        std::cout << target_energy[i] / constants::herg 
                   << " " << exp(log_target_diff_spec[i]) << " " 
                   << exp(log_target_diff_spec_iter[i])
                   << std::endl;

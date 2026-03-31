@@ -14,11 +14,11 @@ class Compton : public Radiation {
     double rphot;          //!< photospheric radius when tau > 1, used to renormalize volume
     double escape_corr;    //!< escape term, used to renormalize our spectra to CompPS
 
-    std::vector<double> log_target_energy;    //!< array of seed energies in erg
+    std::vector<double> target_energy;    //!< array of seed energies in erg
     std::vector<double> log_target_diff_spec;     //!< array of seed photon number density in log(#/erg/cm^3)
     std::vector<double>
         log_target_diff_spec_iter;    //!< array of iterated photon number density in log(#/erg/cm^3)
-    std::vector<double> log_energy_iter;
+
 
     gsl_spline* seed_ph;           //!< interpolation of photon field array target_diff_spec
     gsl_interp_accel* acc_seed;    //!< accelerator for above spline
