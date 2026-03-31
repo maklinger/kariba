@@ -325,7 +325,7 @@ void Compton::add_target_energy_density(
     const double x_min = log_new_target_energy.front();
     const double x_max = log_new_target_energy.back();
 
-    std::vector<double> interp_log_new_target_diff_spec(log_target_energy.size());
+    std::vector<double> interp_new_target_diff_spec(log_target_energy.size());
     for (size_t i = 0; i < log_target_energy.size(); ++i) {
         const double x = log_target_energy[i];
 
@@ -335,7 +335,7 @@ void Compton::add_target_energy_density(
         }
 
         // Interpolate log(E-density_new) at this log(E)
-        interp_new_target_diff_spec[i] = std:exp(gsl_spline_eval(spline_add_target, x, acc_add_target));
+        interp_new_target_diff_spec[i] = exp(gsl_spline_eval(spline_add_target, x, acc_add_target));
     }
 
     gsl_spline_free(spline_add_target);
