@@ -91,7 +91,7 @@ Compton::Compton(size_t size, size_t target_size)
     gsl_spline2d_init(esc_p_sph, Te_table, tau_table, esc_table_sph, 15, 15);
     gsl_spline2d_init(esc_p_cyl, Te_table, tau_table, esc_table_cyl, 15, 15);
 
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, target_energy.size());
     acc_seed = gsl_interp_accel_alloc();
 
     iter_ph = gsl_spline_alloc(gsl_interp_steffen, en_phot.size());
@@ -254,7 +254,7 @@ void Compton::set_target_energy_array(const std::vector<double>& new_target_ener
     target_energy = new_target_energy;
     log_target_diff_spec = std::vector<double>(new_target_energy.size(), -100);
     gsl_spline_free(seed_ph);
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, target_energy.size());
 }
 //! Method to set target energy array from frequency array, resets also log_target_diff_spec
 void Compton::set_target_frequency_array(const std::vector<double>& new_target_frequency) {
@@ -264,7 +264,7 @@ void Compton::set_target_frequency_array(const std::vector<double>& new_target_f
     }
     log_target_diff_spec = std::vector<double>(new_target_frequency.size(), -100);
     gsl_spline_free(seed_ph);
-    seed_ph = gsl_spline_alloc(gsl_interp_steffen, log_target_energy.size());
+    seed_ph = gsl_spline_alloc(gsl_interp_steffen, target_energy.size());
 }
 
 // adds target and updates spline, assumes ame energy grid
@@ -283,7 +283,7 @@ void Compton::add_target_diff_spec(
         }
     }
     
-    gsl_spline_init(seed_ph, target_energy.data(), log_target_diff_spec.data(), log_target_energy.size());
+    gsl_spline_init(seed_ph, target_energy.data(), log_target_diff_spec.data(), target_energy.size());
 }
 
 // adds target, cuts off outside energy boundaries, interpolates inbetween
@@ -321,7 +321,7 @@ void Compton::add_target_energy_density(
     const double x_min = log_new_target_energy.front();
     const double x_max = log_new_target_energy.back();
 
-    std::vector<double> interp_new_target_diff_spec(log_target_energy.size());
+    std::vector<double> interp_new_target_diff_spec(target_energy.size());
     for (size_t i = 0; i < target_energy.size(); ++i) {
         const double x = log(target_energy[i]);
 
