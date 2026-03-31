@@ -147,6 +147,7 @@ double comint(double gam, void* pars) {
     gsl_interp_accel* acc_eldis = (params->acc_eldis);
     gsl_spline* phodis = (params->phodis);
     gsl_interp_accel* acc_phodis = (params->acc_phodis);
+    gsl_integration_workspace* w2 = (params->w2);
 
     double game, econst, blim, ulim, e1, elden;
     double result, error;
@@ -178,8 +179,8 @@ double Compton::comintegral(size_t it, double blim, double ulim, double enphot, 
     double result, error;
 
     gsl_function F1;
-    auto F1params = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed};
-    auto F1params_it = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter};
+    auto F1params = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, seed_ph, acc_seed, w2};
+    auto F1params_it = ComintParams{enphot, enphmin, enphmax, eldis, acc_eldis, iter_ph, acc_iter, w2};
     F1.function = &comint;
     if (it == 0) {
         F1.params = &F1params;

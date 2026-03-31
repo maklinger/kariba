@@ -36,6 +36,7 @@ struct ComintParams {
     gsl_interp_accel* acc_eldis;
     gsl_spline* phodis;
     gsl_interp_accel* acc_phodis;
+    gsl_integration_workspace* w2;
 };
 
 //! Structure used for GSL integration
