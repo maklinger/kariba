@@ -556,11 +556,11 @@ void Compton::set_frequency(double numin, double numax) {
 void Compton::set_escape(double escape) { escape_corr = escape; }
 
 
-std::vector<double> Compton::get_target_energy(){
+std::vector<double> Compton::get_target_energy() const {
     return target_energy;
 }
 
-std::vector<double> Compton::get_target_diff_spec(){
+std::vector<double> Compton::get_target_diff_spec() const {
     std::vector<double> vals(log_target_diff_spec.size(), 0.);
     for (size_t i = 0; i < log_target_diff_spec.size(); i++)
     {
