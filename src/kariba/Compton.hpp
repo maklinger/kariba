@@ -9,7 +9,7 @@ namespace kariba {
 //! Class inverse Compton, inherited from Radiation.hpp
 class Compton : public Radiation {
   protected:
-    double log_floor = -230;
+    double log_floor = -230; // about 1e-100 
     size_t Niter;          //!< number of IC iterations
     double tau, ypar;      //!< optical depth/comtpon Y of emitting region
     double rphot;          //!< photospheric radius when tau > 1, used to renormalize volume
