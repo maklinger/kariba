@@ -72,8 +72,8 @@ Compton::~Compton() {
 }
 
 Compton::Compton(size_t size, size_t target_size)
-    : Radiation(size), target_energy(target_size, 0.0), log_target_diff_spec(target_size, -230), 
-      log_target_diff_spec_iter(size, -230) {
+    : Radiation(size), target_energy(target_size, 0.0), log_target_diff_spec(target_size, log_floor), 
+      log_target_diff_spec_iter(size, log_floor) {
     en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
 
@@ -232,7 +232,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
                 num_phot_obs[i + size] = 0.0;
             }
             if (com == 0) {
-                log_target_diff_spec_iter[i] = -230;
+                log_target_diff_spec_iter[i] = log_floor;
             } else {
                 if (geometry == "cylinder"){
                     log_target_diff_spec_iter[i] = log(escape_corr * com * vol /
@@ -252,7 +252,7 @@ void Compton::compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
 //! Method to set new target energy array, resets also log_target_diff_spec
 void Compton::set_target_energy_array(const std::vector<double>& new_target_energy) {
     target_energy = new_target_energy;
-    log_target_diff_spec = std::vector<double>(new_target_energy.size(), -230);
+    log_target_diff_spec = std::vector<double>(new_target_energy.size(), log_floor);
     gsl_spline_free(seed_ph);
     seed_ph = gsl_spline_alloc(gsl_interp_steffen, target_energy.size());
 }
@@ -262,7 +262,7 @@ void Compton::set_target_frequency_array(const std::vector<double>& new_target_f
     for (size_t i = 0; i < new_target_frequency.size(); i++) {
         target_energy[i] = new_target_frequency[i] * constants::herg;
     }
-    log_target_diff_spec = std::vector<double>(new_target_frequency.size(), -230);
+    log_target_diff_spec = std::vector<double>(new_target_frequency.size(), log_floor);
     gsl_spline_free(seed_ph);
     seed_ph = gsl_spline_alloc(gsl_interp_steffen, target_energy.size());
 }
@@ -278,8 +278,6 @@ void Compton::add_target_diff_spec(
         // Guard against numerical issues for very small sums
         if (sum_lin > 0.0) {
             log_target_diff_spec[i] = log(sum_lin);
-        } else {
-            // keep old value
         }
     }
     
@@ -401,7 +399,7 @@ void Compton::bb_seed_k(double Urad, double Tbb) {
                       (constants::herg * pow(constants::cee, 2.) * constants::sbconst *
                        pow(Tbb, 4) * (exp(energy / (constants::kboltz * Tbb)) - 1.));
         } else {
-            bb_diff_spec[i] = 1.e-100;
+            bb_diff_spec[i] = 1e-100;
         }
     }
     add_target_diff_spec(bb_diff_spec);
@@ -576,7 +574,7 @@ std::vector<double> Compton::get_target_diff_spec(){
 //! This resets the energy density in case different photon fields want to be
 //! calculated separately to see the contribution of each
 void Compton::reset() {
-    std::fill(log_target_diff_spec.begin(), log_target_diff_spec.end(), -230);
+    std::fill(log_target_diff_spec.begin(), log_target_diff_spec.end(), log_floor);
     std::fill(target_energy.begin(), target_energy.end(), 0);
     std::fill(num_phot.begin(), num_phot.end(), 0);
     std::fill(num_phot_obs.begin(), num_phot_obs.end(), 0);
