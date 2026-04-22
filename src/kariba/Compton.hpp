@@ -51,8 +51,6 @@ class Compton : public Radiation {
 
     virtual void set_target_energy_array(const std::vector<double>& new_target_energy);
     virtual void set_target_frequency_array(const std::vector<double>& new_target_frequency);
-    virtual void set_target_energy_array(const std::vector<double>& new_target_energy);
-    virtual void set_target_frequency_array(const std::vector<double>& new_target_frequency);
 
     virtual void add_target_diff_spec(const std::vector<double>& new_target_diff_spec);
     virtual void add_target_energy_density(
@@ -71,12 +69,6 @@ class Compton : public Radiation {
     virtual void bb_seed_kev(double Urad, double Tbb);
     virtual void shsdisk_seed(double tin, double rin, double rout, double h, double z);
 
-    virtual void set_niter(double nu0, double Te);
-    virtual void set_niter(size_t n);
-    virtual void set_tau(double n, double gam);
-    virtual void set_tau(double _tau);
-    virtual void set_frequency(double numin, double numax);
-    virtual void set_escape(double escape);
     virtual void set_niter(double nu0, double Te);
     virtual void set_niter(size_t n);
     virtual void set_tau(double n, double gam);
