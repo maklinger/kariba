@@ -43,34 +43,40 @@ class Compton : public Radiation {
     friend double comfnc(double logein, void* pars);
     friend double comint(double gam, void* pars);
     friend double disk_integral(double alfa, void* p);
-    virtual double comintegral(size_t it, double blim, double ulim, double nu, double numin, double numax,
-                       gsl_spline* eldis, gsl_interp_accel* acc_eldis);
-    virtual void compton_spectrum(double gmin, double gmax, gsl_spline* eldis, gsl_interp_accel* acc_eldis);
 
+    virtual double comintegral(size_t it, double blim, double ulim, double nu, double numin,
+                               double numax, gsl_spline* eldis, gsl_interp_accel* acc_eldis);
+    virtual void compton_spectrum(double gmin, double gmax, gsl_spline* eldis,
+                                  gsl_interp_accel* acc_eldis);
+
+    virtual void set_target_energy_array(const std::vector<double>& new_target_energy);
+    virtual void set_target_frequency_array(const std::vector<double>& new_target_frequency);
     virtual void set_target_energy_array(const std::vector<double>& new_target_energy);
     virtual void set_target_frequency_array(const std::vector<double>& new_target_frequency);
 
     virtual void add_target_diff_spec(const std::vector<double>& new_target_diff_spec);
     virtual void add_target_energy_density(
-      const std::vector<double>& new_target_energy,
-      const std::vector<double>& new_target_energy_density
-    );
+        const std::vector<double>& new_target_energy,
+        const std::vector<double>& new_target_energy_density);
     virtual void add_target_number_density(
-      const std::vector<double>& new_target_energy,
-      const std::vector<double>& new_target_number_density
-    );
+        const std::vector<double>& new_target_energy,
+        const std::vector<double>& new_target_number_density);
     virtual void add_target_number_density_on_freq_grid(
-      const std::vector<double>& new_target_frequency,
-      const std::vector<double>& new_target_number_density
-    );
+        const std::vector<double>& new_target_frequency,
+        const std::vector<double>& new_target_number_density);
 
-    
-    virtual void cyclosyn_seed(const std::vector<double>& syn_frequencies, const std::vector<double>& syn_number_densities);
+    virtual void cyclosyn_seed(const std::vector<double>& syn_energies,
+                               const std::vector<double>& syn_number_rates);
     virtual void bb_seed_k(double Urad, double Tbb);
     virtual void bb_seed_kev(double Urad, double Tbb);
-    virtual void shsdisk_seed(double tin, double rin, double rout,
-                      double h, double z);
+    virtual void shsdisk_seed(double tin, double rin, double rout, double h, double z);
 
+    virtual void set_niter(double nu0, double Te);
+    virtual void set_niter(size_t n);
+    virtual void set_tau(double n, double gam);
+    virtual void set_tau(double _tau);
+    virtual void set_frequency(double numin, double numax);
+    virtual void set_escape(double escape);
     virtual void set_niter(double nu0, double Te);
     virtual void set_niter(size_t n);
     virtual void set_tau(double n, double gam);
@@ -82,12 +88,46 @@ class Compton : public Radiation {
     virtual std::vector<double> get_target_diff_spec();
 
     virtual double get_tau() const { return tau; };
-
     virtual double get_ypar() const { return ypar; };
 
-    friend double comfnc(double ein, void* p);
-    friend double comint(double gam, void* p);
-    friend double disk_integral(double alfa, void* p);
+    virtual void reset();
+    virtual void urad_test();
+    virtual void test();
+
+    // -------------------------------------------------------------------------
+    // Legacy API — backwards compatibility wrappers
+    // The seed_arr parameter is accepted but ignored; set the energy grid
+    // explicitly with set_target_energy_array() / set_target_frequency_array()
+    // before calling these if needed.
+    // -------------------------------------------------------------------------
+
+    //! @deprecated Use set_target_energy_array() instead.
+    virtual void seed_freq_array(const std::vector<double>& seed_arr) {
+        set_target_energy_array(seed_arr);
+    }
+
+    //! @deprecated Use cyclosyn_seed(syn_energies, syn_number_rates) instead.
+    virtual void cyclosyn_seed(const std::vector<double>& /*seed_arr*/,
+                               const std::vector<double>& syn_energies,
+                               const std::vector<double>& syn_number_rates) {
+        cyclosyn_seed(syn_energies, syn_number_rates);
+    }
+
+    //! @deprecated Use bb_seed_k(Urad, Tbb) instead.
+    virtual void bb_seed_k(const std::vector<double>& /*seed_arr*/, double Urad, double Tbb) {
+        bb_seed_k(Urad, Tbb);
+    }
+
+    //! @deprecated Use bb_seed_kev(Urad, Tbb) instead.
+    virtual void bb_seed_kev(const std::vector<double>& /*seed_arr*/, double Urad, double Tbb) {
+        bb_seed_kev(Urad, Tbb);
+    }
+
+    //! @deprecated Use shsdisk_seed(tin, rin, rout, h, z) instead.
+    virtual void shsdisk_seed(const std::vector<double>& /*seed_arr*/, double tin, double rin,
+                              double rout, double h, double z) {
+        shsdisk_seed(tin, rin, rout, h, z);
+    }
 };
 
 }    // namespace kariba
