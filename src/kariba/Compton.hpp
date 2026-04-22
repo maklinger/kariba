@@ -88,36 +88,27 @@ class Compton : public Radiation {
 
     // -------------------------------------------------------------------------
     // Legacy API — backwards compatibility wrappers
-    // The seed_arr parameter is accepted but ignored; set the energy grid
-    // explicitly with set_target_energy_array() / set_target_frequency_array()
-    // before calling these if needed.
+    // The seed_arr parameter sets the energy grid, but it is cleaner to set it
+    // explicitly with set_target_energy_array() / set_target_frequency_array().
     // -------------------------------------------------------------------------
 
-    //! @deprecated Use set_target_energy_array() instead.
-    virtual void seed_freq_array(const std::vector<double>& seed_arr) {
-        set_target_energy_array(seed_arr);
-    }
-
-    //! @deprecated Use cyclosyn_seed(syn_energies, syn_number_rates) instead.
-    virtual void cyclosyn_seed(const std::vector<double>& /*seed_arr*/,
-                               const std::vector<double>& syn_energies,
-                               const std::vector<double>& syn_number_rates) {
-        cyclosyn_seed(syn_energies, syn_number_rates);
-    }
 
     //! @deprecated Use bb_seed_k(Urad, Tbb) instead.
-    virtual void bb_seed_k(const std::vector<double>& /*seed_arr*/, double Urad, double Tbb) {
+    virtual void bb_seed_k(const std::vector<double>& seed_arr, double Urad, double Tbb) {
+        set_target_energy_array(seed_arr);
         bb_seed_k(Urad, Tbb);
     }
 
     //! @deprecated Use bb_seed_kev(Urad, Tbb) instead.
-    virtual void bb_seed_kev(const std::vector<double>& /*seed_arr*/, double Urad, double Tbb) {
+    virtual void bb_seed_kev(const std::vector<double>& seed_arr, double Urad, double Tbb) {
+        set_target_energy_array(seed_arr);
         bb_seed_kev(Urad, Tbb);
     }
 
     //! @deprecated Use shsdisk_seed(tin, rin, rout, h, z) instead.
-    virtual void shsdisk_seed(const std::vector<double>& /*seed_arr*/, double tin, double rin,
+    virtual void shsdisk_seed(const std::vector<double>& seed_arr, double tin, double rin,
                               double rout, double h, double z) {
+        set_target_energy_array(seed_arr);
         shsdisk_seed(tin, rin, rout, h, z);
     }
 };
