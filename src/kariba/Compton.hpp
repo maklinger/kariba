@@ -9,6 +9,7 @@ namespace kariba {
 //! Class inverse Compton, inherited from Radiation.hpp
 class Compton : public Radiation {
   protected:
+    double log_floor = -230;
     size_t Niter;          //!< number of IC iterations
     double tau, ypar;      //!< optical depth/comtpon Y of emitting region
     double rphot;          //!< photospheric radius when tau > 1, used to renormalize volume
@@ -76,8 +77,8 @@ class Compton : public Radiation {
     virtual void set_frequency(double numin, double numax);
     virtual void set_escape(double escape);
 
-    virtual std::vector<double> get_target_energy();
-    virtual std::vector<double> get_target_diff_spec();
+    virtual std::vector<double> get_target_energy() const;
+    virtual std::vector<double> get_target_diff_spec() const;
 
     virtual double get_tau() const { return tau; };
     virtual double get_ypar() const { return ypar; };
