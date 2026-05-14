@@ -31,6 +31,7 @@ Cyclosyn::~Cyclosyn() { gsl_spline_free(syn_f), gsl_interp_accel_free(syn_acc); 
 Cyclosyn::Cyclosyn(size_t size) : Radiation(size) {
     en_phot_obs.resize(en_phot_obs.size() * 2, 0.0);
     num_phot_obs.resize(num_phot_obs.size() * 2, 0.0);
+    cyclosyn_abs.resize(size, 0.0);
 
     counterjet = false;
 
@@ -179,6 +180,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             acons = -constants::cee * constants::cee /
                     (8. * constants::pi * std::pow(en_phot[k] / constants::herg, 2.));
             asyn = acons * elcons * abs;
+            cyclosyn_abs[k] = asyn;
             epsasyn = emis / (acons * abs);
             if (geometry == "cylinder") {
                 tsyn = constants::pi / 2. * asyn * r;

@@ -11,6 +11,7 @@ class Cyclosyn : public Radiation {
     double mass_gr;    // Mass of the emitting particle
     gsl_spline* syn_f;
     gsl_interp_accel* syn_acc;
+    std::vector<double> cyclosyn_abs;
 
   public:
     ~Cyclosyn();
@@ -34,8 +35,8 @@ class Cyclosyn : public Radiation {
 
     virtual void test();
 
-    friend double emis(double gamma, void* p);
-    friend double abs(double gamma, void* p);
+    // friend double get_cyclosyn_emission() const {return cyclosyn_emission;};
+    friend double get_cyclosyn_absorption_rate() const {return cyclosyn_abs;};
 };
 
 }    // namespace kariba
