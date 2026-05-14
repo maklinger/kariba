@@ -35,8 +35,8 @@ class Cyclosyn : public Radiation {
 
     virtual void test();
 
-    // friend double get_cyclosyn_emission() const {return cyclosyn_emission;};
-    friend double get_cyclosyn_absorption_rate() const {return cyclosyn_abs;};
+    // friend double get_cyclosyn_emission() {return cyclosyn_emission;};
+    friend double get_cyclosyn_absorption_rate() {return cyclosyn_abs;};
 };
 
 }    // namespace kariba
