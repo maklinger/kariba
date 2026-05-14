@@ -196,11 +196,8 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             } else {
                 tsyn_obs = constants::pi / 3. * asyn * r;
             }
-            if (tsyn_obs >= 1.) {
-                absfac_obs = (1. - std::exp(-tsyn_obs));
-            } else {
-                absfac_obs = tsyn_obs - std::pow(tsyn_obs, 2.) / 2. + std::pow(tsyn_obs, 3.) / 6.;
-            }
+            // numerically stable -( exp(-tsyn) - 1 )
+            absfac_obs = - std::expm1(-tsyn_obs);
 
             num_phot[k] = constants::pi * r * r * absfac * epsasyn;
             num_phot_obs[k] = 2. * r * z * absfac_obs * epsasyn * std::pow(dopfac, dopnum);
