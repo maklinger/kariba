@@ -180,7 +180,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             acons = -constants::cee * constants::cee /
                     (8. * constants::pi * std::pow(en_phot[k] / constants::herg, 2.));
             asyn = acons * elcons * abs;
-            cyclosyn_abs[k] = asyn;
+            cyclosyn_abs[k] = asyn * constants::cee;
             epsasyn = emis / (acons * abs);
             if (geometry == "cylinder") {
                 tsyn = constants::pi / 2. * asyn * r;
