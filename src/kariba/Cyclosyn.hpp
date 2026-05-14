@@ -35,8 +35,10 @@ class Cyclosyn : public Radiation {
 
     virtual void test();
 
-    // friend double get_cyclosyn_emission() {return cyclosyn_emission;};
-    friend double get_cyclosyn_absorption_rate() {return cyclosyn_absorption_rate;};
+    const std::vector<double>& get_cyclosyn_absorption_rate() const { return cyclosyn_absorption_rate; }
+
+    friend double cyclosyn_emis(double gamma, void* pars);
+    friend double cyclosyn_abs(double gamma, void* pars);
 };
 
 }    // namespace kariba
