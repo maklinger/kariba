@@ -317,24 +317,25 @@ void Mixed::test() {
 //! Injection function to be integrated in cooling
 double injection_mixed_int(double x, void* pars) {
     InjectionMixedParams* params = static_cast<InjectionMixedParams*>(pars);
-    double s = params->s;
-    double t = params->t;
+    double s_index = params->s;
+    double theta_temp = params->t;
     double nth = params->nth;
     double npl = params->npl;
-    double m = params->m;
-    double min = params->min;
-    double max = params->max;
+    double mass = params->m;
+    double gamma_min = params->min;
+    double gamma_max = params->max;
     double cutoff = params->cutoff;
 
-    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * mass * constants::cee;
+    double mom_cuton = std::pow(std::pow(gamma_max, 2.) - 1., 1. / 2.) * mass * constants::cee;
 
-    if (x <= min / 10) {
-        return nth * std::pow(mom_int, 2.) * std::exp(-x / t);
-    } else if (x < max) {
-        return nth * std::pow(mom_int, 2.) * std::exp(-x / t) +
-               npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff) * std::exp(-max / mom_int);
+    if (x <= gamma_min / 10) {
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp);
+    } else if (x < gamma_max) {
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp) +
+               npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-mom_cuton / mom_int);
     } else {
-        return npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff) * std::exp(-max / mom_int);
+        return npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-mom_cuton / mom_int);
     }
 }
 
