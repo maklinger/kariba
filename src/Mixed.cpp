@@ -52,9 +52,9 @@ void Mixed::set_ndens() {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta);
         } else if (p[i] < pmax_th) {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta) +
-                       plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl);
+                       plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-pmin_pl / p[i]);
         } else {
-            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl);
+            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-pmin_pl / p[i]);
         }
     }
     initialize_gdens();
@@ -83,17 +83,19 @@ void Mixed::set_plfrac(double f) { plfrac = f; }
 void Mixed::set_plfrac(double Le, double r, double eldens) {
     double gpmax =
         sqrt(pmax_pl * pmax_pl / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
+    double gpmin =
+        sqrt(pmin_pl * pmin_pl / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
     double sum = 0;
     double dx = std::log10(gamma[2] / gamma[1]);
     for (size_t i = 0; i < p.size(); i++) {
-        sum += std::log(10.) * std::pow(gamma[i], -pspec + 2.) * std::exp(-gamma[i] / gpmax) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 2.) * std::exp(-gamma[i] / gpmax) * std::exp(-gpmin / gamma[i]) * dx;
     }
     double Ue = Le / (constants::pi * r * r * constants::cee);
     double K = std::max(Ue / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
     sum = 0.;
     for (size_t i = 0; i < gamma.size(); i++) {
-        sum += std::log(10.) * std::pow(gamma[i], -pspec + 1.) * std::exp(-gamma[i] / gpmax) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 1.) * std::exp(-gamma[i] / gpmax) * std::exp(-gpmin / gamma[i]) * dx;
     }
     double n_nth = K * sum;
     plfrac = n_nth / eldens;
@@ -328,9 +330,9 @@ double injection_mixed_int(double x, void* pars) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / t);
     } else if (x < max) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / t) +
-               npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
+               npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff) * std::exp(-max / mom_int);
     } else {
-        return npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
+        return npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff) * std::exp(-max / mom_int);
     }
 }
 
