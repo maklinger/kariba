@@ -48,7 +48,7 @@ void Mixed::set_p(double gmax) {
 
 void Mixed::set_ndens() {
     for (size_t i = 0; i < p.size(); i++) {
-        if (p[i] <= pmin_pl) {
+        if (p[i] <= pmin_pl / 10) {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta);
         } else if (p[i] < pmax_th) {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta) +
@@ -326,7 +326,7 @@ double injection_mixed_int(double x, void* pars) {
 
     double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    if (x <= min) {
+    if (x <= min / 10) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / t);
     } else if (x < max) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / t) +
