@@ -310,6 +310,8 @@ void Mixed::test() {
     std::cout << "Number density: " << count_particles() << std::endl;
     std::cout << "Thermal monetum limits: " << pmin_th << " " << pmax_th << std::endl;
     std::cout << "Non-thermal momentum limits: " << pmin_pl << " " << pmax_pl << std::endl;
+    std::cout << "Thermal norm: " << thnorm << std::endl;
+    std::cout << "Non-thermal norm: " << plnorm << std::endl;
 }
 
 //! Injection function to be integrated in cooling
