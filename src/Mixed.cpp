@@ -54,7 +54,7 @@ void Mixed::set_ndens() {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta) +
                        plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-std::pow(pmin_pl / p[i], 3));
         } else {
-            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-std::pow(pmin_pl / p[i]));
+            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-std::pow(pmin_pl / p[i], 3));
         }
     }
     initialize_gdens();
