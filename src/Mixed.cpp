@@ -52,9 +52,9 @@ void Mixed::set_ndens() {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta);
         } else if (p[i] < pmax_th) {
             ndens[i] = thnorm * std::pow(p[i], 2.) * std::exp(-gamma[i] / theta) +
-                       plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-pmin_pl / p[i]);
+                       plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-std::pow(pmin_pl / p[i], 3));
         } else {
-            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-pmin_pl / p[i]);
+            ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax_pl) * std::exp(-std::pow(pmin_pl / p[i]));
         }
     }
     initialize_gdens();
@@ -88,14 +88,14 @@ void Mixed::set_plfrac(double Le, double r, double eldens) {
     double sum = 0;
     double dx = std::log10(gamma[2] / gamma[1]);
     for (size_t i = 0; i < p.size(); i++) {
-        sum += std::log(10.) * std::pow(gamma[i], -pspec + 2.) * std::exp(-gamma[i] / gpmax) * std::exp(-gpmin / gamma[i]) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 2.) * std::exp(-gamma[i] / gpmax) * std::exp(-std::pow(gpmin / gamma[i], 3)) * dx;
     }
     double Ue = Le / (constants::pi * r * r * constants::cee);
     double K = std::max(Ue / (sum * mass_gr * constants::cee * constants::cee), 0.);
 
     sum = 0.;
     for (size_t i = 0; i < gamma.size(); i++) {
-        sum += std::log(10.) * std::pow(gamma[i], -pspec + 1.) * std::exp(-gamma[i] / gpmax) * std::exp(-gpmin / gamma[i]) * dx;
+        sum += std::log(10.) * std::pow(gamma[i], -pspec + 1.) * std::exp(-gamma[i] / gpmax) * std::exp(-std::pow(gpmin / gamma[i], 3)) * dx;
     }
     double n_nth = K * sum;
     plfrac = n_nth / eldens;
@@ -333,9 +333,9 @@ double injection_mixed_int(double x, void* pars) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp);
     } else if (x < gamma_max) {
         return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp) +
-               npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-mom_cuton / mom_int);
+               npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-pow(mom_cuton / mom_int, 3));
     } else {
-        return npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-mom_cuton / mom_int);
+        return npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff) * std::exp(-pow(mom_cuton / mom_int, 3));
     }
 }
 
