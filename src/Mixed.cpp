@@ -58,7 +58,7 @@ void Mixed::set_ndens() {
         }
     }
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! methods to set the temperature, pl fraction, and normalizations. Temperature
@@ -158,7 +158,7 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
         ndens[i] = ndens[i] / renorm;
     }
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! Method to calculate maximum momentum of non thermal particles based on

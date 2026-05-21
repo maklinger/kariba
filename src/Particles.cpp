@@ -11,7 +11,7 @@
 namespace kariba {
 
 Particles::Particles(size_t size)
-    : p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0), gdens(size, 0.0), gdens_diff(size, 0.0) {}
+    : p(size, 0.0), ndens(size, 0.0), gamma(size, 0.0), gdens(size, 0.0), pdensp2_diff_logp(size, 0.0) {}
 
 //! Simple numerical integrals /w trapeze method
 double Particles::count_particles() {
@@ -106,19 +106,19 @@ void Particles::differentiate() {
 
         if (i == 0) {
             // Forward difference
-            d_lnf_d_lnp = safe_log(pdens[1]/pdens[0] * std::pow(p[0]/p[1], power)) /
+            d_lnf_d_lnp = safe_log(ndens[1]/ndens[0] * std::pow(p[0]/p[1], power)) /
                           safe_log(p[1]/p[0]);
         } else if (i == size - 1) {
             // Backward difference
-            d_lnf_d_lnp = safe_log(pdens[size-1]/pdens[size-2] * std::pow(p[size-2]/p[size-1], power)) /
+            d_lnf_d_lnp = safe_log(ndens[size-1]/ndens[size-2] * std::pow(p[size-2]/p[size-1], power)) /
                           safe_log(p[size-1]/p[size-2]);
         } else {
             // Centered difference in log-log space
-            d_lnf_d_lnp = safe_log(pdens[i+1]/pdens[i-1] * std::pow(p[i-1]/p[i+1], power)) /
+            d_lnf_d_lnp = safe_log(ndens[i+1]/ndens[i-1] * std::pow(p[i-1]/p[i+1], power)) /
                           safe_log(p[i+1]/p[i-1]);
         }
 
-        pdensp2_diff_logp[i] = (pdens[i]/std::pow(p[i], power)) * d_lnf_d_lnp;
+        pdensp2_diff_logp[i] = (ndens[i]/std::pow(p[i], power)) * d_lnf_d_lnp;
         pdensp2_diff_logp[i] *= std::pow(mass_gr * constants::cee, 3);
     }
 }

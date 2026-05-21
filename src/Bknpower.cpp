@@ -53,7 +53,7 @@ void Bknpower::set_ndens() {
                    (1. + std::pow(p[i] / pbrk, -pspec1 + pspec2)) * std::exp(-p[i] / pmax);
     }
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! methods to set the slopes, break and normalization
@@ -161,7 +161,7 @@ void Bknpower::cooling_steadystate(double ucom, double n0, double bfield, double
     }
 
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! Method to calculate maximum momentum of non thermal particles based on
