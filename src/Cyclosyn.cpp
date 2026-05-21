@@ -223,7 +223,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             num_phot[k] =  cross_section_circle * absfac * j_emis/alpha_abs;
             double projected_area = 2. * r * z;
             // num_phot_obs[k] = projected_area * absfac_obs * j_emis * std::pow(dopfac, dopnum);
-            num_phot_obs[k] = projected_area * t_esc * j_emis * std::pow(dopfac, dopnum);
+            num_phot_obs[k] = projected_area * r* t_esc * j_emis * std::pow(dopfac, dopnum);
 
             if (counterjet == true) {
                 tau_syn_obs *= dopfac/dopfac_cj;
