@@ -66,7 +66,7 @@ void Mixed::set_ndens() {
 void Mixed::set_temp_kev(double T) {
     Temp = T;
     theta = T * constants::kboltz_kev2erg / (mass_gr * constants::cee * constants::cee);
-    double emin_th = (1. / 100.) * T;
+    double emin_th = 1e-4 * T;
     double emax_th = 20. * T;
     double gmin_th, gmax_th;
 
