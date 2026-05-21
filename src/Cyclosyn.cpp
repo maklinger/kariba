@@ -65,7 +65,7 @@ double cyclosyn_kernel(double gamma, double nu, double b, gsl_spline* syn, gsl_i
             double t1 = 1.808 * x13 / std::sqrt(1 + 3.4 * x23);
             double t2 = 1 + 2.21 * x23  + 0.347 * x43;
             double t3 = 1 + 1.353 * x23  + 0.217 * x43;
-            emisfunc = t1 * t2 / t3 * std::exp(-x)
+            emisfunc = t1 * t2 / t3 * std::exp(-x);
         }
         else {
             emisfunc = 1e-305; // floor, = 0
@@ -210,7 +210,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             }
             tau_syn = t_esc * alpha_abs;
             // numerically stable -( exp(-tsyn) - 1 )
-            absfac = - std::expm1(-tsyn);
+            absfac = - std::expm1(-tau_syn);
             // observed opacities changed by doppler factor and viewing angle
             tau_syn_obs = tau_syn / dopfac;
             if (geometry == "cylinder") {
