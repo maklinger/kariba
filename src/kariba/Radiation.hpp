@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_integration.h>
 
 namespace kariba {
 
@@ -36,6 +37,7 @@ struct ComintParams {
     gsl_interp_accel* acc_eldis;
     gsl_spline* phodis;
     gsl_interp_accel* acc_phodis;
+    gsl_integration_workspace* w2;
 };
 
 //! Structure used for GSL integration

@@ -5,3 +5,5 @@
 *.dat
 
 make.config
+
+.DS_Store
