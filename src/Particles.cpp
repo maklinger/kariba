@@ -73,21 +73,56 @@ void Particles::initialize_pdens() {
     }
 }
 
-void Particles::gdens_differentiate() {
-    std::vector<double> temp;
-    size_t size = gdens.size();
+// void Particles::gdens_differentiate() {
+//     std::vector<double> temp;
+//     size_t size = gdens.size();
+
+//     for (size_t i = 0; i < size; i++) {
+//         temp.push_back(gdens[i] / (std::pow(gamma[i], 1.)));
+//     }
+
+//     for (size_t i = 0; i < size - 1; i++) {
+//         gdens_diff[i] = (temp[i + 1] - temp[i]) /
+//                         (mass_gr * std::pow(constants::cee, 2.) * (gamma[i + 1] - gamma[i]));
+//     }
+
+//     gdens_diff[size - 1] = gdens_diff[size - 2];
+// }
+
+void Particles::differentiate() {
+    const size_t size = gdens.size();
+
+    // Work in log space.  Guard against zero/negative gdens with a floor
+    // (should not occur for physical distributions, but avoids log(0)).
+    const double floor_val = 1e-300;
+
+    auto safe_log = [&](double x) -> double {
+        return std::log(std::max(x, floor_val));
+    };
 
     for (size_t i = 0; i < size; i++) {
-        temp.push_back(gdens[i] / (std::pow(gamma[i], 1.)));
-    }
+        double d_lnf_d_lnp;
+        double power = 2.;
 
-    for (size_t i = 0; i < size - 1; i++) {
-        gdens_diff[i] = (temp[i + 1] - temp[i]) /
-                        (mass_gr * std::pow(constants::cee, 2.) * (gamma[i + 1] - gamma[i]));
-    }
+        if (i == 0) {
+            // Forward difference
+            d_lnf_d_lnp = safe_log(pdens[1]/pdens[0] * std::pow(p[0]/p[1], power)) /
+                          safe_log(p[1]/p[0]);
+        } else if (i == size - 1) {
+            // Backward difference
+            d_lnf_d_lnp = safe_log(pdens[size-1]/pdens[size-2] * std::pow(p[size-2]/p[size-1], power)) /
+                          safe_log(p[size-1]/p[size-2]);
+        } else {
+            // Centered difference in log-log space
+            d_lnf_d_lnp = safe_log(pdens[i+1]/pdens[i-1] * std::pow(p[i-1]/p[i+1], power)) /
+                          safe_log(p[i+1]/p[i-1]);
+        }
 
-    gdens_diff[size - 1] = gdens_diff[size - 2];
+        pdensp2_diff_logp[i] = (pdens[i]/std::pow(p[i], power)) * d_lnf_d_lnp;
+        pdensp2_diff_logp[i] *= std::pow(mass_gr * constants::cee, 3);
+    }
 }
+
 
 void Particles::set_mass(double m) {
     mass_gr = m;

@@ -37,8 +37,9 @@ class Cyclosyn : public Radiation {
 
     const std::vector<double>& get_cyclosyn_absorption_rate() const { return cyclosyn_absorption_rate; }
 
-    friend double cyclosyn_emis(double gamma, void* pars);
-    friend double cyclosyn_abs(double gamma, void* pars);
+    friend double cyclosyn_kernel(double gamma, double nu, double b, gsl_spline* syn, gsl_interp_accel* acc_syn);
+    friend double cyclosyn_emis(double log_gamma, void* pars);
+    friend double cyclosyn_abs(double log_gamma, void* pars);
 };
 
 }    // namespace kariba
