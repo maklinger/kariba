@@ -214,7 +214,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             // observed opacities changed by doppler factor and viewing angle
             tau_syn_obs = tau_syn / dopfac;
             if (geometry == "cylinder") {
-                tau_syn_obs \= sin(angle); // this is spooky for theta = 0 ? 
+                tau_syn_obs *= 1/sin(angle); // this is spooky for theta = 0 ? 
             }
             absfac_obs = - std::expm1(-tau_syn_obs);
             double cross_section_circle = constants::pi * r * r;
