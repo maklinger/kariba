@@ -51,25 +51,25 @@ double cyclosyn_kernel(double gamma, double nu, double b, gsl_spline* syn, gsl_i
                (4. * constants::pi * constants::emgm * constants::cee);
         x = nu / nu_c;
         // This is F(x) , which is not pitch angle averaged
-        // if (x <= 1.e-4) {
-        //     emisfunc = 4. * constants::pi * std::cbrt(x / 2.) / (sqrt(3.) * 2.68);
-        // } else if (x > 50.) {
-        //     emisfunc = sqrt(constants::pi * x / 2.) * std::exp(-x);
-        // } else {
-        //     emisfunc = std::pow(10., gsl_spline_eval(syn, x, acc_syn));
+        if (x <= 1.e-4) {
+            emisfunc = 4. * constants::pi * std::cbrt(x / 2.) / (sqrt(3.) * 2.68);
+        } else if (x > 50.) {
+            emisfunc = sqrt(constants::pi * x / 2.) * std::exp(-x);
+        } else {
+            emisfunc = std::pow(10., gsl_spline_eval(syn, x, acc_syn));
+        }
+        // if (x <= 700) {
+        //     double x13 = std::cbrt(x);   // more stable than pow(x, 1./3.)
+        //     double x23 = x13 * x13;
+        //     double x43 = x23 * x23;
+        //     double t1 = 1.808 * x13 / std::sqrt(1 + 3.4 * x23);
+        //     double t2 = 1 + 2.21 * x23  + 0.347 * x43;
+        //     double t3 = 1 + 1.353 * x23  + 0.217 * x43;
+        //     emisfunc = t1 * t2 / t3 * std::exp(-x);
         // }
-        if (x <= 700) {
-            double x13 = std::cbrt(x);   // more stable than pow(x, 1./3.)
-            double x23 = x13 * x13;
-            double x43 = x23 * x23;
-            double t1 = 1.808 * x13 / std::sqrt(1 + 3.4 * x23);
-            double t2 = 1 + 2.21 * x23  + 0.347 * x43;
-            double t3 = 1 + 1.353 * x23  + 0.217 * x43;
-            emisfunc = t1 * t2 / t3 * std::exp(-x);
-        }
-        else {
-            emisfunc = 1e-305; // floor, = 0
-        }
+        // else {
+        //     emisfunc = 1e-305; // floor, = 0
+        // }
     } else {    // cyclotron regime
         nu_larmor =
             (constants::charg * b) / (2. * constants::pi * constants::emgm * constants::cee);
