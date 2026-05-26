@@ -209,7 +209,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             } else {
                 l_average *= constants::pi / 3.;
             }
-            double t_esc = l_average / constants::c; 
+            double t_esc = l_average / constants::cee; 
             tau_syn = l_average * alpha_abs;
             // numerically stable -( exp(-tsyn) - 1 )
             absfac = - std::expm1(-tau_syn);
