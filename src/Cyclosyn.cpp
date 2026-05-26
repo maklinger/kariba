@@ -201,7 +201,7 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             //     tsyn_obs = constants::pi / 3. * asyn * r;
             // }
 
-            cyclosyn_absorption_rate[k] = alpha_abs / constants::cee;
+            cyclosyn_absorption_rate[k] = alpha_abs * constants::cee;
             double l_average = r;
             // average path lengths
             if (geometry == "cylinder") {
