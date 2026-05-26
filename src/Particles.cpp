@@ -101,7 +101,7 @@ void Particles::differentiate() {
     };
 
     for (size_t i = 0; i < size; i++) {
-        double d_lnf_d_lnp;
+        double d_lnf_d_lnp; // f = dn/dp * p^-2, as in syn. absorption coefficient
         double power = 2.;
 
         if (i == 0) {
@@ -119,7 +119,8 @@ void Particles::differentiate() {
         }
 
         pdensp2_diff_logp[i] = (ndens[i]/std::pow(p[i], power)) * d_lnf_d_lnp;
-        pdensp2_diff_logp[i] *= std::pow(mass_gr * constants::cee, 3);
+        // multiply later, this is in p = rho * m_e * c
+        // pdensp2_diff_logp[i] *= std::pow(mass_gr * constants::cee, 3);
     }
 }
 

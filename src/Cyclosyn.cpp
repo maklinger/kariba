@@ -116,8 +116,8 @@ double cyclosyn_abs(double log_rho, void* pars) {
     pdensp2_diff_logp = gsl_spline_eval(derivs, gamma, acc_derivs);
     norm_em = sqrt(3.) * std::pow(constants::charg, 3) * b / constants::emerg;
     norm_ab = - std::pow(nu, -2.) / (8. * constants::pi * constants::emgm);
-    fac_p = std::pow(constants::emgm * constants::cee, 3);
-    return norm_ab * pdensp2_diff_logp * gamma * rho * emisfunc * norm_em * fac_p;
+    fac_p = std::pow(constants::emgm * constants::cee, 3); // from p to rho
+    return norm_ab * gamma * rho * norm_em * emisfunc * pdensp2_diff_logp * fac_p;
 }
 
 //! Integrals of single particle emissivity/absorption coefficient over particle
@@ -201,15 +201,16 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             //     tsyn_obs = constants::pi / 3. * asyn * r;
             // }
 
-            cyclosyn_absorption_rate[k] = alpha_abs;
-            double t_esc = r / constants::cee; 
+            cyclosyn_absorption_rate[k] = alpha_abs / constants::cee;
+            double l_average = r;
             // average path lengths
             if (geometry == "cylinder") {
-                t_esc *= constants::pi / 2.;
+                l_average *= constants::pi / 2.;
             } else {
-                t_esc *= constants::pi / 3.;
+                l_average *= constants::pi / 3.;
             }
-            tau_syn = t_esc * alpha_abs;
+            double t_esc = l_average / constants::c; 
+            tau_syn = l_average * alpha_abs;
             // numerically stable -( exp(-tsyn) - 1 )
             absfac = - std::expm1(-tau_syn);
             // observed opacities changed by doppler factor and viewing angle
@@ -217,17 +218,16 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             if (geometry == "cylinder") {
                 tau_syn_obs *= 1/sin(angle); // this is spooky for theta = 0 ? 
             }
-            absfac_obs = - std::expm1(-tau_syn_obs);
+            absfac_obs = - std::expm1(-tau_syn_obs) / alpha_abs;
             double cross_section_circle = constants::pi * r * r;
-            // photon
             num_phot[k] =  cross_section_circle * absfac * j_emis/alpha_abs;
-            double projected_area = 2. * r * z;
-            // num_phot_obs[k] = projected_area * absfac_obs * j_emis * std::pow(dopfac, dopnum);
-            num_phot_obs[k] = projected_area * r* t_esc * j_emis * std::pow(dopfac, dopnum);
+            double projected_area = 2. * r * z; // diameter * height -> lacks projection for headon?
+            num_phot_obs[k] = projected_area * absfac_obs * j_emis * std::pow(dopfac, dopnum);
+            // num_phot_obs[k] = projected_area * r* t_esc * j_emis * std::pow(dopfac, dopnum);
 
             if (counterjet == true) {
                 tau_syn_obs *= dopfac/dopfac_cj;
-                absfac_obs = - std::expm1(-tau_syn_obs);
+                absfac_obs = - std::expm1(-tau_syn_obs) / alpha_abs;
                 num_phot_obs[k + size] = projected_area * absfac_obs * j_emis * std::pow(dopfac_cj, dopnum);
             } else {
                 num_phot_obs[k + size] = 0.;
