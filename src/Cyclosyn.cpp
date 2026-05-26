@@ -109,6 +109,7 @@ double cyclosyn_abs(double log_rho, void* pars) {
     gsl_spline* derivs = (params->derivs);
     gsl_interp_accel* acc_derivs = (params->acc_derivs);
 
+    // using eg. Ghisellini & Svensson 1991, eq 1
     double gamma, rho, emisfunc, pdensp2_diff_logp, nlogp, norm_em, norm_ab, fac_p;
     gamma = std::sqrt(std::exp(2*log_rho) + 1);
     rho = std::exp(log_rho);
