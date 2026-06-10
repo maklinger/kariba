@@ -142,7 +142,7 @@ TEST_CASE("Synchrotron radiation") {
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         100);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
-                        electrons.get_gdens_diff().data(), 100);
+                        electrons.get_pdensp2_diff_logp().data(), 100);
 
         SUBCASE("Basic synchrotron setup") {
             double bfield = 1e3;     // Gauss
@@ -301,7 +301,7 @@ TEST_CASE("Inverse Compton scattering") {
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         100);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
-                        electrons.get_gdens_diff().data(), 100);
+                        electrons.get_pdensp2_diff_logp().data(), 100);
 
         double gmin = electrons.get_gamma()[0];
         double gmax_actual = electrons.get_gamma()[99];
