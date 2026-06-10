@@ -51,7 +51,7 @@ TEST_CASE("Integration tests - Complete workflows") {
         gsl_spline_init(spline_eldis, electrons.get_gamma().data(), electrons.get_gdens().data(),
                         nel);
         gsl_spline_init(spline_deriv, electrons.get_gamma().data(),
-                        electrons.get_gdens_diff().data(), nel);
+                        electrons.get_pdensp2_diff_logp().data(), nel);
 
         // Calculate synchrotron emission
         kariba::Cyclosyn syncro(nfreq);
