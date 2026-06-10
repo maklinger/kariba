@@ -82,8 +82,8 @@ class Particles {
     std::vector<double> ndens;    //!< array of number density per unit volume, per unit momentum
     std::vector<double> gamma;    //!< array of particle kinetic energies for each momentum
     std::vector<double> gdens;    //!< array of number density per unit volume, per unit gamma
-    std::vector<double> gdens_diff;    //!< array with differential of number
-                                       //!< density for radiation calculation
+    std::vector<double> pdensp2_diff_logp;    //!< array with differential of number
+                                       //!< density for radiation calculation p^-2*dn/dp
 
   public:
     Particles(size_t size);
@@ -91,7 +91,7 @@ class Particles {
     virtual void set_mass(double m);
     virtual void initialize_gdens();
     virtual void initialize_pdens();
-    virtual void gdens_differentiate();
+    virtual void differentiate();
 
     virtual const std::vector<double>& get_p() const { return p; }
 
@@ -101,7 +101,7 @@ class Particles {
 
     virtual const std::vector<double>& get_gdens() const { return gdens; }
 
-    virtual const std::vector<double>& get_gdens_diff() const { return gdens_diff; }
+    virtual const std::vector<double>& get_pdensp2_diff_logp() const { return pdensp2_diff_logp; }
 
     virtual double count_particles();
     virtual double count_particles_energy();

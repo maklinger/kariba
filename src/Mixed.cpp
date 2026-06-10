@@ -58,7 +58,7 @@ void Mixed::set_ndens() {
         }
     }
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! methods to set the temperature, pl fraction, and normalizations. Temperature
@@ -66,7 +66,7 @@ void Mixed::set_ndens() {
 void Mixed::set_temp_kev(double T) {
     Temp = T;
     theta = T * constants::kboltz_kev2erg / (mass_gr * constants::cee * constants::cee);
-    double emin_th = (1. / 100.) * T;
+    double emin_th = 1e-4 * T;
     double emax_th = 20. * T;
     double gmin_th, gmax_th;
 
@@ -83,6 +83,8 @@ void Mixed::set_plfrac(double f) { plfrac = f; }
 void Mixed::set_plfrac(double Le, double r, double eldens) {
     double gpmax =
         sqrt(pmax_pl * pmax_pl / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
+    double gpmin =
+        sqrt(pmin_pl * pmin_pl / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
     double sum = 0;
     double dx = std::log10(gamma[2] / gamma[1]);
     for (size_t i = 0; i < p.size(); i++) {
@@ -156,7 +158,7 @@ void Mixed::cooling_steadystate(double ucom, double n0, double bfield, double r,
         ndens[i] = ndens[i] / renorm;
     }
     initialize_gdens();
-    gdens_differentiate();
+    differentiate();
 }
 
 //! Method to calculate maximum momentum of non thermal particles based on
@@ -308,29 +310,32 @@ void Mixed::test() {
     std::cout << "Number density: " << count_particles() << std::endl;
     std::cout << "Thermal monetum limits: " << pmin_th << " " << pmax_th << std::endl;
     std::cout << "Non-thermal momentum limits: " << pmin_pl << " " << pmax_pl << std::endl;
+    std::cout << "Thermal norm: " << thnorm << std::endl;
+    std::cout << "Non-thermal norm: " << plnorm << std::endl;
 }
 
 //! Injection function to be integrated in cooling
 double injection_mixed_int(double x, void* pars) {
     InjectionMixedParams* params = static_cast<InjectionMixedParams*>(pars);
-    double s = params->s;
-    double t = params->t;
+    double s_index = params->s;
+    double theta_temp = params->t;
     double nth = params->nth;
     double npl = params->npl;
-    double m = params->m;
-    double min = params->min;
-    double max = params->max;
+    double mass = params->m;
+    double gamma_min = params->min;
+    double gamma_max = params->max;
     double cutoff = params->cutoff;
 
-    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
+    double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * mass * constants::cee;
+    // double mom_cuton = std::pow(std::pow(gamma_max, 2.) - 1., 1. / 2.) * mass * constants::cee;
 
-    if (x <= min) {
-        return nth * std::pow(mom_int, 2.) * std::exp(-x / t);
-    } else if (x < max) {
-        return nth * std::pow(mom_int, 2.) * std::exp(-x / t) +
-               npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
+    if (x <= gamma_min) {
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp);
+    } else if (x < gamma_max) {
+        return nth * std::pow(mom_int, 2.) * std::exp(-x / theta_temp) +
+               npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff);
     } else {
-        return npl * std::pow(mom_int, -s) * std::exp(-mom_int / cutoff);
+        return npl * std::pow(mom_int, -s_index) * std::exp(-mom_int / cutoff);
     }
 }
 
