@@ -11,6 +11,28 @@
 namespace karcst = kariba::constants;
 
 TEST_CASE("Particles subclass functionality") {
+
+    SUBCASE("Cutoff type is actually being set within the code:") {
+        kariba::Powerlaw powerlaw(100);
+        kariba::Mixed mixed(100);
+        kariba::Bknpower bknpower(100);
+
+        // see that it is able to pick up the "hardcoded" backwards compatible type
+        CHECK(powerlaw.get_cutoff_type() == 0);
+        CHECK(mixed.get_cutoff_type() == 0);
+        CHECK(bknpower.get_cutoff_type() == 0);
+
+        //this should check that it can be overwritten from the setting: 
+        powerlaw.set_cutoff_type(2);
+        mixed.set_cutoff_type(2);
+        bknpower.set_cutoff_type(2);
+
+        CHECK(powerlaw.get_cutoff_type() == 2);
+        CHECK(mixed.get_cutoff_type() == 2);
+        CHECK(bknpower.get_cutoff_type() == 2);
+    }
+
+
     SUBCASE("Thermal particle distribution") {
         kariba::Thermal thermal(100);
 
