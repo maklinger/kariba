@@ -93,7 +93,7 @@ class Particles {
     // cutoff adjustments: 
     virtual int get_cutoff_type() const { return cutoff_type; }
     virtual void set_cutoff_type(int t) { cutoff_type = t; }
-    virtual double cutoff_factor(double x, int cutoff_type = 0);
+    static double cutoff_factor(double x, int cutoff_type = 0);
 
     virtual void set_mass(double m);
     virtual void initialize_gdens();
@@ -101,13 +101,9 @@ class Particles {
     virtual void differentiate();
 
     virtual const std::vector<double>& get_p() const { return p; }
-
     virtual const std::vector<double>& get_pdens() const { return ndens; }
-
     virtual const std::vector<double>& get_gamma() const { return gamma; }
-
     virtual const std::vector<double>& get_gdens() const { return gdens; }
-
     virtual const std::vector<double>& get_pdensp2_diff_logp() const { return pdensp2_diff_logp; }
 
     virtual double count_particles();

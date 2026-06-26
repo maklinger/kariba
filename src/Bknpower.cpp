@@ -73,7 +73,7 @@ double norm_bkn_int(double x, void* pars) {
 
     double s1 = params->s1;
     double s2 = params->s2;
-    double brk = params->brk;
+    double brk = params->brk; 
     double max = params->max;
     double m = params->m;
     const int cutoff_type=params->cutoff_type; 
