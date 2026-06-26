@@ -30,6 +30,13 @@ TEST_CASE("Particles subclass functionality") {
         CHECK(powerlaw.get_cutoff_type() == 2);
         CHECK(mixed.get_cutoff_type() == 2);
         CHECK(bknpower.get_cutoff_type() == 2);
+
+        // check both the functions are actually doing something? 
+        
+        const double x = 2.0;
+        const double c = std::cosh(x); 
+        CHECK(kariba::Particles::cutoff_factor(x, 0) == doctest::Approx(std::exp(-x)));
+        CHECK(kariba::Particles::cutoff_factor(x, 2) == doctest::Approx(1.0 / (c * c)));
     }
 
 
