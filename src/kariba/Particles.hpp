@@ -145,7 +145,7 @@ class Particles {
 // 
 
 
-inline double Particles::cutoff_factor(double x, CutoffType type) 
+inline double Particles::cutoff_factor(double x, int type) 
 {
     switch (type) {
 
