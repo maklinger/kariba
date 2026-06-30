@@ -39,7 +39,7 @@ void Powerlaw::set_p(double min, double gmax) {
     pmin = min;
     pcut = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
     double p_grid_max = 10*pcut; 
-    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(p_grid_max) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);

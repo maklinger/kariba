@@ -43,7 +43,7 @@ struct InjectionMixedParams {
     double min;
     double max;
     double cutoff;
-    int cutoff_type = 0;
+    int cutoff_type;
 };
 
 //! Structure used for GSL integration
@@ -60,6 +60,7 @@ struct InjectionPlParams {
     double n;
     double m;
     double max;
+    int cutoff_type;
 };
 
 //! Structure used for GSL integration
@@ -76,6 +77,16 @@ struct InjectionBknParams {
 //! Template class for particle distributions
 //! This class contains members and methods that are used for thermal,
 //! non-thermal and mixed distributions
+
+
+enum class CutoffType { //trying something to make this easier to read, 
+    // it will convert directly to int when used 
+    Exponential = 0,
+    SuperExponential = 1,
+    Sech2 = 2
+
+};
+
 class Particles {
   protected:
     double mass_gr;     //!< particle mass in grams
@@ -87,13 +98,13 @@ class Particles {
     std::vector<double> gdens;    //!< array of number density per unit volume, per unit gamma
     std::vector<double> pdensp2_diff_logp;    //!< array with differential of number
                                        //!< density for radiation calculation p^-2*dn/dp
-    int cutoff_type = 0;
+    int cutoff_type = Exponential; // setting cutoff type for legacy bhjet without cutoff switch 
   public:
     Particles(size_t size);
     // cutoff adjustments: 
-    virtual int get_cutoff_type() const { return cutoff_type; }
+    int get_cutoff_type() const { return cutoff_type; }
     virtual void set_cutoff_type(int t) { cutoff_type = t; }
-    static double cutoff_factor(double x, int cutoff_type = 0);
+    static double cutoff_factor(double x, int type = Exponential);
 
     virtual void set_mass(double m);
     virtual void initialize_gdens();
@@ -132,21 +143,33 @@ class Particles {
 // cutoff type 2 = sech(x)^2 = 1/cosh(x)^2 
 // cosh(x) = ( e^x + e^-x ) / 2
 // 
-inline double Particles::cutoff_factor(double x, int type) {
-    if (type == 0) return std::exp(-x); // classic exponential cutoff 
-    if (type == 1) return std::exp(-(x * x)); // 
-    if (type == 2) {    // sech^2 cutoff
-        const double ax = std::fabs(x); 
-        if (ax < 30.0) { //cosh(30) ~ 5e12 
+
+
+inline double Particles::cutoff_factor(double x, CutoffType type) 
+{
+    switch (type) {
+
+    case Exponential: // classic exponential cutoff 
+        return std::exp(-x); 
+
+    case SuperExponential:
+        return std::exp(-(x * x)); 
+
+    case Sech2: {  // sech^2 cutoff
+        const double ax = std::fabs(x);
+
+        if (ax < 30.0) { //cosh(30) ~ 5e12
             const double c = std::cosh(ax); //directly calculate sech(x)
             return 1.0 / (c * c);
-        } else { // maybe should replace this with taylor exp .
-            const double t = std::exp(-2.0 * ax); //approx
-            const double denom = 1.0 + t;
-            return 4.0 * t / (denom * denom);
-        }
+        } // this is to avoid issues with cosh, maybe should replace this with taylor exp .
+        const double t = std::exp(-2.0 * ax); //approx
+        const double denom = 1.0 + t;
+        return 4.0 * t / (denom * denom);
     }
-    return std::exp(-x); 
+
+    default:
+        return std::exp(-x);
+    }
 }
 
 }    // namespace kariba
