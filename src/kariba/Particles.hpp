@@ -144,20 +144,15 @@ class Particles {
 // cosh(x) = ( e^x + e^-x ) / 2
 // 
 
-
 inline double Particles::cutoff_factor(double x, int type) 
 {
     switch (type) {
-
     case Exponential: // classic exponential cutoff 
         return std::exp(-x); 
-
     case SuperExponential:
         return std::exp(-(x * x)); 
-
     case Sech2: {  // sech^2 cutoff
         const double ax = std::fabs(x);
-
         if (ax < 30.0) { //cosh(30) ~ 5e12
             const double c = std::cosh(ax); //directly calculate sech(x)
             return 1.0 / (c * c);
