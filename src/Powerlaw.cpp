@@ -113,8 +113,8 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield, double
                                      pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
             // preserving the cutoff shape at the last bin p^(-s+1)*cutoff_type(p/pcut)
-            double C1 = Particles::cutoff_factor(p[size-1]/pcut, cutoff_type);
-            double C0 = Particles::cutoff_factor(p[size-2]/pcut, cutoff_type);
+            double C1 = Particles::cutoff_factor(p[gamma.size() -1]/pcut, cutoff_type);
+            double C0 = Particles::cutoff_factor(p[gamma.size() -2]/pcut, cutoff_type);
             ndens[gamma.size() - 1] =
                 ndens[gamma.size() - 2] *
                 std::pow(p[gamma.size() - 1] / p[gamma.size() - 2], -pspec - 1) * (C1/C0);
