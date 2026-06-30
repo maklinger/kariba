@@ -79,7 +79,7 @@ struct InjectionBknParams {
 //! non-thermal and mixed distributions
 
 
-enum class CutoffType { //trying something to make this easier to read, 
+enum CutoffType { //trying something to make this easier to read, 
     // it will convert directly to int when used 
     Exponential = 0,
     SuperExponential = 1,
