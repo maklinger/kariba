@@ -185,7 +185,7 @@ void Powerlaw::set_energy(double gpmin, double fsc, double f_beta, double bfield
         p[i] = sqrt(gamma[i] * gamma[i] - 1.) * mass_gr * constants::cee;
     }
     pmin = p[0];
-    pmax = sqrt(gpmax * gpmax - 1.) * mass_gr * constants::cee;
+    pcut = sqrt(gpmax * gpmax - 1.) * mass_gr * constants::cee; //changed this to be pcut for now, for the protons, not sure if that is good enough 
 }
 
 void Powerlaw::ProtonTimescales(double& logdgp, double fsc, double f_beta, double bfield,
@@ -297,9 +297,9 @@ double Powerlaw::sigma_pp(double Ep) {    // cross section of pp in mb (that's
     return sinel;
 }
 
-double Powerlaw::set_normprot(double nprot) {
+double Powerlaw::set_normprot(double nprot) {3
     double Epmin = mass_gr * constants::cee * constants::cee * gamma[0];
-    double Epmax = sqrt((pmax * constants::cee) * (pmax * constants::cee) +
+    double Epmax = sqrt((pcut * constants::cee) * (pcut * constants::cee) +
                         (mass_gr * constants::cee * constants::cee) *
                             (mass_gr * constants::cee * constants::cee));
 
@@ -319,7 +319,7 @@ void Powerlaw::set_gdens(double r, double protdens, double nwind, double bfield,
         double Tsynp0, Tchar, Tpp;
         double betap;
         double gpmax =
-            sqrt(pmax * pmax / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
+            sqrt(pcut * pcut / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
         Tsynp0 = 6. * constants::pi / (constants::sigtom * bfield * bfield) *
                  std::pow(mass_gr * constants::cee, 4) /
                  (constants::emgm * constants::emgm * constants::cee);    // proton synchrotron
@@ -357,7 +357,7 @@ void Powerlaw::set_gdens_pdens(double r, double beta, double Ljet, double ep, do
         double G_jet = 1. / sqrt(1. - beta * beta);    // bulk Lorentz factor
         double plnormprot;                             // in #/cm3
         double gpmax =
-            sqrt(pmax * pmax / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
+            sqrt(pcut * pcut / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
         double sum = 0;
         double dx = std::log10(gamma[2] / gamma[1]);
         for (size_t i = 0; i < gamma.size(); i++) {
@@ -388,7 +388,7 @@ void Powerlaw::set_gdens(double& plfrac_p, double Up, double protdens) {
     // If mass-loading, I use the specific enthalpy to work the normalisation
     if (isEfficient) {
         double gpmax =
-            sqrt(pmax * pmax / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
+            sqrt(pcut * pcut / (mass_gr * constants::cee * mass_gr * constants::cee) + 1.);
         double sum = 0;
         double dx = std::log10(gamma[2] / gamma[1]);
         for (size_t i = 0; i < gamma.size(); i++) {
