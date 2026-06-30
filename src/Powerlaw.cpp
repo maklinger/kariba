@@ -24,9 +24,10 @@ Powerlaw::Powerlaw(size_t size) : Particles(size) {
 //! Methods to set momentum/energy arrays
 void Powerlaw::set_p(double min, double ucom, double bfield, double betaeff, double r, double fsc) {
     pmin = min;
-    pmax = max_p(ucom, bfield, betaeff, r, fsc);
+    pcut = max_p(ucom, bfield, betaeff, r, fsc);
+    double p_grid_max = 10*pcut; 
 
-    double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
+    double pinc = (std::log10(p_grid_max) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
         p[i] = std::pow(10., std::log10(pmin) + static_cast<double>(i) * pinc);
@@ -36,8 +37,8 @@ void Powerlaw::set_p(double min, double ucom, double bfield, double betaeff, dou
 
 void Powerlaw::set_p(double min, double gmax) {
     pmin = min;
-    pmax = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
-
+    pcut = std::pow(std::pow(gmax, 2.) - 1., 1. / 2.) * mass_gr * constants::cee;
+    double p_grid_max = 10*pcut; 
     double pinc = (std::log10(pmax) - std::log10(pmin)) / static_cast<double>(p.size() - 1);
 
     for (size_t i = 0; i < p.size(); i++) {
@@ -50,7 +51,9 @@ void Powerlaw::set_p(double min, double gmax) {
 //! normalization, and momentum array
 void Powerlaw::set_ndens() {
     for (size_t i = 0; i < ndens.size(); i++) {
-        ndens[i] = plnorm * std::pow(p[i], -pspec) * std::exp(-p[i] / pmax);
+        const double x = p[i] / pcut;
+        const double C = Particles::cutoff_factor(x, cutoff_type);
+        ndens[i] = plnorm*pow(p[i], -pspec) * C;
     }
     initialize_gdens();
     differentiate();
@@ -71,10 +74,14 @@ double injection_pl_int(double x, void* pars) {
     double n = params->n;
     double m = params->m;
     double max = params->max;
+    int cutoff_type = (params->cutoff_type); //type for cutoff
 
     double mom_int = std::pow(std::pow(x, 2.) - 1., 1. / 2.) * m * constants::cee;
 
-    return n * std::pow(mom_int, -s) * std::exp(-mom_int / max);
+    //cutoff prescription: 
+    double x_pos = mom_int/max; 
+    double C = Particles::cutoff_factor(x_pos, cutoff_type);
+    return n*pow(mom_int,-s)*C;
 }
 
 //! Method to solve steady state continuity equation. NOTE: KN cross section not
@@ -89,7 +96,7 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield, double
 
     double integral, error;
     gsl_function F1;
-    auto params = InjectionPlParams{pspec, plnorm, mass_gr, pmax};
+    auto params = InjectionPlParams{pspec, plnorm, mass_gr, pcut, cutoff_type};
     F1.function = &injection_pl_int;
     F1.params = &params;
 
@@ -105,9 +112,12 @@ void Powerlaw::cooling_steadystate(double ucom, double n0, double bfield, double
                 (integral / tinj) / (pdot_ad * p[i] / (mass_gr * constants::cee) +
                                      pdot_rad * (gamma[i] * p[i] / (mass_gr * constants::cee)));
         } else {
+            // preserving the cutoff shape at the last bin p^(-s+1)*cutoff_type(p/pcut)
+            double C1 = Particles::cutoff_factor(p[size-1]/pcut, cutoff_type);
+            double C0 = Particles::cutoff_factor(p[size-2]/pcut, cutoff_type);
             ndens[gamma.size() - 1] =
                 ndens[gamma.size() - 2] *
-                std::pow(p[gamma.size() - 1] / p[gamma.size() - 2], -pspec - 1) * std::exp(-1.);
+                std::pow(p[gamma.size() - 1] / p[gamma.size() - 2], -pspec - 1) * (C1/C0);
         }
     }
     // the last bin is set by arbitrarily assuming cooled distribution; this is

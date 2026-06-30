@@ -13,7 +13,7 @@ namespace kariba {
 class Powerlaw : public Particles {
   protected:
     double pspec, plnorm;
-    double pmin, pmax;
+    double pmin, pcut; // was pmax, has been adjusted in the code 
     bool isEfficient;    //!< Proton acceleration
 
   public:
