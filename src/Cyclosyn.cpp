@@ -134,7 +134,7 @@ double Cyclosyn::emis_integral(double nu, double gmin, double gmax, gsl_spline* 
     F1.params = &F1params;
     double rho_min = std::sqrt(gmin*gmin - 1);
     double rho_max = std::sqrt(gmax*gmax - 1);
-    gsl_integration_qag(&F1, std::log(rho_min), std::log(rho_max), 1e1, 1e1, 100, 2, w1, &result1,
+    gsl_integration_qag(&F1, std::log(rho_min), std::log(rho_max), 0, 1e-1, 100, 2, w1, &result1,
                         &error1);
     gsl_integration_workspace_free(w1);
 
