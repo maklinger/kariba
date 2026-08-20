@@ -164,7 +164,7 @@ double comint(double gam, void* pars) {
         auto F2params = ComfncParams{game, e1, phodis, acc_phodis};
         F2.function = &comfnc;
         F2.params = &F2params;
-        gsl_integration_qag(&F2, blim, ulim, 0, 1e-1, 100, 2, w2, &result, &error);
+        gsl_integration_qag(&F2, blim, ulim, 0, 1e1, 100, 2, w2, &result, &error);
         
         elden = gsl_spline_eval(eldis, game, acc_eldis);
         return econst * elden * result / game;
@@ -189,7 +189,7 @@ double Compton::comintegral(size_t it, double blim, double ulim, double enphot, 
     // NOTE: in some regimes, using a key of 2 in the gsl_integral_qag line
     // instead of 1 makes for smoother integrals. Not important for the final
     // spectrum, but it makes for better-looking and more accurate plots
-    gsl_integration_qag(&F1, blim, ulim, 0, 1e-1, 100, 2, w1, &result, &error);
+    gsl_integration_qag(&F1, blim, ulim, 0, 1e1, 100, 2, w1, &result, &error);
     
 
     return result;
