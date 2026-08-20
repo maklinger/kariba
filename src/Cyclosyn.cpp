@@ -179,6 +179,11 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
         }
         j_emis = emis_integral(en_phot[k] / constants::herg, gmin, gmax, eldis, acc_eldis);
         alpha_abs = abs_integral(en_phot[k] / constants::herg, gmin, gmax, eldis_diff, acc_eldis_diff);
+
+        if (alpha_abs < 1e-150) {
+            alpha_abs = 1e-150;
+        }
+        cyclosyn_absorption_rate[k] = alpha_abs * constants::cee;
         if (std::log10(j_emis) < -150.) {
             num_phot_obs[k] = 0;
             if (counterjet == true) {
@@ -201,10 +206,6 @@ void Cyclosyn::cycsyn_spectrum(double gmin, double gmax, gsl_spline* eldis,
             // } else {
             //     tsyn_obs = constants::pi / 3. * asyn * r;
             // }
-            if (alpha_abs < 1e-150) {
-                alpha_abs = 1e-150;
-            }
-            cyclosyn_absorption_rate[k] = alpha_abs * constants::cee;
             double l_average = r;
             // average path lengths
             if (geometry == "cylinder") {
