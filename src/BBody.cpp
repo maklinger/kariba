@@ -45,6 +45,7 @@ void BBody::bb_spectrum() {
                       std::pow(en_phot_obs[i] / constants::herg, 3.) /
                       (std::pow(constants::cee, 2.) *
                        (std::exp(en_phot_obs[i] / (Tbb * constants::kboltz)) - 1.));
+        if (num_phot[i] < 1e-150) num_phot[i] = 1e-150;
         num_phot_obs[i] = num_phot[i];
     }
 }
